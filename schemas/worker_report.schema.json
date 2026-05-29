@@ -1,0 +1,270 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://make-harness.local/schemas/worker_report.schema.json",
+  "title": "Worker Report",
+  "description": "Structured result from a subtask worker.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id",
+    "status",
+    "changed_files",
+    "summary",
+    "verification",
+    "security_check",
+    "secret_scan_result",
+    "scope_diff_result",
+    "command_audit",
+    "budget_used",
+    "risks_or_follow_up"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0"
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "completed",
+        "blocked",
+        "needs_review",
+        "needs_rework",
+        "validation_failed",
+        "security_failed",
+        "budget_exceeded",
+        "consensus_failed"
+      ]
+    },
+    "changed_files": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/file_change"
+      }
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "verification": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/string_list"
+        },
+        {
+          "$ref": "#/$defs/verification_check"
+        }
+      ]
+    },
+    "security_check": {
+      "$ref": "#/$defs/check_result"
+    },
+    "secret_scan_result": {
+      "$ref": "#/$defs/check_result"
+    },
+    "scope_diff_result": {
+      "$ref": "#/$defs/check_result"
+    },
+    "command_audit": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/command_audit_entry"
+      }
+    },
+    "budget_used": {
+      "$ref": "#/$defs/budget_used"
+    },
+    "risks_or_follow_up": {
+      "$ref": "#/$defs/string_list"
+    }
+  },
+  "$defs": {
+    "string_list": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "file_change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "action"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/safe_relative_path"
+        },
+        "action": {
+          "enum": [
+            "added",
+            "modified",
+            "deleted",
+            "none"
+          ]
+        }
+      }
+    },
+    "safe_relative_path": {
+      "type": "string",
+      "minLength": 1,
+      "allOf": [
+        {
+          "not": {
+            "pattern": "(^|[\\\\/])\\.\\.([\\\\/]|$)"
+          }
+        },
+        {
+          "not": {
+            "pattern": "^[A-Za-z]:"
+          }
+        },
+        {
+          "not": {
+            "pattern": "^[\\\\/]"
+          }
+        },
+        {
+          "not": {
+            "pattern": "^~"
+          }
+        },
+        {
+          "not": {
+            "pattern": "%[A-Za-z_][A-Za-z0-9_]*%"
+          }
+        },
+        {
+          "not": {
+            "pattern": "\\$\\{?(env:)?[A-Za-z_][A-Za-z0-9_]*\\}?"
+          }
+        },
+        {
+          "not": {
+            "pattern": "[*?\\[\\]]"
+          }
+        }
+      ]
+    },
+    "check_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "evidence"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "not_run",
+            "not_applicable"
+          ]
+        },
+        "evidence": {
+          "type": "string"
+        },
+        "findings": {
+          "$ref": "#/$defs/string_list"
+        }
+      }
+    },
+    "verification_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "build",
+        "lint",
+        "test",
+        "run",
+        "behavior_check"
+      ],
+      "properties": {
+        "build": {
+          "$ref": "#/$defs/check_result"
+        },
+        "lint": {
+          "$ref": "#/$defs/check_result"
+        },
+        "test": {
+          "$ref": "#/$defs/check_result"
+        },
+        "run": {
+          "$ref": "#/$defs/check_result"
+        },
+        "behavior_check": {
+          "$ref": "#/$defs/check_result"
+        }
+      }
+    },
+    "command_audit_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "command",
+        "cwd",
+        "purpose",
+        "exit_code"
+      ],
+      "properties": {
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cwd": {
+          "type": "string",
+          "minLength": 1
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "exit_code": {
+          "type": "integer"
+        },
+        "output_summary": {
+          "type": "string"
+        }
+      }
+    },
+    "budget_used": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "iterations",
+        "rework_iterations",
+        "consensus_rounds",
+        "subagents_started",
+        "open_subagents"
+      ],
+      "properties": {
+        "iterations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rework_iterations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "consensus_rounds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "subagents_started": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "open_subagents": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

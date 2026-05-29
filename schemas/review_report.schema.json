@@ -1,0 +1,362 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://make-harness.local/schemas/review_report.schema.json",
+  "title": "Review Worker Report",
+  "description": "Structured review report with completion scoring, scenario flow scoring, gates, and rework items.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id",
+    "status",
+    "reviewed_outputs",
+    "scope_check",
+    "goal_contract_check",
+    "overall_completion_score",
+    "rubric_scores",
+    "scenario_flow_scores",
+    "score_threshold",
+    "passed_threshold",
+    "blocking_gates",
+    "verification_check",
+    "security_check",
+    "secret_scan_result",
+    "scope_diff_result",
+    "command_audit",
+    "budget_used",
+    "rework_items",
+    "next_iteration_recommendation",
+    "risks_or_follow_up",
+    "recommendation"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0"
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "accepted",
+        "rejected",
+        "needs_rework",
+        "blocked",
+        "validation_failed",
+        "security_failed",
+        "budget_exceeded",
+        "consensus_failed"
+      ]
+    },
+    "reviewed_outputs": {
+      "$ref": "#/$defs/string_list_nonempty"
+    },
+    "scope_check": {
+      "$ref": "#/$defs/check_result"
+    },
+    "goal_contract_check": {
+      "$ref": "#/$defs/check_result"
+    },
+    "overall_completion_score": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "rubric_scores": {
+      "$ref": "#/$defs/rubric_scores"
+    },
+    "scenario_flow_scores": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/scenario_flow_score"
+      }
+    },
+    "score_threshold": {
+      "type": "integer",
+      "minimum": 85,
+      "maximum": 100,
+      "default": 85
+    },
+    "passed_threshold": {
+      "type": "boolean"
+    },
+    "blocking_gates": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "validation_failed",
+          "security_failed",
+          "budget_exceeded",
+          "consensus_failed",
+          "secret_or_sensitive_data_exposure",
+          "workspace_escape",
+          "symlink_target_outside_workspace",
+          "changed_files_outside_allowed_files",
+          "unapproved_file_delete_or_revert",
+          "unauthorized_network_or_external_cost",
+          "schema_validation_failed",
+          "close_audit_failed",
+          "build_failed",
+          "lint_failed",
+          "test_failed",
+          "run_failed",
+          "behavior_check_failed",
+          "scenario_flow_failed"
+        ]
+      }
+    },
+    "verification_check": {
+      "$ref": "#/$defs/verification_check"
+    },
+    "security_check": {
+      "$ref": "#/$defs/check_result"
+    },
+    "secret_scan_result": {
+      "$ref": "#/$defs/check_result"
+    },
+    "scope_diff_result": {
+      "$ref": "#/$defs/check_result"
+    },
+    "command_audit": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/command_audit_entry"
+      }
+    },
+    "budget_used": {
+      "$ref": "#/$defs/budget_used"
+    },
+    "rework_items": {
+      "$ref": "#/$defs/string_list"
+    },
+    "next_iteration_recommendation": {
+      "type": "string"
+    },
+    "risks_or_follow_up": {
+      "$ref": "#/$defs/string_list"
+    },
+    "recommendation": {
+      "enum": [
+        "accepted",
+        "needs_rework",
+        "blocked",
+        "rejected"
+      ]
+    }
+  },
+  "$defs": {
+    "string_list": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "string_list_nonempty": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "check_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "evidence"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "not_run",
+            "not_applicable"
+          ]
+        },
+        "evidence": {
+          "type": "string"
+        },
+        "findings": {
+          "$ref": "#/$defs/string_list"
+        }
+      }
+    },
+    "score_detail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "score",
+        "max_score",
+        "evidence"
+      ],
+      "properties": {
+        "score": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_score": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "evidence": {
+          "type": "string"
+        }
+      }
+    },
+    "rubric_scores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "question_fulfillment",
+        "functional_completeness",
+        "scenario_flow_coverage",
+        "edge_case_handling",
+        "regression_safety",
+        "verification_completeness"
+      ],
+      "properties": {
+        "question_fulfillment": {
+          "$ref": "#/$defs/score_detail"
+        },
+        "functional_completeness": {
+          "$ref": "#/$defs/score_detail"
+        },
+        "scenario_flow_coverage": {
+          "$ref": "#/$defs/score_detail"
+        },
+        "edge_case_handling": {
+          "$ref": "#/$defs/score_detail"
+        },
+        "regression_safety": {
+          "$ref": "#/$defs/score_detail"
+        },
+        "verification_completeness": {
+          "$ref": "#/$defs/score_detail"
+        }
+      }
+    },
+    "scenario_flow_score": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "score",
+        "passed",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "score": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "evidence": {
+          "type": "string"
+        }
+      }
+    },
+    "verification_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "build",
+        "lint",
+        "test",
+        "run",
+        "behavior_check"
+      ],
+      "properties": {
+        "build": {
+          "$ref": "#/$defs/check_result"
+        },
+        "lint": {
+          "$ref": "#/$defs/check_result"
+        },
+        "test": {
+          "$ref": "#/$defs/check_result"
+        },
+        "run": {
+          "$ref": "#/$defs/check_result"
+        },
+        "behavior_check": {
+          "$ref": "#/$defs/check_result"
+        }
+      }
+    },
+    "command_audit_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "command",
+        "cwd",
+        "purpose",
+        "exit_code"
+      ],
+      "properties": {
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cwd": {
+          "type": "string",
+          "minLength": 1
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "exit_code": {
+          "type": "integer"
+        },
+        "output_summary": {
+          "type": "string"
+        }
+      }
+    },
+    "budget_used": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "iterations",
+        "rework_iterations",
+        "consensus_rounds",
+        "subagents_started",
+        "open_subagents"
+      ],
+      "properties": {
+        "iterations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rework_iterations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "consensus_rounds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "subagents_started": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "open_subagents": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

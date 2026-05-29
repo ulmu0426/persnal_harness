@@ -1,0 +1,559 @@
+policy:
+  id: agentic_coding_orchestration_policy
+  version: 0.1.0
+  language: ko
+  default_mode: orchestrated
+  summary: "메인 세션은 오케스트레이터이며 목표 구체화, 구현, 검수처럼 위임 가능한 작업을 직접 수행하지 않는다."
+
+roles:
+  main_orchestrator:
+    description: "사용자 요청을 접수하고 Goal Contract 완비성 확인, 작업 위임, 추적, 검수 위임, 검수 보고서 기반 통합 결정을 하는 세션"
+    allowed_actions:
+      - capture_user_request
+      - delegate_goal_refinement
+      - check_goal_contract_completeness
+      - decompose_work
+      - delegate_subtasks
+      - track_progress
+      - delegate_review
+      - check_review_report_completeness
+      - delegate_rework_iterations
+      - delegate_security_review
+      - delegate_consensus_rounds
+      - check_schema_validation_report_completeness
+      - check_close_audit_report_completeness
+      - track_subagent_lifecycle
+      - close_consumed_subagents
+      - decide_integration
+    prohibited_actions:
+      - analyze_goal_content_directly
+      - refine_goal_directly
+      - judge_goal_feasibility_directly
+      - implement_features
+      - write_or_modify_tests
+      - refactor_code
+      - fix_bugs_directly
+      - write_research_findings
+      - write_document_body
+      - modify_configuration
+      - modify_build_scripts
+      - perform_deployment
+      - perform_delegable_subtask_directly
+      - evaluate_outputs_directly
+      - evaluate_goal_contract_substance
+    must_delegate_when:
+      - action_requires_interpreting_user_goal
+      - action_requires_converting_abstract_request_to_concrete_goal
+      - action_requires_file_creation_or_editing
+      - action_requires_code_execution_as_task_output
+      - action_requires_research_synthesis
+      - action_requires_test_authoring_or_test_update
+      - action_can_be_scoped_as_independent_subtask
+
+  goal_refiner:
+    description: "사용자 요청을 분석해 구현 가능한 Goal Contract로 구체화하되 파일 수정, 구현, 산출물 검수는 하지 않는 세션"
+    allowed_actions:
+      - inspect_user_request
+      - infer_concrete_goal
+      - define_success_criteria
+      - define_scope
+      - define_scenario_flows
+      - define_completion_rubric
+      - define_verification_matrix
+      - define_acceptance_evidence_plan
+      - define_iteration_policy
+      - identify_blocking_questions
+      - report_goal_contract
+    prohibited_actions:
+      - implement_features
+      - modify_files
+      - evaluate_outputs_directly
+      - make_irreversible_product_decisions_without_input
+      - expose_sensitive_data
+
+  subtask_worker:
+    description: "메인 세션이 위임한 범위 안에서 실제 작업을 수행하는 세션"
+    allowed_actions:
+      - inspect_assigned_context
+      - edit_assigned_files
+      - create_assigned_files
+      - run_assigned_verification
+      - report_result
+    prohibited_actions:
+      - change_unassigned_scope
+      - delete_existing_files_without_explicit_instruction
+      - revert_user_or_other_worker_changes
+      - expand_task_without_approval
+      - expose_sensitive_data
+
+  review_worker:
+    description: "작업 워커 산출물과 검증 결과를 독립적으로 검수하고 검수 보고서를 작성하는 세션"
+    allowed_actions:
+      - inspect_assigned_outputs
+      - inspect_worker_reports
+      - run_assigned_verification
+      - compare_outputs_to_goal_contract
+      - score_completion_rubric
+      - score_scenario_flows
+      - identify_rework_items
+      - report_review_result
+    prohibited_actions:
+      - modify_task_outputs
+      - change_unassigned_scope
+      - delete_existing_files_without_explicit_instruction
+      - revert_user_or_other_worker_changes
+      - expand_task_without_approval
+      - expose_sensitive_data
+
+  verification_worker:
+    description: "지정된 검증 명령과 동작 확인을 독립적으로 수행하고 검증 보고서를 작성하는 세션"
+    allowed_actions:
+      - inspect_assigned_outputs
+      - run_assigned_verification
+      - verify_behavior_against_goal_contract
+      - report_verification_result
+    prohibited_actions:
+      - modify_task_outputs
+      - change_unassigned_scope
+      - delete_existing_files_without_explicit_instruction
+      - revert_user_or_other_worker_changes
+      - expand_task_without_approval
+      - expose_sensitive_data
+
+goal_contract:
+  required_fields:
+    - raw_user_request
+    - concrete_goal
+    - success_criteria
+    - scope_in
+    - scope_out
+    - assumptions
+    - implementation_constraints
+    - quality_score_threshold
+    - scenario_flows
+    - completion_rubric
+    - verification_matrix
+    - acceptance_evidence_plan
+    - iteration_policy
+    - open_questions
+    - delegation_plan_seed
+  default_quality_score_threshold: 85
+  scenario_flow_required_fields:
+    - id
+    - name
+    - actor
+    - preconditions
+    - steps
+    - expected_result
+    - failure_or_edge_cases
+  completion_rubric_default_weights:
+    question_fulfillment: 25
+    functional_completeness: 20
+    scenario_flow_coverage: 30
+    edge_case_handling: 10
+    regression_safety: 5
+    verification_completeness: 10
+  completion_scoring_rules:
+    - "review_worker는 completion_rubric과 scenario_flows를 기준으로 0부터 100까지의 overall_completion_score를 산정한다."
+    - "overall_completion_score는 completion_rubric 가중치 합산 결과이며 기본 통과 기준은 85 이상이다."
+    - "scenario_flow_scores는 각 scenario_flows 항목별 0부터 100까지의 점수와 근거를 포함한다."
+    - "치명적 시나리오 실패, 필수 검증 실패, 보안 위험은 overall_completion_score와 무관하게 blocking_gates로 기록한다."
+    - "main_orchestrator는 점수를 직접 산정하거나 조정하지 않고, 점수 필드와 threshold 통과 여부만 확인한다."
+  verification_matrix_required_items:
+    - build
+    - lint
+    - test
+    - run
+    - behavior_check
+  verification_matrix_completion_criteria:
+    build: "구현 후 지정된 빌드 검증이 에러 없이 완료되어야 하는 기준이다."
+    lint: "구현 후 지정된 린트 검증이 에러 없이 완료되어야 하는 기준이다."
+    test: "구현 후 지정된 테스트가 실패나 에러 없이 완료되어야 하는 기준이다."
+    run: "구현 후 지정된 실행 절차가 시작 또는 런타임 에러 없이 완료되어야 하는 기준이다."
+    behavior_check: "구현 후 목표 동작 확인이 불일치나 에러 없이 완료되어야 하는 기준이다."
+  verification_matrix_responsibilities:
+    - "goal_refiner는 build, lint, test, run, behavior_check별로 구현 후 에러 없이 완료되어야 할 명령, 조건, 또는 확인 방식을 작성한다."
+    - "review_worker 또는 verification_worker는 산출물 검수에서 verification_matrix 기준의 충족 여부를 확인한다."
+    - "main_orchestrator는 verification_matrix 항목 존재와 검수 보고서 완비성만 확인하며, 실질 충분성은 직접 검수하지 않는다."
+  iteration_policy:
+    default_loop: "review_worker의 overall_completion_score가 quality_score_threshold 미만이거나 passed_threshold가 false이면 main_orchestrator는 rework_items를 기반으로 구현 워커에게 재위임한다."
+    stop_conditions:
+      - "overall_completion_score가 quality_score_threshold 이상이다."
+      - "passed_threshold가 true이고 blocking_gates가 비어 있다."
+      - "review_worker 또는 subtask_worker가 blocked를 보고해 사용자 입력이나 외부 상태 변경 없이는 개선할 수 없다."
+  question_policy:
+    default: "추상 요청은 기본적으로 사용자에게 되묻지 않고 합리적 가정을 세워 구현 가능한 수준으로 구체화한다."
+    blocking_questions_only_when:
+      - security_risk_without_safe_default
+      - potential_data_loss
+      - external_cost
+      - irreversible_product_decision
+    blocking_questions_destination: open_questions
+  main_orchestrator_must_check:
+    - "Goal Contract가 필수 필드를 모두 포함하는가?"
+    - "verification_matrix에 build, lint, test, run, behavior_check 항목이 모두 있는가?"
+    - "quality_score_threshold, scenario_flows, completion_rubric, acceptance_evidence_plan, iteration_policy가 모두 있는가?"
+    - "open_questions에 차단 질문이 있으면 작업 위임을 보류하거나 사용자 입력을 요청하는가?"
+  main_orchestrator_must_not_check:
+    - "concrete_goal이 제품적으로 타당한지 직접 판단하지 않는다."
+    - "success_criteria나 scope의 내용 품질을 직접 평가하지 않는다."
+    - "scenario_flows나 completion_rubric의 내용 품질을 직접 평가하지 않는다."
+    - "overall_completion_score를 직접 산정하거나 조정하지 않는다."
+    - "verification_matrix의 실질 충분성을 직접 검수하지 않는다."
+
+subagent_lifecycle:
+  purpose: "서브에이전트를 필요한 동안만 유지하고, 보고서가 오케스트레이션 입력으로 소비되면 즉시 close해 메모리와 컨텍스트 오염을 줄인다."
+  states:
+    - spawned
+    - assigned
+    - running
+    - report_received
+    - consumed
+    - close_pending
+    - closed
+    - blocked
+    - validation_failed
+    - security_failed
+    - budget_exceeded
+    - consensus_failed
+  lifecycle_record_required_fields:
+    - agent_id
+    - role
+    - task_id
+    - owner
+    - status
+    - close_condition
+    - close_deferred_reason
+  default_close_policy: "보고서가 다음 오케스트레이션 단계의 입력으로 소비되면 즉시 close한다."
+  close_required_when:
+    - "goal_refiner의 Goal Contract가 main_orchestrator의 완비성 확인에 사용됐다."
+    - "subtask_worker의 Worker Report가 review_worker 또는 verification_worker 위임 입력으로 소비됐다."
+    - "review_worker의 Review Worker Report가 통합, 재위임, 또는 완료 결정에 소비됐다."
+    - "verification_worker의 Verification Report가 review 또는 통합 결정에 소비됐다."
+    - "blocked 상태의 서브에이전트를 즉시 재사용하지 않는다."
+    - "main_orchestrator가 사용자에게 최종 응답을 보내기 직전이다."
+  close_deferred_when:
+    - "같은 서브에이전트에 즉시 후속 입력을 보내야 하며 컨텍스트 유지가 재작업 품질에 중요하다."
+    - "보고서가 아직 다음 오케스트레이션 단계에서 소비되지 않았다."
+    - "서브에이전트가 아직 running 상태다."
+  close_deferred_required_record:
+    - agent_id
+    - task_id
+    - reason
+    - next_input_expected
+    - revisit_condition
+  main_orchestrator_must_check:
+    - "모든 spawned 서브에이전트가 lifecycle record에 등록됐는가?"
+    - "report_received 상태의 보고서가 소비되면 close_pending으로 전환됐는가?"
+    - "close_pending 서브에이전트가 closed 상태로 정리됐는가?"
+    - "final response 전 running, report_received, consumed, close_pending 상태가 남아 있지 않은가?"
+  main_orchestrator_must_not_do:
+    - "close를 구현, 검수, 목표 평가 작업으로 취급하지 않는다."
+    - "보고서가 소비된 서브에이전트를 이유 없이 열어두지 않는다."
+
+exceptions:
+  - id: blocking_relief
+    name: "긴급 차단 해소"
+    allowed_for: main_orchestrator
+    conditions:
+      - "워커 위임 또는 검수 위임이 즉시 막혀 있다."
+      - "짧은 조치 없이는 진행할 수 없다."
+      - "조치 범위가 명확하고 되돌림 위험이 낮다."
+    required_record:
+      - exception_type
+      - reason
+      - scope
+      - follow_up
+
+  - id: mechanical_under_5_minutes
+    name: "5분 이하의 기계적 수정"
+    allowed_for: main_orchestrator
+    conditions:
+      - "판단이 거의 필요 없다."
+      - "수정이 5분 이하로 끝난다."
+      - "작업 자체보다 위임 비용이 명확히 크다."
+    examples:
+      - typo_fix
+      - broken_link_fix
+      - formatting_key_alignment
+    required_record:
+      - exception_type
+      - reason
+      - scope
+      - follow_up
+
+  - id: security_or_data_leak_prevention
+    name: "보안 또는 데이터 유출 방지"
+    allowed_for: main_orchestrator
+    conditions:
+      - "비밀값, 인증 토큰, 개인 정보, 민감 로그 노출 위험이 있다."
+      - "즉시 차단하지 않으면 피해가 커질 수 있다."
+    required_record:
+      - exception_type
+      - reason
+      - scope
+      - follow_up
+
+workflow:
+  required_steps:
+    - id: intake
+      owner: main_orchestrator
+      output: "raw_user_request"
+    - id: goal_refinement
+      owner: goal_refiner
+      output: "Goal Contract"
+    - id: goal_contract_completeness_check
+      owner: main_orchestrator
+      output: "Goal Contract 필수 필드와 verification_matrix 필수 항목 존재 확인 메타 결과"
+    - id: schema_validation
+      owner: verification_worker
+      output: "Goal Contract, 위임 계약, 보고서, lifecycle event의 schema validation report"
+    - id: consensus_when_required
+      owner: main_orchestrator
+      output: "보안, 기술, 관리 역할 에이전트의 순차 토론 결과와 합의 또는 consensus_failed 상태"
+    - id: breakdown
+      owner: main_orchestrator
+      output: "Goal Contract 기반 하위 작업 목록과 의존성"
+    - id: delegation
+      owner: main_orchestrator
+      output: "워커별 작업 지시"
+    - id: execution
+      owner: subtask_worker
+      output: "변경 사항, 산출물, 검증 결과"
+    - id: review
+      owner: review_worker
+      output: "완성도 점수, 시나리오 플로우 점수, 검수 보고서와 재작업 권고"
+    - id: rework_iteration
+      owner: main_orchestrator
+      output: "overall_completion_score가 threshold 미만이거나 passed_threshold가 false일 때 rework_items 기반 재위임"
+    - id: integration_decision
+      owner: main_orchestrator
+      output: "threshold 통과 검수 보고서 기반 통합, 재위임, 완료 중 하나의 결정"
+
+delegation_contract:
+  required_fields:
+    - task_id
+    - objective
+    - assigned_scope
+    - inputs
+    - allowed_files
+    - prohibited_actions
+    - expected_outputs
+    - verification
+    - reporting_format
+  security_required_fields:
+    - allowed_files
+    - path_normalization_policy
+    - symlink_policy
+    - secret_handling_policy
+    - network_cost_policy
+
+review_gate:
+  review_worker_must_check:
+    - "워커가 할당 범위만 변경했는가?"
+    - "산출물이 Goal Contract의 성공 기준과 범위를 만족하는가?"
+    - "산출물이 scenario_flows를 단계별로 충족하는가?"
+    - "completion_rubric 가중치에 따라 overall_completion_score가 산정됐는가?"
+    - "overall_completion_score가 quality_score_threshold 이상인가?"
+    - "검증 방법과 결과가 보고됐는가?"
+    - "verification_matrix의 build, lint, test, run, behavior_check 기준이 구현 후 에러 없이 완료됐는가?"
+    - "기존 파일 삭제, 되돌림, 범위 밖 변경이 없는가?"
+    - "보안 또는 민감 정보 노출 위험이 없는가?"
+  review_report_required_fields:
+    - task_id
+    - reviewed_outputs
+    - scope_check
+    - goal_contract_check
+    - overall_completion_score
+    - rubric_scores
+    - scenario_flow_scores
+    - score_threshold
+    - passed_threshold
+    - blocking_gates
+    - verification_check
+    - security_check
+    - secret_scan_result
+    - scope_diff_result
+    - command_audit
+    - budget_used
+    - rework_items
+    - next_iteration_recommendation
+    - risks_or_follow_up
+    - recommendation
+  main_orchestrator_must_check:
+    - "검수 보고서가 필수 항목을 모두 포함하는가?"
+    - "검수 보고서가 모든 관련 워커 산출물을 다루는가?"
+    - "overall_completion_score, score_threshold, passed_threshold가 보고됐는가?"
+    - "passed_threshold가 false이면 rework_items와 next_iteration_recommendation이 있는가?"
+    - "검수 보고서의 권고가 threshold 기반 통합 또는 재위임 결정을 내릴 수 있는 상태인가?"
+    - "미검증 항목, 위험, 후속 작업이 사용자 보고에 반영됐는가?"
+
+schema_validation:
+  dialect: "https://json-schema.org/draft/2020-12/schema"
+  validator_policy:
+    recommended_validator: ajv
+    requirements:
+      - "Ajv를 구현 러너에 사용할 경우 package.json과 lockfile에 버전을 고정한다."
+      - "버전 고정 없는 npx 실행은 표준 하네스 검증으로 인정하지 않는다."
+      - "검증 실패는 validation_failed 상태로 기록하고 워커 생성, 통합, 최종화를 막는다."
+  schemas:
+    goal_contract: schemas/goal_contract.schema.json
+    delegation_contract: schemas/delegation_contract.schema.json
+    worker_report: schemas/worker_report.schema.json
+    review_report: schemas/review_report.schema.json
+    lifecycle_event: schemas/lifecycle_event.schema.json
+    runner_policy: schemas/runner_policy.schema.json
+    run_state: schemas/run_state.schema.json
+  required_before:
+    - goal_contract_decomposition
+    - worker_assignment
+    - review_assignment
+    - integration_decision
+    - final_response
+  hard_fail_status: validation_failed
+
+runner_policy:
+  file: harness/runner_policy.yaml
+  mode: dry_run_record_audit_v1
+  commands:
+    validate:
+      - "harness-runner validate --type goal-contract --input <file>"
+      - "harness-runner validate --type delegation-contract --input <file>"
+      - "harness-runner validate --type worker-report --input <file>"
+      - "harness-runner validate --type review-report --input <file>"
+      - "harness-runner validate --type lifecycle-event --input <file>"
+      - "harness-runner validate --type runner-policy --input <file>"
+      - "harness-runner validate --type run-state --input <file>"
+    dry_run:
+      - "harness-runner dry-run --assignment <file>"
+    record:
+      - "harness-runner record-report --type worker --input <file>"
+      - "harness-runner record-report --type review --input <file>"
+    audit:
+      - "harness-runner audit-close --state <file>"
+      - "harness-runner audit-scope --assignment <file> --report <file>"
+      - "harness-runner finalize --state <file>"
+  non_execution_scope_v1:
+    - no_file_creation_or_modification
+    - no_file_deletion
+    - no_build_lint_test_run_execution
+    - no_worker_process_spawning
+    - no_network_access
+    - no_external_cost
+    - no_raw_environment_output
+
+iteration_budget:
+  defaults:
+    max_iterations: 8
+    max_rework_iterations: 6
+    default_consensus_rounds: 2
+    max_consensus_rounds: 3
+    max_subagents_per_task: 16
+    max_open_subagents: 6
+    max_validation_failures: 3
+    max_wall_clock_minutes: 180
+    max_command_count:
+      dry_run_v1: 0
+      future_guarded_execution: 100
+    min_completion_score: 85
+  extension_policy: "예산 증액은 같은 run 안에서 조용히 변경하지 않고 새 run 또는 새 phase로 기록한다."
+  hard_fail_status: budget_exceeded
+
+security_gates:
+  security_veto_status: security_failed
+  hard_fail_conditions:
+    - secret_or_sensitive_data_exposure
+    - workspace_escape
+    - symlink_target_outside_workspace
+    - changed_files_outside_allowed_files
+    - unapproved_file_delete_or_revert
+    - unauthorized_network_or_external_cost
+    - schema_validation_failed
+    - close_audit_failed
+    - budget_exceeded
+  path_policy:
+    require_workspace_relative_paths: true
+    normalize_paths_before_compare: true
+    reject_parent_directory_segments: true
+    reject_absolute_paths: true
+    reject_workspace_escape: true
+    reject_globs: true
+    symlink_policy: "symlink를 해석한 최종 대상이 workspace 밖이면 security_failed로 처리한다."
+  scope_policy:
+    require_allowed_files: true
+    require_scope_diff_result: true
+    compare_changed_files_to_allowed_files: true
+    reject_unapproved_deletes: true
+    reject_unapproved_reverts: true
+  secret_policy:
+    require_secret_scan_result: true
+    mask_secret_candidates: true
+    reject_raw_secret_output: true
+  network_cost_policy:
+    default_network: denied
+    default_external_cost: denied
+    require_explicit_approval_for_network_or_cost: true
+  command_audit:
+    required_for_future_execution_runner: true
+    v1_runner_command_execution_allowed: false
+
+consensus_protocol:
+  required_for:
+    - harness_policy_change
+    - security_sensitive_change
+    - runner_policy_change
+    - lifecycle_or_budget_policy_change
+    - destructive_change
+    - network_or_external_cost
+    - deployment_or_release
+    - broad_filesystem_scope
+    - schema_policy_change
+  roles:
+    - security_agent
+    - technical_agent
+    - management_agent
+  round_order:
+    - security_agent
+    - technical_agent
+    - management_agent
+  default_max_rounds: 2
+  max_rounds: 3
+  consensus_required_from_all_roles: true
+  failure_status: consensus_failed
+  after_consensus:
+    - "합의 결과를 실행할 subtask_worker를 새로 생성한다."
+    - "구현 결과를 security_agent, technical_agent, management_agent가 각각 읽고 평가한다."
+    - "세 역할 모두 충분하다고 판단하거나 hard gate 없는 85점 이상 검수 보고가 나올 때까지 rework_items 기반 재작업을 반복한다."
+
+close_audit:
+  required_before_final_response: true
+  command_contract: "harness-runner audit-close --state <file>"
+  active_statuses_must_be_empty:
+    - spawned
+    - assigned
+    - running
+    - report_received
+    - consumed
+    - close_pending
+  terminal_statuses:
+    - closed
+    - blocked
+    - validation_failed
+    - security_failed
+    - budget_exceeded
+    - consensus_failed
+
+status_values:
+  - pending
+  - delegated
+  - in_progress
+  - blocked
+  - needs_review
+  - needs_rework
+  - accepted
+  - rejected
+  - integrated
+  - validation_failed
+  - security_failed
+  - budget_exceeded
+  - consensus_failed

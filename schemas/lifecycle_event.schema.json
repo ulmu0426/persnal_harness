@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://make-harness.local/schemas/lifecycle_event.schema.json",
+  "title": "Lifecycle Event",
+  "description": "Append-only JSONL event for subagent lifecycle tracking and close audit.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "event_time",
+    "run_id",
+    "agent_id",
+    "role",
+    "task_id",
+    "status",
+    "previous_status",
+    "close_condition",
+    "close_deferred_reason",
+    "budget_used"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0"
+    },
+    "event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "event_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "agent_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "role": {
+      "enum": [
+        "goal_refiner",
+        "subtask_worker",
+        "review_worker",
+        "verification_worker",
+        "security_agent",
+        "technical_agent",
+        "management_agent",
+        "main_orchestrator"
+      ]
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "$ref": "#/$defs/lifecycle_status"
+    },
+    "previous_status": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/lifecycle_status"
+        },
+        {
+          "const": ""
+        }
+      ]
+    },
+    "close_condition": {
+      "type": "string"
+    },
+    "close_deferred_reason": {
+      "type": "string"
+    },
+    "next_input_expected": {
+      "type": "string"
+    },
+    "revisit_condition": {
+      "type": "string"
+    },
+    "budget_used": {
+      "$ref": "#/$defs/budget_used"
+    },
+    "hash": {
+      "type": "string"
+    },
+    "previous_hash": {
+      "type": "string"
+    },
+    "details": {
+      "type": "object",
+      "additionalProperties": {
+        "type": [
+          "string",
+          "number",
+          "integer",
+          "boolean",
+          "null"
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "lifecycle_status": {
+      "enum": [
+        "spawned",
+        "assigned",
+        "running",
+        "report_received",
+        "consumed",
+        "close_pending",
+        "closed",
+        "blocked",
+        "validation_failed",
+        "security_failed",
+        "budget_exceeded",
+        "consensus_failed"
+      ]
+    },
+    "budget_used": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "iterations",
+        "rework_iterations",
+        "consensus_rounds",
+        "subagents_started",
+        "open_subagents"
+      ],
+      "properties": {
+        "iterations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rework_iterations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "consensus_rounds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "subagents_started": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "open_subagents": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

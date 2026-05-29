@@ -1,0 +1,144 @@
+policy:
+  id: agentic_harness_runner_policy
+  version: 0.1.0
+  language: ko
+  mode: dry_run_record_audit
+  summary: "v1 runner policy for schema validation, dry-run assignment checks, report recording, lifecycle close audit, and finalization audit."
+
+schema_validation:
+  dialect: "https://json-schema.org/draft/2020-12/schema"
+  validator:
+    recommended: ajv
+    dependency_policy:
+      - "Pin validator dependencies in package.json and lockfile before implementation."
+      - "Do not use unpinned npx commands as the harness standard."
+  schemas:
+    goal_contract: schemas/goal_contract.schema.json
+    delegation_contract: schemas/delegation_contract.schema.json
+    worker_report: schemas/worker_report.schema.json
+    review_report: schemas/review_report.schema.json
+    lifecycle_event: schemas/lifecycle_event.schema.json
+    runner_policy: schemas/runner_policy.schema.json
+    run_state: schemas/run_state.schema.json
+
+commands:
+  validate:
+    - "harness-runner validate --type goal-contract --input <file>"
+    - "harness-runner validate --type delegation-contract --input <file>"
+    - "harness-runner validate --type worker-report --input <file>"
+    - "harness-runner validate --type review-report --input <file>"
+    - "harness-runner validate --type lifecycle-event --input <file>"
+    - "harness-runner validate --type runner-policy --input <file>"
+    - "harness-runner validate --type run-state --input <file>"
+  dry_run:
+    - "harness-runner dry-run --assignment <file>"
+  record:
+    - "harness-runner record-report --type worker --input <file>"
+    - "harness-runner record-report --type review --input <file>"
+  audit:
+    - "harness-runner audit-close --state <file>"
+    - "harness-runner audit-scope --assignment <file> --report <file>"
+    - "harness-runner finalize --state <file>"
+
+non_execution_scope_v1:
+  - no_file_creation_or_modification
+  - no_file_deletion
+  - no_build_lint_test_run_execution
+  - no_worker_process_spawning
+  - no_network_access
+  - no_external_cost
+  - no_raw_environment_output
+
+iteration_budget_defaults:
+  max_iterations: 8
+  max_rework_iterations: 6
+  default_consensus_rounds: 2
+  max_consensus_rounds: 3
+  max_subagents_per_task: 16
+  max_open_subagents: 6
+  max_validation_failures: 3
+  max_wall_clock_minutes: 180
+  max_command_count:
+    dry_run_v1: 0
+    future_guarded_execution: 100
+  min_completion_score: 85
+  extension_policy: "Budget extension must be recorded as a new run or phase."
+
+security_gates:
+  hard_fail_statuses:
+    - validation_failed
+    - security_failed
+    - budget_exceeded
+    - consensus_failed
+  path_policy:
+    require_workspace_relative_paths: true
+    normalize_paths_before_compare: true
+    reject_parent_directory_segments: true
+    reject_absolute_paths: true
+    reject_workspace_escape: true
+    reject_globs: true
+    symlink_policy: "Resolve symlinks and reject targets outside the workspace."
+  scope_policy:
+    require_allowed_files: true
+    require_scope_diff_result: true
+    compare_changed_files_to_allowed_files: true
+    reject_unapproved_deletes: true
+    reject_unapproved_reverts: true
+  secret_policy:
+    require_secret_scan_result: true
+    mask_secret_candidates: true
+    reject_raw_secret_output: true
+  network_cost_policy:
+    default_network: denied
+    default_external_cost: denied
+    require_explicit_approval_for_network_or_cost: true
+
+reporting_requirements:
+  worker_report:
+    required_audit_fields:
+      - secret_scan_result
+      - scope_diff_result
+      - command_audit
+      - budget_used
+  review_report:
+    required_audit_fields:
+      - security_check
+      - secret_scan_result
+      - scope_diff_result
+      - command_audit
+      - budget_used
+
+lifecycle:
+  event_log_format: jsonl
+  hash_chain:
+    version: "1.1"
+    optional_placeholder_fields:
+      - hash
+      - previous_hash
+    enforcement: "Not required in v1; require only when hash-chain v1.1 implementation exists."
+  active_statuses:
+    - spawned
+    - assigned
+    - running
+    - report_received
+    - consumed
+    - close_pending
+  terminal_statuses:
+    - closed
+    - blocked
+    - validation_failed
+    - security_failed
+    - budget_exceeded
+    - consensus_failed
+  close_audit:
+    require_no_active_status_before_finalize: true
+    require_close_deferred_reason_resolution: true
+
+finalize_requirements:
+  - schema_validation_passed
+  - security_gates_passed
+  - review_score_at_or_above_threshold
+  - passed_threshold_true
+  - blocking_gates_empty
+  - close_audit_passed
+  - consensus_complete_when_required

@@ -1,0 +1,170 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-harness-v1",
+  "raw_user_request": "Add the v1 harness contracts for schemas, dry-run runner policy, lifecycle close audit, security gates, and consensus flow.",
+  "concrete_goal": "Define schema-backed contracts and examples for an orchestrated coding harness without implementing an executable runner.",
+  "success_criteria": [
+    "Goal Contract, delegation, worker report, review report, lifecycle event, runner policy, and run state schemas exist.",
+    "Valid examples exist for a Goal Contract, Review Worker Report, and lifecycle JSONL log.",
+    "The runner policy clearly stays in dry-run, record, and audit scope for v1.",
+    "Security gates, consensus failure, budget failure, validation failure, and close audit are represented."
+  ],
+  "scope_in": [
+    "JSON Schemas under schemas/",
+    "Valid examples under examples/",
+    "Runner policy and docs that describe v1 dry-run behavior"
+  ],
+  "scope_out": [
+    "Executable runner implementation",
+    "Worker process spawning implementation",
+    "Build, lint, test, or run command execution by the runner"
+  ],
+  "assumptions": [
+    "The harness is for a small team or individual workflow with enough AI budget for several review loops.",
+    "The main session acts only as orchestrator and delegates implementation and review work."
+  ],
+  "implementation_constraints": [
+    "Do not require the main session to judge goal substance or review output substance directly.",
+    "Do not allow unapproved network or external cost in runner v1.",
+    "Require allowed_files and path safety checks for worker assignments."
+  ],
+  "quality_score_threshold": 85,
+  "scenario_flows": [
+    {
+      "id": "flow-goal-to-review-loop",
+      "name": "Goal refinement to scored review loop",
+      "actor": "main_orchestrator",
+      "preconditions": [
+        "A raw user request is received.",
+        "No blocking open question is present."
+      ],
+      "steps": [
+        "Delegate goal refinement.",
+        "Check Goal Contract required fields.",
+        "Delegate worker tasks with allowed_files and security policy.",
+        "Delegate review scoring to a review worker.",
+        "Repeat rework when score is below threshold or hard gates fail."
+      ],
+      "expected_result": "The work is accepted only when the review score is at least 85 and hard gates are clear.",
+      "failure_or_edge_cases": [
+        "validation_failed blocks worker creation or finalization.",
+        "security_failed blocks integration regardless of score.",
+        "budget_exceeded stops the loop and is reported."
+      ]
+    },
+    {
+      "id": "flow-close-audit",
+      "name": "Subagent lifecycle close audit",
+      "actor": "main_orchestrator",
+      "preconditions": [
+        "One or more subagents were spawned."
+      ],
+      "steps": [
+        "Record lifecycle events for spawned, assigned, running, report_received, consumed, close_pending, and closed states.",
+        "Close each subagent after its report is consumed.",
+        "Run close audit before final response."
+      ],
+      "expected_result": "No active subagent status remains before final response.",
+      "failure_or_edge_cases": [
+        "A close_deferred_reason must be resolved before finalize.",
+        "Unclosed active status fails close audit."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "No application build is required for docs and schema v1; JSON and YAML syntax checks must pass.",
+    "lint": "Markdown fence checks and key policy field searches must pass.",
+    "test": "JSON and YAML syntax checks must pass; schema validation evidence is accepted only from a pinned dependency and lockfile-backed validator.",
+    "run": "Runner execution is out of scope; dry-run command contracts must be documented.",
+    "behavior_check": "The documented flow must represent goal refinement, delegation, scored review, rework loop, hard gates, and close audit."
+  },
+  "acceptance_evidence_plan": [
+    "JSON parse result for schemas and examples.",
+    "YAML parse result for harness policies.",
+    "Schema validation of example files when a pinned dependency and lockfile-backed validator is available.",
+    "Review report showing score at or above 85 and empty blocking_gates."
+  ],
+  "iteration_policy": {
+    "threshold_rule": "overall_completion_score must be at least quality_score_threshold.",
+    "rework_rule": "If passed_threshold is false or blocking_gates is non-empty, create rework tasks from rework_items.",
+    "stop_conditions": [
+      "passed_threshold is true and blocking_gates is empty.",
+      "budget_exceeded is reached.",
+      "A worker reports blocked with no safe default."
+    ]
+  },
+  "iteration_budget": {
+    "max_iterations": 8,
+    "max_rework_iterations": 6,
+    "default_consensus_rounds": 2,
+    "max_consensus_rounds": 3,
+    "max_subagents_per_task": 16,
+    "max_open_subagents": 6,
+    "max_validation_failures": 3,
+    "max_wall_clock_minutes": 180,
+    "min_completion_score": 85
+  },
+  "security_policy": {
+    "allowed_files_required": true,
+    "path_normalization_required": true,
+    "symlink_escape_rejected": true,
+    "secret_scan_required": true,
+    "scope_diff_required": true,
+    "unauthorized_network_or_cost_rejected": true
+  },
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "schema-worker-001",
+      "objective": "Create schemas and valid examples.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "schemas/goal_contract.schema.json",
+        "schemas/review_report.schema.json",
+        "schemas/worker_report.schema.json",
+        "schemas/delegation_contract.schema.json",
+        "schemas/lifecycle_event.schema.json",
+        "schemas/runner_policy.schema.json",
+        "schemas/run_state.schema.json",
+        "examples/goal_contract.valid.json",
+        "examples/review_report.valid.json",
+        "examples/lifecycle_log.jsonl"
+      ]
+    },
+    {
+      "task_id": "review-001",
+      "objective": "Score the schema and policy artifacts against the Goal Contract.",
+      "owner": "review_worker",
+      "allowed_files": [
+        "schemas/goal_contract.schema.json",
+        "schemas/review_report.schema.json",
+        "schemas/worker_report.schema.json",
+        "schemas/delegation_contract.schema.json",
+        "schemas/lifecycle_event.schema.json",
+        "schemas/runner_policy.schema.json",
+        "schemas/run_state.schema.json",
+        "examples/goal_contract.valid.json",
+        "examples/review_report.valid.json",
+        "examples/lifecycle_log.jsonl",
+        "harness/orchestration_policy.yaml",
+        "harness/runner_policy.yaml",
+        "docs/orchestration-rule.md",
+        "docs/schema-validation.md",
+        "docs/runner-cli.md",
+        "docs/lifecycle-log.md",
+        "docs/security-gates.md",
+        "docs/consensus-protocol.md",
+        "prompts/main_orchestrator.md",
+        "prompts/subtask_worker.md"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,475 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://make-harness.local/schemas/goal_contract.schema.json",
+  "title": "Goal Contract",
+  "description": "Concrete contract produced by goal_refiner before any worker execution.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "raw_user_request",
+    "concrete_goal",
+    "success_criteria",
+    "scope_in",
+    "scope_out",
+    "assumptions",
+    "implementation_constraints",
+    "quality_score_threshold",
+    "scenario_flows",
+    "completion_rubric",
+    "verification_matrix",
+    "acceptance_evidence_plan",
+    "iteration_policy",
+    "open_questions",
+    "delegation_plan_seed"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0"
+    },
+    "goal_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "raw_user_request": {
+      "type": "string",
+      "minLength": 1
+    },
+    "concrete_goal": {
+      "type": "string",
+      "minLength": 1
+    },
+    "success_criteria": {
+      "$ref": "#/$defs/string_list_nonempty"
+    },
+    "scope_in": {
+      "$ref": "#/$defs/string_list_nonempty"
+    },
+    "scope_out": {
+      "$ref": "#/$defs/string_list"
+    },
+    "assumptions": {
+      "$ref": "#/$defs/string_list"
+    },
+    "implementation_constraints": {
+      "$ref": "#/$defs/string_list_nonempty"
+    },
+    "quality_score_threshold": {
+      "type": "integer",
+      "minimum": 85,
+      "maximum": 100,
+      "default": 85
+    },
+    "scenario_flows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/scenario_flow"
+      }
+    },
+    "completion_rubric": {
+      "$ref": "#/$defs/completion_rubric"
+    },
+    "verification_matrix": {
+      "$ref": "#/$defs/verification_matrix"
+    },
+    "acceptance_evidence_plan": {
+      "$ref": "#/$defs/string_list_nonempty"
+    },
+    "iteration_policy": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        {
+          "$ref": "#/$defs/iteration_policy_object"
+        }
+      ]
+    },
+    "iteration_budget": {
+      "$ref": "#/$defs/iteration_budget"
+    },
+    "security_policy": {
+      "$ref": "#/$defs/security_policy"
+    },
+    "open_questions": {
+      "$ref": "#/$defs/string_list"
+    },
+    "delegation_plan_seed": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "type": "string",
+            "minLength": 1
+          },
+          {
+            "$ref": "#/$defs/delegation_seed"
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "string_list": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "string_list_nonempty": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "scenario_flow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "actor",
+        "preconditions",
+        "steps",
+        "expected_result",
+        "failure_or_edge_cases"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "actor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "preconditions": {
+          "$ref": "#/$defs/string_list"
+        },
+        "steps": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "expected_result": {
+          "type": "string",
+          "minLength": 1
+        },
+        "failure_or_edge_cases": {
+          "$ref": "#/$defs/string_list"
+        }
+      }
+    },
+    "completion_rubric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "question_fulfillment",
+        "functional_completeness",
+        "scenario_flow_coverage",
+        "edge_case_handling",
+        "regression_safety",
+        "verification_completeness"
+      ],
+      "properties": {
+        "question_fulfillment": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "functional_completeness": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "scenario_flow_coverage": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "edge_case_handling": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "regression_safety": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "verification_completeness": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "verification_matrix": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "build",
+        "lint",
+        "test",
+        "run",
+        "behavior_check"
+      ],
+      "properties": {
+        "build": {
+          "$ref": "#/$defs/verification_item"
+        },
+        "lint": {
+          "$ref": "#/$defs/verification_item"
+        },
+        "test": {
+          "$ref": "#/$defs/verification_item"
+        },
+        "run": {
+          "$ref": "#/$defs/verification_item"
+        },
+        "behavior_check": {
+          "$ref": "#/$defs/verification_item"
+        }
+      }
+    },
+    "verification_item": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "method",
+            "success_condition"
+          ],
+          "properties": {
+            "method": {
+              "type": "string",
+              "minLength": 1
+            },
+            "command": {
+              "type": "string",
+              "minLength": 1
+            },
+            "success_condition": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "iteration_policy_object": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "threshold_rule",
+        "rework_rule",
+        "stop_conditions"
+      ],
+      "properties": {
+        "threshold_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rework_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stop_conditions": {
+          "$ref": "#/$defs/string_list_nonempty"
+        }
+      }
+    },
+    "iteration_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_iterations",
+        "max_rework_iterations",
+        "default_consensus_rounds",
+        "max_consensus_rounds",
+        "max_subagents_per_task",
+        "max_open_subagents",
+        "max_validation_failures",
+        "max_wall_clock_minutes",
+        "min_completion_score"
+      ],
+      "properties": {
+        "max_iterations": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 8
+        },
+        "max_rework_iterations": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 6
+        },
+        "default_consensus_rounds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 2
+        },
+        "max_consensus_rounds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 3
+        },
+        "max_subagents_per_task": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 16
+        },
+        "max_open_subagents": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 6
+        },
+        "max_validation_failures": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 3
+        },
+        "max_wall_clock_minutes": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 180
+        },
+        "min_completion_score": {
+          "type": "integer",
+          "minimum": 85,
+          "maximum": 100,
+          "default": 85
+        }
+      }
+    },
+    "security_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowed_files_required",
+        "path_normalization_required",
+        "symlink_escape_rejected",
+        "secret_scan_required",
+        "scope_diff_required",
+        "unauthorized_network_or_cost_rejected"
+      ],
+      "properties": {
+        "allowed_files_required": {
+          "type": "boolean",
+          "const": true
+        },
+        "path_normalization_required": {
+          "type": "boolean",
+          "const": true
+        },
+        "symlink_escape_rejected": {
+          "type": "boolean",
+          "const": true
+        },
+        "secret_scan_required": {
+          "type": "boolean",
+          "const": true
+        },
+        "scope_diff_required": {
+          "type": "boolean",
+          "const": true
+        },
+        "unauthorized_network_or_cost_rejected": {
+          "type": "boolean",
+          "const": true
+        }
+      }
+    },
+    "delegation_seed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "objective",
+        "owner"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "objective": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "enum": [
+            "goal_refiner",
+            "subtask_worker",
+            "review_worker",
+            "verification_worker",
+            "security_agent",
+            "technical_agent",
+            "management_agent"
+          ]
+        },
+        "allowed_files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/safe_relative_path"
+          }
+        }
+      }
+    },
+    "safe_relative_path": {
+      "type": "string",
+      "minLength": 1,
+      "allOf": [
+        {
+          "not": {
+            "pattern": "(^|[\\\\/])\\.\\.([\\\\/]|$)"
+          }
+        },
+        {
+          "not": {
+            "pattern": "^[A-Za-z]:"
+          }
+        },
+        {
+          "not": {
+            "pattern": "^[\\\\/]"
+          }
+        },
+        {
+          "not": {
+            "pattern": "^~"
+          }
+        },
+        {
+          "not": {
+            "pattern": "%[A-Za-z_][A-Za-z0-9_]*%"
+          }
+        },
+        {
+          "not": {
+            "pattern": "\\$\\{?(env:)?[A-Za-z_][A-Za-z0-9_]*\\}?"
+          }
+        },
+        {
+          "not": {
+            "pattern": "[*?\\[\\]]"
+          }
+        }
+      ]
+    }
+  }
+}
