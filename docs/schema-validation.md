@@ -8,6 +8,7 @@
 - `schemas/delegation_contract.schema.json`: 메인 세션이 워커에게 전달하는 위임 계약
 - `schemas/worker_report.schema.json`: 구현 또는 문서화 워커의 결과 보고서
 - `schemas/review_report.schema.json`: `review_worker` 또는 `verification_worker`의 검수 보고서
+- `schemas/summary_report.schema.json`: `summary_worker`의 최종 Summary Report
 - `schemas/lifecycle_event.schema.json`: 서브에이전트 수명주기 이벤트 로그
 - `schemas/runner_policy.schema.json`: dry-run 러너 정책 파일
 - `schemas/run_state.schema.json`: 한 실행 단위의 집계 상태
@@ -29,6 +30,7 @@ harness-runner validate --type goal-contract --input <file>
 harness-runner validate --type delegation-contract --input <file>
 harness-runner validate --type worker-report --input <file>
 harness-runner validate --type review-report --input <file>
+harness-runner validate --type summary-report --input <file>
 harness-runner validate --type lifecycle-event --input <file>
 harness-runner validate --type runner-policy --input <file>
 harness-runner validate --type run-state --input <file>

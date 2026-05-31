@@ -9,6 +9,7 @@ harness-runner validate --type goal-contract --input <file>
 harness-runner validate --type delegation-contract --input <file>
 harness-runner validate --type worker-report --input <file>
 harness-runner validate --type review-report --input <file>
+harness-runner validate --type summary-report --input <file>
 harness-runner validate --type lifecycle-event --input <file>
 harness-runner validate --type runner-policy --input <file>
 harness-runner validate --type run-state --input <file>

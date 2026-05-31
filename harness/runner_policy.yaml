@@ -17,6 +17,7 @@ schema_validation:
     delegation_contract: schemas/delegation_contract.schema.json
     worker_report: schemas/worker_report.schema.json
     review_report: schemas/review_report.schema.json
+    summary_report: schemas/summary_report.schema.json
     lifecycle_event: schemas/lifecycle_event.schema.json
     runner_policy: schemas/runner_policy.schema.json
     run_state: schemas/run_state.schema.json
@@ -27,6 +28,7 @@ commands:
     - "harness-runner validate --type delegation-contract --input <file>"
     - "harness-runner validate --type worker-report --input <file>"
     - "harness-runner validate --type review-report --input <file>"
+    - "harness-runner validate --type summary-report --input <file>"
     - "harness-runner validate --type lifecycle-event --input <file>"
     - "harness-runner validate --type runner-policy --input <file>"
     - "harness-runner validate --type run-state --input <file>"
@@ -107,6 +109,12 @@ reporting_requirements:
       - scope_diff_result
       - command_audit
       - budget_used
+  summary_report:
+    required_fields:
+      - 명령
+      - 수행 사전 작업
+      - 수행 내용
+      - 수행 결과
 
 lifecycle:
   event_log_format: jsonl

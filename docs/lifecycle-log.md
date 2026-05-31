@@ -65,6 +65,7 @@ close는 구현이나 검수가 아니라 오케스트레이션 메모리 관리
 - Worker Report가 리뷰 입력으로 소비된 `subtask_worker`
 - Review Report가 통합 또는 재작업 결정에 소비된 `review_worker`
 - Verification Report가 리뷰 또는 통합 결정에 소비된 `verification_worker`
+- Summary Report가 최종 사용자 보고 입력으로 소비된 `summary_worker`
 - 재사용 계획이 없는 `blocked` 에이전트
 
 close 지연은 같은 에이전트에 즉시 후속 입력을 보내야 하고, 이전 컨텍스트 유지가 재작업 품질에 필요할 때만 허용한다. 이때 `close_deferred_reason`, `next_input_expected`, `revisit_condition`을 기록해야 한다.

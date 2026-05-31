@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "summary-001",
+  "status": "completed",
+  "명령": [
+    "사용자 요청: local-project-harness에 summary_worker 최종 보고 단계를 추가한다.",
+    "확정 목표: 모든 작업 종료 후 summary_worker가 명령, 수행 사전 작업, 수행 내용, 수행 결과 형식으로 Summary Report를 작성하도록 하네스를 갱신한다."
+  ],
+  "수행 사전 작업": [
+    "README 기반 source-of-truth 구조를 확인했다.",
+    "역할 enum과 프롬프트, 정책, 스킬 참조의 수정 범위를 확인했다."
+  ],
+  "수행 내용": [
+    "README에 summary_worker 역할과 Summary Report 형식을 추가했다.",
+    "오케스트레이션 정책, 프롬프트, 라이프사이클 문서, 역할 참조, 스키마 역할 enum을 갱신했다.",
+    "Summary Report 스키마와 유효 예제를 추가했다."
+  ],
+  "수행 결과": [
+    "summary_worker는 새 작업을 수행하지 않고 완료된 오케스트레이션 기록만 요약하도록 정의됐다.",
+    "Summary Report는 네 필수 항목을 포함해야 한다.",
+    "summary_worker도 close audit 대상이며 Summary Report 소비 후 close되어야 한다."
+  ],
+  "risks_or_follow_up": []
+}

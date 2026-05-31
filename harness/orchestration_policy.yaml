@@ -25,6 +25,9 @@ roles:
       - track_subagent_lifecycle
       - close_consumed_subagents
       - decide_integration
+      - delegate_final_summary
+      - check_summary_report_completeness
+      - report_final_summary_to_user
     prohibited_actions:
       - analyze_goal_content_directly
       - refine_goal_directly
@@ -119,6 +122,28 @@ roles:
       - revert_user_or_other_worker_changes
       - expand_task_without_approval
       - expose_sensitive_data
+
+  summary_worker:
+    description: "모든 작업, 검증, 검수, 재작업, 통합 결정, 기존 서브에이전트 close 정리가 끝난 뒤 완료된 오케스트레이션 기록을 최종 사용자 보고용 Summary Report로 정리하는 세션"
+    allowed_actions:
+      - inspect_goal_contract
+      - inspect_delegation_records
+      - inspect_worker_reports
+      - inspect_verification_reports
+      - inspect_review_reports
+      - inspect_rework_history
+      - inspect_gate_status
+      - inspect_lifecycle_close_status
+      - report_final_summary
+    prohibited_actions:
+      - modify_files
+      - implement_features
+      - run_new_verification
+      - evaluate_outputs_directly
+      - rescore_completion
+      - change_integration_decision
+      - hide_failed_or_unrun_checks
+      - invent_evidence
 
 goal_contract:
   required_fields:
@@ -230,6 +255,7 @@ subagent_lifecycle:
     - "subtask_worker의 Worker Report가 review_worker 또는 verification_worker 위임 입력으로 소비됐다."
     - "review_worker의 Review Worker Report가 통합, 재위임, 또는 완료 결정에 소비됐다."
     - "verification_worker의 Verification Report가 review 또는 통합 결정에 소비됐다."
+    - "summary_worker의 Summary Report가 최종 사용자 보고 입력으로 소비됐다."
     - "blocked 상태의 서브에이전트를 즉시 재사용하지 않는다."
     - "main_orchestrator가 사용자에게 최종 응답을 보내기 직전이다."
   close_deferred_when:
@@ -329,6 +355,12 @@ workflow:
     - id: integration_decision
       owner: main_orchestrator
       output: "threshold 통과 검수 보고서 기반 통합, 재위임, 완료 중 하나의 결정"
+    - id: final_summary
+      owner: summary_worker
+      output: "명령, 수행 사전 작업, 수행 내용, 수행 결과를 포함한 Summary Report"
+    - id: final_user_report
+      owner: main_orchestrator
+      output: "Summary Report 기반 최종 사용자 보고"
 
 delegation_contract:
   required_fields:
@@ -388,6 +420,31 @@ review_gate:
     - "검수 보고서의 권고가 threshold 기반 통합 또는 재위임 결정을 내릴 수 있는 상태인가?"
     - "미검증 항목, 위험, 후속 작업이 사용자 보고에 반영됐는가?"
 
+summary_report:
+  required_after:
+    - integration_decision
+    - previous_subagents_closed_or_terminal_gate_recorded
+  owner: summary_worker
+  required_fields:
+    - 명령
+    - 수행 사전 작업
+    - 수행 내용
+    - 수행 결과
+  field_definitions:
+    명령: "사용자 원 요청과 main_orchestrator가 확정한 concrete goal"
+    수행 사전 작업: "Goal Contract 작성, 범위 설정, 위임 계획, 검증 계획, 사전 조사처럼 실제 변경 전에 수행된 준비 작업"
+    수행 내용: "하위 에이전트별 구현, 검증, 검수, 재작업, 합의, close 처리 내용"
+    수행 결과: "최종 통합 결정, 검증 결과, 완료 여부, 미검증 항목, 남은 위험, 후속 권고"
+  prohibited_actions:
+    - "새 작업을 수행하지 않는다."
+    - "파일을 수정하지 않는다."
+    - "완성도 점수나 통합 결정을 다시 산정하지 않는다."
+    - "이전 보고서에 없는 증거를 만들어내지 않는다."
+  main_orchestrator_must_check:
+    - "Summary Report가 네 필수 항목을 모두 포함하는가?"
+    - "Summary Report가 이전 Goal Contract, 위임 기록, 검증, 검수, rework, hard gate, close audit 상태와 모순되지 않는가?"
+    - "Summary Report가 최종 사용자 보고의 입력으로 소비된 뒤 summary_worker가 close됐는가?"
+
 schema_validation:
   dialect: "https://json-schema.org/draft/2020-12/schema"
   validator_policy:
@@ -401,6 +458,7 @@ schema_validation:
     delegation_contract: schemas/delegation_contract.schema.json
     worker_report: schemas/worker_report.schema.json
     review_report: schemas/review_report.schema.json
+    summary_report: schemas/summary_report.schema.json
     lifecycle_event: schemas/lifecycle_event.schema.json
     runner_policy: schemas/runner_policy.schema.json
     run_state: schemas/run_state.schema.json
@@ -421,6 +479,7 @@ runner_policy:
       - "harness-runner validate --type delegation-contract --input <file>"
       - "harness-runner validate --type worker-report --input <file>"
       - "harness-runner validate --type review-report --input <file>"
+      - "harness-runner validate --type summary-report --input <file>"
       - "harness-runner validate --type lifecycle-event --input <file>"
       - "harness-runner validate --type runner-policy --input <file>"
       - "harness-runner validate --type run-state --input <file>"

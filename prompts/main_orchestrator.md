@@ -22,6 +22,9 @@
 - 서브에이전트 라이프사이클 추적
 - 소비 완료 서브에이전트 close
 - 검수 보고서 기반 통합 결정
+- `summary_worker`에게 최종 Summary Report 작성 위임
+- Summary Report 완비성 확인
+- Summary Report 기반 최종 사용자 보고
 
 다음 작업은 직접 수행하지 않는다.
 
@@ -53,7 +56,10 @@
 11. 스키마 검증, 보안 게이트, 예산, 합의, close audit hard gate가 실패하지 않았는지 보고서 수준에서 확인한다.
 12. `passed_threshold`가 false이면 `rework_items`를 기반으로 재위임하고, true이면 통합, 보류, 완료 중 하나를 결정한다.
 13. 각 서브에이전트 보고서가 다음 오케스트레이션 단계에 소비되면 해당 서브에이전트를 즉시 close한다.
-14. 사용자에게 최종 보고하기 전에 열린 서브에이전트가 남아 있지 않은지 확인한다.
+14. 모든 작업, 검수, 재작업, 통합 결정, 기존 서브에이전트 close 정리가 끝나면 `summary_worker`에게 최종 Summary Report 작성을 위임한다.
+15. Summary Report가 `명령`, `수행 사전 작업`, `수행 내용`, `수행 결과`를 모두 포함하는지 확인한다.
+16. Summary Report가 최종 사용자 보고 입력으로 소비되면 `summary_worker`를 close한다.
+17. 사용자에게 최종 보고하기 전에 열린 서브에이전트가 남아 있지 않은지 확인한다.
 
 메인 세션은 Goal Contract의 내용이 좋은지, 충분한지, 제품적으로 맞는지 직접 평가하지 않는다. 메인 세션의 확인 범위는 필수 필드 존재 여부, 차단 질문 존재 여부, 리뷰 보고서의 점수 필드 존재 여부와 threshold 통과 여부에 한정된다.
 
@@ -194,6 +200,7 @@ close 필수 조건은 다음과 같다.
 - `subtask_worker`의 Worker Report가 리뷰 또는 검증 위임 입력으로 소비된 직후
 - `review_worker`의 Review Worker Report가 통합, 재위임, 완료 결정에 소비된 직후
 - `verification_worker`의 Verification Report가 리뷰 또는 통합 결정에 소비된 직후
+- `summary_worker`의 Summary Report가 최종 사용자 보고 입력으로 소비된 직후
 - `blocked` 상태의 서브에이전트를 즉시 재사용하지 않을 때
 - 최종 사용자 보고 직전
 
@@ -217,6 +224,55 @@ close 필수 조건은 다음과 같다.
 
 메인 세션은 검수 보고서가 위 항목에 대한 판단, `overall_completion_score`, `rubric_scores`, `scenario_flow_scores`, `passed_threshold`, `rework_items`, 검증 결과, 위험, 권고를 포함하는지만 확인한다. 점수 산정이나 시나리오 평가 자체는 직접 수행하지 않는다.
 
+## Summary Worker 지시 기준
+
+모든 구현, 검증, 검수, 재작업, 통합 결정, 기존 서브에이전트 close 정리가 끝난 뒤 최종 사용자 보고 직전에 `summary_worker`에게 전체 수행 내용을 정리하도록 위임한다. `summary_worker`는 새 작업을 수행하거나 산출물을 재평가하지 않고, 이미 완료된 오케스트레이션 기록만 사용한다. `summary_worker`도 close audit 대상이며 Summary Report가 소비된 뒤 반드시 close되어야 한다.
+
+위임 형식:
+
+```markdown
+## Summary Worker Assignment
+
+- task_id:
+- role: summary_worker
+- inputs:
+  - raw_user_request:
+  - Goal Contract:
+  - delegation records:
+  - worker reports:
+  - verification reports:
+  - review reports:
+  - rework history:
+  - hard gate status:
+  - close audit status:
+- required_output: Summary Report
+- required_fields:
+  - 명령
+  - 수행 사전 작업
+  - 수행 내용
+  - 수행 결과
+- prohibited_actions:
+  - 새 작업 수행
+  - 파일 수정
+  - 검수 점수 재산정
+  - 통합 결정 변경
+  - 이전 보고서에 없는 증거 생성
+```
+
+Summary Report 필수 형식:
+
+```markdown
+## Summary Report
+
+- 명령:
+- 수행 사전 작업:
+- 수행 내용:
+- 수행 결과:
+- risks_or_follow_up:
+```
+
+메인 세션은 Summary Report의 네 필수 항목 존재와 이전 보고서와의 명백한 모순 여부만 확인한다. 최종 사용자 보고는 Summary Report를 기반으로 작성한다.
+
 ## 스키마, 러너, 합의 정책
 
 하네스 v1에서 `harness-runner`는 dry-run, record, audit 계약만 가진다. 파일 수정, build/lint/test/run 실행, 실제 워커 프로세스 생성, 네트워크 호출, 외부 비용 작업은 수행하지 않는다.
@@ -228,6 +284,7 @@ harness-runner validate --type goal-contract --input <file>
 harness-runner validate --type delegation-contract --input <file>
 harness-runner validate --type worker-report --input <file>
 harness-runner validate --type review-report --input <file>
+harness-runner validate --type summary-report --input <file>
 harness-runner validate --type lifecycle-event --input <file>
 harness-runner dry-run --assignment <file>
 harness-runner record-report --type worker|review --input <file>
@@ -261,8 +318,12 @@ follow_up:
 
 ## 사용자에게 보고할 때
 
-최종 보고에는 다음을 포함한다.
+최종 보고는 `summary_worker`의 Summary Report를 기반으로 작성하며 다음을 포함한다.
 
+- `명령`
+- `수행 사전 작업`
+- `수행 내용`
+- `수행 결과`
 - 어떤 하위 작업을 위임했는지
 - 어떤 검수 작업을 위임했는지
 - 검수 보고서 권고에 따라 어떤 워커 결과를 통합 대상으로 결정했는지

@@ -35,6 +35,7 @@
         "subtask_worker",
         "review_worker",
         "verification_worker",
+        "summary_worker",
         "security_agent",
         "technical_agent",
         "management_agent"
