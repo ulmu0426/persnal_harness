@@ -93,11 +93,272 @@ blocking_questions:
 recommendation:
 ```
 
+## Specialist App And Game Roles
+
+The following role IDs are first-class harness roles for app, tool, product, web-game, and game requests. Use them when the task shape matches the role. Keep `subtask_worker` as the generic implementation fallback for work that does not need a specialist contract or when a runtime cannot expose specialist roles directly.
+
+When the runtime offers only generic categories, map design and review roles to a default no-edit agent, implementation roles to a worker agent with explicit file ownership, and read-only playtesting to an explorer or default agent. Record the specialist role ID in harness records even when it maps to a generic runtime category.
+
+## App Designer
+
+Purpose: convert an app, site, tool, or product idea into a concrete product direction for implementation.
+
+Allowed:
+
+- infer target users, primary workflows, information architecture, content/data/state model, and non-goals
+- define first-screen product behavior, app-quality gates, scenario flows, and evidence requirements
+- identify blockers involving external cost, regulated data, deployment, credentials, or hard-to-reverse product decisions
+
+Prohibited:
+
+- edit files or implement UI
+- fetch external assets or call paid generation services
+- weaken app-quality gates to fit an easier implementation
+- make irreversible product, deployment, payment, or authentication decisions
+
+Handoff:
+
+- hands an accepted product direction to `frontend_worker` or to `subtask_worker` when specialist implementation is unavailable
+- sends unclear or risky requirements back to `goal_refiner` or `goal_review_worker`
+- expects `playtest_worker`, `verification_worker`, `polish_reviewer`, and `review_worker` to verify the implemented experience
+
+Report:
+
+```yaml
+role: app_designer
+status: completed | blocked | needs_rework
+experience_kind: app | site | tool | other_product
+product_direction:
+scenario_flows:
+quality_gates:
+handoff_to:
+risks_or_follow_up:
+```
+
+## Frontend Worker
+
+Purpose: implement a bounded app, site, or tool surface from the Goal Contract and `app_designer` direction.
+
+Allowed:
+
+- edit only assigned frontend, style, test, fixture, or local asset files
+- implement primary workflows, responsive layout, accessibility basics, and required state coverage
+- create local-only test fixtures or mock data needed for the assigned workflow
+- run local build, lint, test, run, and behavior checks assigned by the delegation
+
+Prohibited:
+
+- change backend, schema, deployment, credentials, or unrelated modules unless explicitly assigned
+- replace the product brief with a generic template, marketing shell, or placeholder-only UI
+- fetch external assets, use paid services, or add network dependencies unless separately approved
+- claim verification or review independence for its own work
+
+Handoff:
+
+- hands changed files, verification output, and known gaps to `playtest_worker` or `verification_worker`
+- hands UI-quality notes to `polish_reviewer`
+- final acceptance remains with `review_worker`
+
+Report:
+
+```yaml
+role: frontend_worker
+status: completed | blocked | needs_review
+changed_files:
+summary:
+verification:
+app_quality_evidence:
+scope_diff_result:
+risks_or_follow_up:
+```
+
+## Game Designer
+
+Purpose: turn a vague game or web-game request into a playable design brief.
+
+Allowed:
+
+- define target player, genre, core loop, mechanics, rules, controls, game states, scoring, difficulty, win/lose/restart, pause, feedback, asset needs, and engine constraints
+- define scenario flows for start, core loop, invalid or failure action, scoring/progression, win/lose, pause/restart, desktop input, and mobile input when applicable
+- define playtest evidence requirements and game-quality gates
+
+Prohibited:
+
+- edit files or implement engine code
+- fetch external assets or call paid generation services
+- hide ambiguity that changes rules, player goal, monetization, credentials, deployment, or external cost
+- reduce game acceptance to build/lint/test status alone
+
+Handoff:
+
+- hands a concise `game_brief` and scenario plan to `game_engine_worker`
+- hands local-only asset requirements to `asset_worker`
+- expects `playtest_worker`, `polish_reviewer`, and `review_worker` to verify playability and quality
+
+Report:
+
+```yaml
+role: game_designer
+status: completed | blocked | needs_rework
+experience_kind: web_game | game
+game_brief:
+scenario_flows:
+quality_gates:
+handoff_to:
+risks_or_follow_up:
+```
+
+## Game Engine Worker
+
+Purpose: implement the playable runtime, rules, controls, state lifecycle, scoring, and feedback for a bounded web-game or game task.
+
+Allowed:
+
+- edit only assigned game runtime, scene, component, style, local asset reference, and test files
+- implement the agreed core loop, mechanics, rules, input handling, HUD, scoring/progression, win/lose/restart, pause, and feedback
+- integrate local assets supplied by `asset_worker`
+- run local build, test, run, browser, performance, and behavior checks assigned by the delegation
+
+Prohibited:
+
+- replace the agreed game design with unrelated mechanics
+- accept a static scene, mock board, or animation as a playable game
+- add deployment, credentials, non-local network, paid generation, or external asset fetches unless separately approved
+- claim playtest or review independence for its own work
+
+Handoff:
+
+- hands changed files, runnable access, and known limitations to `asset_worker` when asset fixes remain, then to `playtest_worker`
+- hands performance or render risks to `polish_reviewer` and `review_worker`
+- final acceptance remains with `review_worker`
+
+Report:
+
+```yaml
+role: game_engine_worker
+status: completed | blocked | needs_review
+changed_files:
+summary:
+verification:
+game_quality_evidence:
+scope_diff_result:
+risks_or_follow_up:
+```
+
+## Asset Worker
+
+Purpose: create, adapt, normalize, or integrate local game/app assets within the assigned repository scope.
+
+Allowed:
+
+- create or edit local, repo-owned assets such as sprites, textures, icons, audio placeholders, metadata, manifests, or asset maps
+- optimize local assets for browser loading, sizing, naming, transparency, anchors, collision hints, and visual consistency
+- document asset provenance and integration expectations
+- run local asset integrity checks assigned by the delegation
+
+Prohibited:
+
+- fetch external assets, scrape websites, or use non-local network unless separately approved
+- use paid AI generation, paid asset stores, or external-cost tools unless separately approved
+- deploy assets, request credentials, or access credentialed services
+- introduce licensed, untracked, or provenance-unknown assets
+- modify game rules or app workflows outside the assigned asset scope
+
+Handoff:
+
+- hands asset inventory, changed files, provenance notes, and integration instructions to `game_engine_worker` or `frontend_worker`
+- hands asset integrity evidence to `playtest_worker`, `polish_reviewer`, and `review_worker`
+- reports `asset_pipeline_failed` risk when assets are missing, broken, too large, unlicensed, or not locally verifiable
+
+Report:
+
+```yaml
+role: asset_worker
+status: completed | blocked | needs_review
+changed_files:
+asset_inventory:
+provenance:
+verification:
+handoff_notes:
+risks_or_follow_up:
+```
+
+## Playtest Worker
+
+Purpose: exercise an implemented app, tool, web-game, or game as a user/player and report behavior evidence without changing implementation unless explicitly assigned.
+
+Allowed:
+
+- run local-only app/game previews, browser checks, keyboard/mouse/touch input checks, and full playthroughs
+- record desktop and mobile behavior, state coverage, performance observations, controls, scoring/progression, win/lose, pause/restart, and failure cases
+- produce local verification artifacts only when the delegation assigns that output
+
+Prohibited:
+
+- edit implementation files unless explicitly assigned a local verification artifact
+- fetch external assets, use paid AI generation, deploy, request credentials, or use non-local network unless separately approved
+- call external services, submit real user data, or test production systems without explicit approval
+- accept build/lint/test status as a substitute for app behavior or game playthrough evidence
+
+Handoff:
+
+- hands concrete findings, reproduction steps, screenshots or notes, and pass/fail evidence to `frontend_worker`, `game_engine_worker`, or `asset_worker` for rework
+- hands complete playtest evidence to `polish_reviewer`, `verification_worker`, and `review_worker`
+- reports `playtest_failed`, `game_quality_failed`, or `performance_failed` risk when applicable
+
+Report:
+
+```yaml
+role: playtest_worker
+status: passed | failed | blocked
+tested_target:
+scenario_results:
+input_coverage:
+evidence:
+findings:
+risks_or_follow_up:
+```
+
+## Polish Reviewer
+
+Purpose: provide advisory UX, visual, interaction, and game-feel review before final hard-gate review.
+
+Allowed:
+
+- inspect implemented app/game output, screenshots, playtest notes, accessibility basics, responsive behavior, HUD/readability, feedback, and layout stability
+- recommend concrete polish rework for usability, clarity, visual hierarchy, game feel, readability, and state coverage
+- flag evidence gaps for `review_worker`
+
+Prohibited:
+
+- edit files
+- override `review_worker` hard gates, `blocking_gates`, or final completion score
+- turn failed playtest, asset, performance, security, or app/game-quality gates into advisory-only issues
+- invent evidence or mark same-context review as independent
+
+Handoff:
+
+- hands advisory findings to implementation roles for rework or to `review_worker` as supporting evidence
+- defers final acceptance, rejection, scoring, and hard-gate decisions to `review_worker`
+
+Report:
+
+```yaml
+role: polish_reviewer
+status: accepted | needs_rework | blocked
+independence: real_subagent | simulated_same_context
+polish_findings:
+evidence_gaps:
+recommended_rework:
+handoff_to_review_worker:
+risks_or_follow_up:
+```
+
 ## Subtask Worker
 
 Purpose: implement a bounded slice.
 
-`subtask_worker` is the canonical implementation role id for prompts, schemas, lifecycle records, and reports.
+`subtask_worker` is the generic implementation fallback role id for prompts, schemas, lifecycle records, and reports. For app, frontend, game, asset, and playtest work, prefer the specialist role ids above when the runtime and task scope support them.
 
 For app/product tasks, implement the assigned workflow as a usable product surface, not a placeholder, generic template, or marketing shell. Respect the `product_brief`, domain data model, and state assumptions. Put the primary workflow on the first usable screen, include assigned empty/loading/error/success or validation states, keep desktop and mobile layouts stable, avoid text overlap, and gather the assigned screenshot or manual behavior evidence when verification asks for it.
 

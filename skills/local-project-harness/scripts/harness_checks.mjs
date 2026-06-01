@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
 import path from "node:path";
@@ -276,6 +277,258 @@ function auditWorkspacePath(workspaceReal, relativePath, label) {
   return undefined;
 }
 
+function runGit(args, options = {}) {
+  return execFileSync("git", args, {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+    windowsHide: true,
+    ...options,
+  });
+}
+
+function parseGitStatusPorcelainZ(output) {
+  const records = output.split("\0");
+  if (records[records.length - 1] === "") records.pop();
+
+  const changes = [];
+  for (let index = 0; index < records.length; index += 1) {
+    const record = records[index];
+    if (!record) continue;
+    if (record.length < 4) {
+      throw new Error("unexpected git status record");
+    }
+
+    const indexStatus = record[0];
+    const worktreeStatus = record[1];
+    const status = `${indexStatus}${worktreeStatus}`;
+    const repoPath = record.slice(3);
+    if (!repoPath) {
+      throw new Error("empty git status path");
+    }
+
+    const isRename = indexStatus === "R" || worktreeStatus === "R";
+    const isCopy = indexStatus === "C" || worktreeStatus === "C";
+    if (isRename || isCopy) {
+      const sourcePath = records[index + 1];
+      if (!sourcePath) {
+        throw new Error("missing git status rename/copy source path");
+      }
+      index += 1;
+      changes.push({
+        repoPath,
+        status,
+        kind: isCopy ? "copy destination" : "rename destination",
+        requiresDelete: false,
+      });
+      changes.push({
+        repoPath: sourcePath,
+        status,
+        kind: isCopy ? "copy source" : "rename source",
+        requiresDelete: isRename,
+      });
+      continue;
+    }
+
+    changes.push({
+      repoPath,
+      status,
+      kind: "change",
+      requiresDelete: indexStatus === "D" || worktreeStatus === "D",
+    });
+  }
+
+  return changes;
+}
+
+function parseGitDiffNameStatusZ(output) {
+  const records = output.split("\0");
+  if (records[records.length - 1] === "") records.pop();
+
+  const changes = [];
+  for (let index = 0; index < records.length; index += 1) {
+    const status = records[index];
+    if (!status) continue;
+    const code = status[0];
+
+    if (code === "R" || code === "C") {
+      const sourcePath = records[index + 1];
+      const repoPath = records[index + 2];
+      if (!sourcePath || !repoPath) {
+        throw new Error("missing git diff rename/copy path");
+      }
+      index += 2;
+      changes.push({
+        repoPath,
+        status,
+        kind: code === "C" ? "copy destination" : "rename destination",
+        requiresDelete: false,
+      });
+      changes.push({
+        repoPath: sourcePath,
+        status,
+        kind: code === "C" ? "copy source" : "rename source",
+        requiresDelete: code === "R",
+      });
+      continue;
+    }
+
+    const repoPath = records[index + 1];
+    if (!repoPath) {
+      throw new Error("missing git diff path");
+    }
+    index += 1;
+    changes.push({
+      repoPath,
+      status,
+      kind: "change",
+      requiresDelete: code === "D",
+    });
+  }
+
+  return changes;
+}
+
+function gitRepoPathToWorkspacePath(gitRootReal, workspaceReal, repoPath) {
+  if (!isSafeRelativePath(repoPath)) {
+    return { error: `unsafe git-visible path: ${String(repoPath)}` };
+  }
+
+  const absPath = path.resolve(gitRootReal, repoPath);
+  if (!isWithinWorkspace(absPath, workspaceReal)) {
+    return { error: `git-visible path outside workspace: ${repoPath}` };
+  }
+
+  const relativePath = normalizePath(path.relative(workspaceReal, absPath));
+  if (!isSafeRelativePath(relativePath)) {
+    return { error: `unsafe git-visible workspace path: ${String(relativePath)}` };
+  }
+
+  const workspaceError = auditWorkspacePath(workspaceReal, relativePath, "git-visible");
+  if (workspaceError) return { error: workspaceError };
+  return { path: relativePath };
+}
+
+function inspectGitScope(workspaceReal) {
+  let gitRootPath;
+  try {
+    gitRootPath = runGit(["-C", workspaceReal, "rev-parse", "--show-toplevel"]).trim();
+  } catch {
+    return { available: false, reason: "workspace is not inside a readable git repository" };
+  }
+
+  if (!gitRootPath) {
+    return { available: false, reason: "git rev-parse returned no repository root" };
+  }
+
+  let gitRootReal;
+  try {
+    gitRootReal = realpathExisting(path.resolve(workspaceReal, gitRootPath));
+  } catch {
+    return { available: false, reason: "git repository root could not be resolved" };
+  }
+
+  if (!isWithinWorkspace(workspaceReal, gitRootReal)) {
+    return { error: "git repository root does not contain workspace" };
+  }
+
+  let statusOutput;
+  try {
+    statusOutput = runGit(["-C", gitRootReal, "status", "--porcelain=v1", "-z", "--untracked-files=all", "--renames"]);
+  } catch {
+    return { available: false, reason: "git status could not be read" };
+  }
+
+  let changes;
+  try {
+    changes = parseGitStatusPorcelainZ(statusOutput);
+  } catch (error) {
+    return { available: false, reason: error.message };
+  }
+
+  if (changes.some((change) => change.status[0] === "A")) {
+    let copyOutput;
+    try {
+      copyOutput = runGit([
+        "-C",
+        gitRootReal,
+        "diff",
+        "--name-status",
+        "-z",
+        "--cached",
+        "--find-copies",
+        "--find-copies-harder",
+      ]);
+    } catch {
+      return { available: false, reason: "git copy detection could not be read" };
+    }
+
+    try {
+      changes.push(...parseGitDiffNameStatusZ(copyOutput).filter((change) => change.status[0] === "C"));
+    } catch (error) {
+      return { available: false, reason: error.message };
+    }
+  }
+
+  const workspaceChanges = [];
+  for (const change of changes) {
+    const conversion = gitRepoPathToWorkspacePath(gitRootReal, workspaceReal, change.repoPath);
+    if (conversion.error) return { error: conversion.error };
+    workspaceChanges.push({ ...change, path: conversion.path });
+  }
+
+  return { available: true, changes: workspaceChanges };
+}
+
+function auditChangedPath({ allowedSet, allowDelete, path: changedPath, action, label }) {
+  if (!allowedSet.has(normalizePath(changedPath))) {
+    return `${label} outside allowed_files: ${changedPath}`;
+  }
+  if ((action === "deleted" || action === "reverted") && !allowDelete) {
+    return `delete/revert requires explicit allowance: ${changedPath}`;
+  }
+  return undefined;
+}
+
+const AUDIT_SCOPE_HARD_GATE_KEYS = ["security_check", "secret_scan_result", "scope_diff_result"];
+const AUDIT_SCOPE_BUDGET_COUNTER_KEYS = [
+  "iterations",
+  "rework_iterations",
+  "consensus_rounds",
+  "subagents_started",
+  "open_subagents",
+];
+
+function isObjectRecord(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function auditScopePassedCheckObject(report, key) {
+  const check = report[key];
+  if (!isObjectRecord(check)) return `report.${key} must be an object`;
+  if (check.status !== "passed") return `report.${key}.status must be "passed"`;
+  if (typeof check.evidence !== "string") return `report.${key}.evidence must be a string`;
+  return undefined;
+}
+
+function auditScopeWorkerReportHardGates(report) {
+  for (const key of AUDIT_SCOPE_HARD_GATE_KEYS) {
+    const error = auditScopePassedCheckObject(report, key);
+    if (error) return error;
+  }
+
+  if (!Array.isArray(report.command_audit)) return "report.command_audit must be an array";
+
+  if (!isObjectRecord(report.budget_used)) return "report.budget_used must be an object";
+  for (const key of AUDIT_SCOPE_BUDGET_COUNTER_KEYS) {
+    const value = report.budget_used[key];
+    if (!Number.isInteger(value) || value < 0) {
+      return `report.budget_used.${key} must be a non-negative integer`;
+    }
+  }
+
+  return undefined;
+}
+
 function auditScope(args) {
   const assignmentPath = option(args, "--assignment");
   const reportPath = option(args, "--report");
@@ -283,6 +536,7 @@ function auditScope(args) {
 
   const workspacePath = option(args, "--workspace") ?? process.cwd();
   const workspaceReal = realpathExisting(path.resolve(workspacePath));
+  const allowDelete = hasFlag(args, "--allow-delete");
   const assignment = readJson(assignmentPath);
   const report = readJson(reportPath);
   const allowed = assignment.allowed_files;
@@ -301,6 +555,9 @@ function auditScope(args) {
   const changedFiles = report.changed_files ?? [];
   if (!Array.isArray(changedFiles)) return fail("report.changed_files must be a list");
 
+  const hardGateError = auditScopeWorkerReportHardGates(report);
+  if (hardGateError) return fail(hardGateError);
+
   for (const change of changedFiles) {
     if (typeof change !== "object" || change === null) {
       return fail("each changed_files item must be an object");
@@ -310,15 +567,40 @@ function auditScope(args) {
     if (!isSafeRelativePath(path)) return fail(`unsafe changed_files path: ${String(path)}`);
     const workspaceError = auditWorkspacePath(workspaceReal, path, "changed_files");
     if (workspaceError) return fail(workspaceError);
-    if (!allowedSet.has(normalizePath(path))) {
-      return fail(`changed file outside allowed_files: ${path}`);
-    }
-    if ((action === "deleted" || action === "reverted") && !hasFlag(args, "--allow-delete")) {
-      return fail(`delete/revert requires explicit allowance: ${path}`);
+    const changeError = auditChangedPath({
+      allowedSet,
+      allowDelete,
+      path,
+      action,
+      label: "changed file",
+    });
+    if (changeError) {
+      return fail(changeError);
     }
   }
 
-  return ok("scope audit passed");
+  const gitScope = inspectGitScope(workspaceReal);
+  if (gitScope.error) return fail(gitScope.error);
+  if (!gitScope.available) {
+    return ok(
+      `scope audit passed using report.changed_files only; git-visible workspace changes were not inspected (${gitScope.reason}); ignored files are outside git-visible scope`,
+    );
+  }
+
+  for (const change of gitScope.changes) {
+    const changeError = auditChangedPath({
+      allowedSet,
+      allowDelete,
+      path: change.path,
+      action: change.requiresDelete ? "deleted" : "modified",
+      label: `git-visible ${change.kind}`,
+    });
+    if (changeError) return fail(changeError);
+  }
+
+  return ok(
+    `scope audit passed; git-visible changes checked (${gitScope.changes.length} path entries); ignored files are outside git-visible scope`,
+  );
 }
 
 function secretScan(args) {

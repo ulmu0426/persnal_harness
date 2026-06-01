@@ -42,6 +42,16 @@
         "other"
       ]
     },
+    "experience_kind": {
+      "enum": [
+        "app",
+        "site",
+        "tool",
+        "web_game",
+        "game",
+        "other_product"
+      ]
+    },
     "raw_user_request": {
       "type": "string",
       "minLength": 1
@@ -70,6 +80,9 @@
     },
     "app_quality_gates": {
       "$ref": "#/$defs/app_quality_gates"
+    },
+    "game_brief": {
+      "$ref": "#/$defs/game_brief"
     },
     "quality_score_threshold": {
       "type": "integer",
@@ -349,6 +362,68 @@
         }
       }
     },
+    "game_brief": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target_player",
+        "genre",
+        "core_loop",
+        "mechanics",
+        "rules",
+        "controls",
+        "states",
+        "win_lose_restart",
+        "difficulty_progression",
+        "scoring",
+        "feedback",
+        "assets",
+        "engine_constraints"
+      ],
+      "properties": {
+        "target_player": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "genre": {
+          "type": "string",
+          "minLength": 1
+        },
+        "core_loop": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mechanics": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "rules": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "controls": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "states": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "win_lose_restart": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "difficulty_progression": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "scoring": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "feedback": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "assets": {
+          "$ref": "#/$defs/string_list"
+        },
+        "engine_constraints": {
+          "$ref": "#/$defs/string_list_nonempty"
+        }
+      }
+    },
     "verification_item": {
       "oneOf": [
         {
@@ -525,6 +600,14 @@
           "enum": [
             "goal_refiner",
             "goal_review_worker",
+            "explorer_agent",
+            "app_designer",
+            "frontend_worker",
+            "game_designer",
+            "game_engine_worker",
+            "asset_worker",
+            "playtest_worker",
+            "polish_reviewer",
             "subtask_worker",
             "review_worker",
             "verification_worker",

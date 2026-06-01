@@ -17,6 +17,22 @@ An app/product output is not accepted unless all applicable gates pass with evid
 - `behavior_evidence`: primary interactions were manually checked or covered by tests
 - `runnable_access`: final response reports a runnable local URL, dev server URL, or static file path
 
+## Game-Specific Gates
+
+For `experience_kind: web_game` or `game`, these gates apply in addition to app/product UX gates. Build, lint, and test results alone cannot satisfy game acceptance.
+
+- `playable_core_loop`: the player can start, perform the main action loop, receive feedback, and reach progression or resolution
+- `rules_clarity`: objectives, valid actions, invalid/failure actions, scoring, and win/lose conditions are understandable from play
+- `controls_input_coverage`: desktop controls work, and mobile/touch controls work when the target includes mobile
+- `game_state_lifecycle`: start, playing, pause, restart, win, lose, loading, and error or missing-asset states are handled when applicable
+- `challenge_difficulty_progression`: challenge ramps or changes intentionally and avoids impossible, trivial, or stalled play
+- `feedback_game_feel`: movement, hits, collects, invalid actions, transitions, and scoring produce timely visual/audio-placeholder/HUD feedback
+- `hud_readability`: score, health, timer, level, prompts, and status remain readable without covering the playfield
+- `performance_render_stability`: canvas/WebGL/animation rendering is nonblank, stable, and responsive at expected desktop and mobile sizes
+- `asset_integrity`: required local sprites, textures, models, audio placeholders, and manifests load with known provenance and no broken references
+- `browser_mobile_playability`: the game is playable in the target browser and on the applicable mobile viewport or documented device class
+- `full_playthrough_evidence`: a complete loop, level, win/loss, or restart path was actually played through
+
 ## Required Evidence Types
 
 Review reports for accepted app/product work must include evidence for every app-quality key plus these evidence types:
@@ -28,6 +44,8 @@ Review reports for accepted app/product work must include evidence for every app
 - `manual_behavior_check` or `automated_test` evidence for state coverage, naming the empty, loading, error, success, disabled, or validation states that were checked
 
 If an evidence type is impossible, keep the report schema-valid by using `status: not_run` or an app-quality gate failure with a concrete reason and blocking rework. A missing dev server, absent browser tooling, or static-only artifact can be a reason for adapting evidence, not for accepting no evidence.
+
+Accepted game/web-game work must also include concrete playtest or game-quality evidence for playable core loop, rules and invalid action, controls, scoring/progression, win/lose/restart, performance/render stability, asset integrity, and full playthrough. Missing, failed, generic, or not-run game evidence creates `game_quality_failed`, `playtest_failed`, `asset_pipeline_failed`, or `performance_failed` blocking gates as appropriate.
 
 ## Rejection Criteria
 
@@ -41,6 +59,11 @@ Reject or require rework when:
 - evidence says only "looks good", "manual check passed", or "seems fine"
 - build/lint/test passes but no UX behavior or visual evidence exists
 - the final answer omits how to run or open the product
+- a game is only a static scene, mock board, menu, animation, or asset preview without a playable loop
+- rules, scoring, controls, win/lose, pause/restart, or invalid action behavior cannot be exercised
+- game assets are broken, externally fetched without approval, missing provenance, or not locally verifiable
+- canvas/WebGL/animation output is blank, unstable, unplayable, or too slow for the target viewport
+- no full playthrough or complete-loop playtest evidence exists
 
 ## Evidence Wording
 

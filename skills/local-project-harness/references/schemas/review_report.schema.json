@@ -117,7 +117,11 @@
           "run_failed",
           "behavior_check_failed",
           "scenario_flow_failed",
-          "app_quality_failed"
+          "app_quality_failed",
+          "game_quality_failed",
+          "playtest_failed",
+          "asset_pipeline_failed",
+          "performance_failed"
         ]
       }
     },
@@ -126,6 +130,9 @@
     },
     "app_quality_check": {
       "$ref": "#/$defs/app_quality_check"
+    },
+    "game_quality_check": {
+      "$ref": "#/$defs/game_quality_check"
     },
     "security_check": {
       "$ref": "#/$defs/check_result"
@@ -572,6 +579,106 @@
             "automated_test",
             "accessibility_check",
             "responsive_check",
+            "not_applicable"
+          ]
+        },
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "not_run",
+            "not_applicable"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifact": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "game_quality_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "playable_core_loop",
+        "rules_clarity",
+        "controls_input_coverage",
+        "game_state_lifecycle",
+        "challenge_difficulty_progression",
+        "feedback_game_feel",
+        "hud_readability",
+        "performance_render_stability",
+        "asset_integrity",
+        "browser_mobile_playability",
+        "full_playthrough_evidence",
+        "evidence"
+      ],
+      "properties": {
+        "playable_core_loop": {
+          "$ref": "#/$defs/check_result"
+        },
+        "rules_clarity": {
+          "$ref": "#/$defs/check_result"
+        },
+        "controls_input_coverage": {
+          "$ref": "#/$defs/check_result"
+        },
+        "game_state_lifecycle": {
+          "$ref": "#/$defs/check_result"
+        },
+        "challenge_difficulty_progression": {
+          "$ref": "#/$defs/check_result"
+        },
+        "feedback_game_feel": {
+          "$ref": "#/$defs/check_result"
+        },
+        "hud_readability": {
+          "$ref": "#/$defs/check_result"
+        },
+        "performance_render_stability": {
+          "$ref": "#/$defs/check_result"
+        },
+        "asset_integrity": {
+          "$ref": "#/$defs/check_result"
+        },
+        "browser_mobile_playability": {
+          "$ref": "#/$defs/check_result"
+        },
+        "full_playthrough_evidence": {
+          "$ref": "#/$defs/check_result"
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/game_quality_evidence"
+          }
+        }
+      }
+    },
+    "game_quality_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "status",
+        "description"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "playtest_note",
+            "screenshot",
+            "video_capture",
+            "automated_test",
+            "performance_trace",
+            "asset_audit",
+            "responsive_check",
+            "manual_behavior_check",
             "not_applicable"
           ]
         },

@@ -6,12 +6,14 @@ For vague app or product requests, the harness should not pester the user for br
 
 For `work_type: app_product`, the Goal Contract includes:
 
+- optional `experience_kind: app | site | tool | web_game | game | other_product`
 - `product_brief.target_users`
 - `product_brief.core_problem`
 - `product_brief.primary_workflows`
 - `product_brief.domain_assumptions`
 - `product_brief.content_data_model_assumptions`
 - `product_brief.non_goals`
+- optional `game_brief` for `experience_kind: web_game` or `game`
 - `app_quality_gates.ux_workflow_completeness`
 - `app_quality_gates.visual_polish`
 - `app_quality_gates.responsive_desktop_mobile`
@@ -23,7 +25,29 @@ For `work_type: app_product`, the Goal Contract includes:
 
 App/product acceptance evidence should cover real user workflows, desktop and mobile behavior, basic accessibility, loading/error/empty states, text overlap and layout stability, and domain-appropriate presentation. Use screenshots, responsive checks, accessibility checks, automated tests, or manual behavior checks when applicable. Non-app coding, docs, schema, and research tasks stay lightweight; their review reports still include `app_quality_check`, but every item is `not_applicable`.
 
-`goal_refiner` must classify app, site, game, tool, and product-experience requests as `work_type: app_product` unless they are clearly only non-product implementation work. `goal_review_worker` must reject or request rework for an `app_product` Goal Contract that lacks the product brief, primary workflows, app-quality gates, or evidence plan. `review_worker` must not accept an app/product result on build/lint/test status alone. Failed, not-run, or inapplicable required app-quality checks add `app_quality_failed` to `blocking_gates` and produce concrete `rework_items`.
+For game and web-game work, `game_brief` should record target player, genre, core loop, mechanics, rules, controls, game states, win/lose/restart, pause, difficulty progression, scoring, feedback, assets, and engine constraints. Scenario flows must cover start, core loop, invalid or failure action, scoring/progression, win/lose, pause/restart, desktop input, and mobile input when applicable. Game acceptance must include playable core-loop and full playthrough evidence. Build/lint/test status alone is never enough for game acceptance.
+
+`goal_refiner` must classify app, site, game, tool, and product-experience requests as `work_type: app_product` unless they are clearly only non-product implementation work. It should add `experience_kind` when the product category affects routing or gates. `goal_review_worker` must reject or request rework for an `app_product` Goal Contract that lacks the product brief, primary workflows, app-quality gates, or evidence plan; for `experience_kind: web_game` or `game`, it must also reject missing game brief, playable-loop scenarios, controls/input coverage, and playtest evidence. `review_worker` must not accept an app/product result on build/lint/test status alone. Failed, not-run, or inapplicable required app-quality checks add `app_quality_failed` to `blocking_gates` and produce concrete `rework_items`. Failed playable-loop, playtest, asset, or performance evidence adds `game_quality_failed`, `playtest_failed`, `asset_pipeline_failed`, or `performance_failed` as appropriate.
+
+## Specialist Routing
+
+The seven app/game specialist names are first-class, schema-valid role IDs in the skill-local schemas:
+
+- `app_designer`
+- `frontend_worker`
+- `game_designer`
+- `game_engine_worker`
+- `asset_worker`
+- `playtest_worker`
+- `polish_reviewer`
+
+Preserve the generic roles as fallbacks. `subtask_worker` remains the generic implementation fallback, not the only implementation role.
+
+For app, site, tool, and product work, route through `app_designer -> frontend_worker -> playtest_worker` or `verification_worker -> polish_reviewer -> review_worker` as appropriate. Use `verification_worker` for deterministic command and behavior checks, and `playtest_worker` when the useful evidence is hands-on workflow exercise.
+
+For web-game and game work, route through `game_designer -> game_engine_worker -> asset_worker -> playtest_worker -> polish_reviewer -> review_worker`. `asset_worker` may be skipped only when no asset changes or asset verification are needed. `polish_reviewer` is advisory and cannot override `review_worker` hard gates or final scoring.
+
+When the runtime offers only default, explorer, and worker agent categories, keep the specialist role ID in the harness record and map execution categories this way: `app_designer`, `game_designer`, `polish_reviewer`, `review_worker`, `goal_refiner`, `goal_review_worker`, and `summary_worker` use a default no-edit agent; `frontend_worker`, `game_engine_worker`, `asset_worker`, and `subtask_worker` use a worker agent with explicit file ownership; `playtest_worker`, `verification_worker`, and `explorer_agent` use explorer or default no-edit agents unless they explicitly own local verification artifacts. Same-context simulation rules still apply, including `independence: simulated_same_context` and disclosure of missing independent checks.
 
 This harness is a minimal operating framework that prevents the main session from directly doing coding work by default. Instead, it forces goal refinement and bounded subtasks to be delegated to workers. Its purpose is to clearly separate user request concretization, Goal Contract completeness checks, work breakdown, delegation, progress tracking, review delegation, and review-report-based integration decisions so the main session does not drift into being the goal analyst, implementer, and reviewer at the same time.
 
@@ -90,13 +114,14 @@ This harness is a minimal operating framework that prevents the main session fro
 4. When a real work request arrives, the main session passes the raw request to `goal_refiner` and delegates Goal Contract creation.
 5. The main session checks only that the Goal Contract has all required fields and that `verification_matrix` includes `build`, `lint`, `test`, `run`, and `behavior_check`.
 6. A separate `goal_review_worker` reviews the Goal Contract's content quality. If it reports `needs_rework`, `blocked`, or `rejected`, resolve the revision or user input before breaking down the work.
-7. The main session breaks the Goal Contract into independent subtasks and assigns scope and expected outputs to each worker.
-8. After receiving worker results, the main session delegates review to a separate `review_worker` or `verification_worker` when real sub-agent tools are available.
-9. `review_worker` writes a review report that includes completion score, scenario-flow scores, threshold status, and rework items.
-10. If the completion score is below 85 or a required gate fails, the main session re-delegates work based on `rework_items`. If the score is at least 85 and required gates pass, it makes the integration decision.
-11. When a sub-agent report has been consumed as input to the next stage, the main session closes that sub-agent.
-12. After all work is complete, the main session delegates final summarization to `summary_worker` and closes `summary_worker` after consuming the Summary Report.
-13. Until a real runner is implemented, commands in `docs/runner-cli.md` are treated only as dry-run, record, and audit contracts.
+7. The main session routes app, site, tool, product, web-game, and game work through the specialist chain when applicable, with generic roles as fallback when a runtime has only default, explorer, and worker agent categories.
+8. The main session breaks the Goal Contract into independent subtasks and assigns scope and expected outputs to each worker.
+9. After receiving worker results, the main session delegates review to a separate `review_worker` or `verification_worker` when real sub-agent tools are available.
+10. `review_worker` writes a review report that includes completion score, scenario-flow scores, threshold status, and rework items.
+11. If the completion score is below 85 or a required gate fails, the main session re-delegates work based on `rework_items`. If the score is at least 85 and required gates pass, it makes the integration decision.
+12. When a sub-agent report has been consumed as input to the next stage, the main session closes that sub-agent.
+13. After all work is complete, the main session delegates final summarization to `summary_worker` and closes `summary_worker` after consuming the Summary Report.
+14. Until a real runner is implemented, commands in `docs/runner-cli.md` are treated only as dry-run, record, and audit contracts.
 
 ## Required Goal Contract Fields
 
@@ -119,6 +144,8 @@ A Goal Contract must include the following 16 fields. The main session checks on
 - `open_questions`
 - `delegation_plan_seed`
 
+For product experiences, add optional `experience_kind` when the category affects routing or gates. For `experience_kind: web_game` or `game`, add optional `game_brief`; `goal_review_worker` should treat it as required for a complete game-quality contract even though the schema keeps it optional for backward compatibility.
+
 ## Completion Scoring
 
 The default passing threshold is `quality_score_threshold: 85`. `review_worker` sums the following axes to a 100-point score.
@@ -131,6 +158,8 @@ The default passing threshold is `quality_score_threshold: 85`. `review_worker` 
 - `verification_completeness`: sufficiency of verification evidence
 
 `scenario_flows` define user or system flows step by step. Each flow includes `id`, `name`, `actor`, `preconditions`, `steps`, `expected_result`, and `failure_or_edge_cases`. A review report must include `task_id`, `work_type`, `status`, `reviewed_outputs`, `scope_check`, `goal_contract_check`, `overall_completion_score`, `rubric_scores`, `scenario_flow_scores`, `score_threshold`, `passed_threshold`, `blocking_gates`, `verification_check`, `app_quality_check`, `security_check`, `secret_scan_result`, `scope_diff_result`, `command_audit`, `budget_used`, `independence`, `rework_items`, `next_iteration_recommendation`, `risks_or_follow_up`, and `recommendation`.
+
+Game scenario flows must not be only a happy path. They cover start, core loop, invalid or failure action, scoring/progression, win/lose, pause/restart, desktop input, and mobile input when applicable.
 
 ## Main Session Role
 
@@ -169,6 +198,8 @@ Workers perform the delegated subtasks.
 If the completion score is below 85, `review_worker` reports `needs_rework` with concrete `rework_items`. The main session does not adjust the score directly; it delegates those items as new implementation work.
 
 Review reports must be logically consistent. `accepted` is allowed only when `passed_threshold: true`, `blocking_gates` is empty, and `overall_completion_score >= score_threshold`. If any `blocking_gates` entry exists, the report must use `passed_threshold: false` and a non-accepted status. If `passed_threshold: false` and the status is not `blocked` or `rejected`, concrete `rework_items` must be present. `accepted` reports must not contain failed verification, app-quality, security, scope, or secret checks.
+
+For games and web games, review reports should include `game_quality_check` when game evidence is relevant. Missing or failed playable core loop, rules clarity, controls/input coverage, game state lifecycle, challenge/difficulty progression, feedback/game feel, HUD/readability, performance/render stability, asset integrity, browser/mobile playability, or full playthrough evidence blocks acceptance. Use `game_quality_failed`, `playtest_failed`, `asset_pipeline_failed`, or `performance_failed` in `blocking_gates` as appropriate.
 
 `summary_worker` runs only after all implementation, verification, review, rework, integration decisions, and previous sub-agent close handling are complete. `summary_worker` does not modify files or re-evaluate outputs; it reads the completed Goal Contract, delegation records, worker reports, review reports, verification results, rework history, hard gate status, and close status, then writes only the final Summary Report. The Summary Report must include the following four fields.
 

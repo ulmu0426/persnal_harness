@@ -1,0 +1,263 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-orbital-rescue-game",
+  "work_type": "app_product",
+  "experience_kind": "web_game",
+  "raw_user_request": "Make a small browser game where a pilot rescues stranded pods.",
+  "concrete_goal": "Build a local browser-playable rescue game where the player pilots a small ship, collects stranded pods, avoids debris, scores rescues, and can pause or restart from the first playable screen.",
+  "success_criteria": [
+    "The first screen is a playable game state with visible objective, controls, score, lives, pause, and restart.",
+    "The player can complete the core loop by moving, collecting a pod, avoiding debris, scoring, and reaching a win or loss state.",
+    "Invalid or failure actions provide feedback, including debris collision, missed pod, and blocked movement.",
+    "Desktop keyboard input and mobile touch controls are covered when the game is run in the browser."
+  ],
+  "scope_in": [
+    "Single-screen web-game runtime, HUD, local assets or placeholders, and playtest evidence.",
+    "Core rescue loop, scoring, lives, pause, restart, win, lose, and responsive input behavior."
+  ],
+  "scope_out": [
+    "Online leaderboards, accounts, analytics, multiplayer, paid assets, external asset fetches, and deployment."
+  ],
+  "assumptions": [
+    "The game uses local placeholder assets unless repo-owned assets already exist.",
+    "A local browser preview is enough for the first iteration.",
+    "Mobile input means a touch viewport check, not native app packaging."
+  ],
+  "implementation_constraints": [
+    "Do not use network, credentials, paid AI generation, paid asset stores, or deployment.",
+    "Keep all game assets local and document asset provenance.",
+    "Do not accept build, lint, or test output without a playable local playtest."
+  ],
+  "product_brief": {
+    "target_users": [
+      "Casual desktop and mobile browser players who want a short arcade rescue session."
+    ],
+    "core_problem": "The player needs an immediately understandable rescue challenge with clear controls, visible scoring, and quick restart.",
+    "primary_workflows": [
+      "Start the game, pilot the ship, collect pods, avoid debris, and score rescues.",
+      "Pause, resume, restart, and recover from collision or loss states.",
+      "Use keyboard controls on desktop and touch controls on mobile viewport."
+    ],
+    "domain_assumptions": [
+      "Arcade rescue vocabulary includes ship, pod, debris, lives, score, wave, pause, and restart.",
+      "The game should communicate objective and failure through HUD text and immediate feedback."
+    ],
+    "content_data_model_assumptions": [
+      "Entities include player ship, rescue pod, debris hazard, score, lives, wave timer, and game state.",
+      "States include start, playing, paused, won, lost, restarted, asset loading, and recoverable render error."
+    ],
+    "non_goals": [
+      "No multiplayer, online score sync, account profile, external asset pack, production deployment, or monetization."
+    ]
+  },
+  "app_quality_gates": {
+    "ux_workflow_completeness": [
+      "The rescue loop is playable from the first screen without a marketing landing page."
+    ],
+    "visual_polish": [
+      "The first game screen shows a blue ship marker, yellow pod beacon, red debris hazard, fixed score badge, lives badge, and collision message so rescue, hazard, and status hierarchy are inspectable."
+    ],
+    "responsive_desktop_mobile": [
+      "Desktop and mobile viewports keep the playfield, HUD, and controls usable."
+    ],
+    "accessibility_basics": [
+      "Controls are labelled, keyboard operation is documented in the UI, focus is visible where DOM controls exist, and status text is readable."
+    ],
+    "error_loading_empty_states": [
+      "Start, loading, paused, win, lose, restart, and recoverable missing-asset or render-error states are represented when applicable."
+    ],
+    "text_overlap_layout_stability": [
+      "HUD labels, pause/restart controls, and mobile touch controls do not overlap the playfield incoherently."
+    ],
+    "domain_fit": [
+      "Labels, goals, feedback, and assets fit an arcade rescue game."
+    ],
+    "evidence_requirements": [
+      "Desktop screenshot or visual inspection, mobile screenshot or visual inspection, full playthrough notes, input coverage, performance/render stability, and asset integrity evidence."
+    ]
+  },
+  "game_brief": {
+    "target_player": [
+      "Casual browser players using keyboard on desktop or touch controls on mobile."
+    ],
+    "genre": "Arcade rescue game",
+    "core_loop": "Pilot the ship, collect a rescue pod, avoid debris, bank score, survive the wave, and repeat until all pods are rescued or lives run out.",
+    "mechanics": [
+      "Directional movement, collision checks, collectible pods, moving debris, lives, score, and wave completion."
+    ],
+    "rules": [
+      "Collecting a pod adds score and advances rescue progress.",
+      "Hitting debris removes a life and shows collision feedback.",
+      "Rescuing all pods wins; losing all lives ends the run."
+    ],
+    "controls": [
+      "Desktop uses arrow or WASD movement plus pause and restart buttons.",
+      "Mobile uses on-screen directional controls plus pause and restart buttons."
+    ],
+    "states": [
+      "start",
+      "playing",
+      "paused",
+      "won",
+      "lost",
+      "restarted",
+      "asset_loading",
+      "render_error"
+    ],
+    "win_lose_restart": [
+      "Win after all pods are rescued, lose after all lives are gone, and restart resets score, lives, pod positions, and hazards."
+    ],
+    "difficulty_progression": [
+      "Each rescue or wave increases debris speed or count within a readable arcade range."
+    ],
+    "scoring": [
+      "Pods award points, survival bonus is shown at wave end, and collision penalty is visible through lives."
+    ],
+    "feedback": [
+      "Collect, collision, score change, life loss, win, lose, pause, and restart each produce visible HUD or animation feedback."
+    ],
+    "assets": [
+      "Use local vector/canvas shapes or repo-owned sprites with documented provenance."
+    ],
+    "engine_constraints": [
+      "Browser runtime only, local preview, no external network, stable desktop and mobile rendering."
+    ]
+  },
+  "quality_score_threshold": 90,
+  "scenario_flows": [
+    {
+      "id": "flow-rescue-core-loop",
+      "name": "Complete one rescue loop",
+      "actor": "player",
+      "preconditions": [
+        "The local game preview is loaded at the first playable screen."
+      ],
+      "steps": [
+        "Start the game.",
+        "Move the ship with desktop controls.",
+        "Collect one rescue pod.",
+        "Avoid debris until the score and rescue progress update.",
+        "Pause and resume the run."
+      ],
+      "expected_result": "The pod is collected, score/progress feedback appears, the game remains playable, and pause/resume preserves state.",
+      "failure_or_edge_cases": [
+        "Collision with debris removes a life and provides feedback.",
+        "Trying to move past a boundary is blocked without breaking controls."
+      ]
+    },
+    {
+      "id": "flow-win-lose-restart-mobile",
+      "name": "Reach resolution and restart on mobile",
+      "actor": "mobile_player",
+      "preconditions": [
+        "The game is open in a mobile viewport with touch controls visible."
+      ],
+      "steps": [
+        "Use touch controls to collect the remaining pods or intentionally collide until the run ends.",
+        "Observe the win or loss state.",
+        "Restart the game.",
+        "Confirm score, lives, pods, and hazards reset."
+      ],
+      "expected_result": "The game reaches a clear win or loss state, restart returns to a fresh playable state, and touch controls remain usable.",
+      "failure_or_edge_cases": [
+        "Missing local asset or render failure shows a recoverable error state.",
+        "HUD and touch controls do not cover critical playfield content."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "Run the project build command when present or document why no build command exists.",
+    "lint": "Run lint or equivalent static checks when present.",
+    "test": "Run automated tests when present, especially for scoring, collisions, state transitions, or input helpers.",
+    "run": "Start a local browser preview or open the static artifact and report the URL or path.",
+    "behavior_check": "Play through core loop, invalid/failure action, scoring/progression, win/lose, pause/restart, desktop input, mobile input, performance/render stability, and asset integrity."
+  },
+  "acceptance_evidence_plan": [
+    "Desktop 1440x900 screenshot or visual inspection artifact showing the rescue ship, pod beacon, debris hazard, score badge, lives badge, pause button, and restart button.",
+    "Mobile 390x844 screenshot or visual inspection artifact showing touch controls, rescue HUD, pod target, debris hazard, and readable win or loss message without overlap.",
+    "Manual workflow behavior check: start the rescue game, move the ship, trigger pod rescue, trigger debris collision, pause/resume, restart, and confirm score, lives, and rescue progress updated.",
+    "Accessibility check artifact covering keyboard controls, visible focus on pause/restart buttons, labels for mobile direction buttons, and contrast for score/lives badges in the rescue HUD.",
+    "State coverage check notes for start, playing, paused, won, lost, restarted, asset_loading, and render_error states in the rescue game.",
+    "Performance/render trace or inspection artifact confirming a nonblank stable rescue playfield and responsive controls.",
+    "Asset integrity audit artifact confirming local ship, pod, debris, and HUD assets or canvas shapes load with known provenance."
+  ],
+  "iteration_policy": {
+    "threshold_rule": "overall_completion_score must be at least quality_score_threshold.",
+    "rework_rule": "Any failed playtest, game-quality, asset, performance, scenario, or app-quality evidence creates concrete rework before acceptance.",
+    "stop_conditions": [
+      "Review is accepted with all required app and game evidence present.",
+      "A network, external cost, deployment, or credential blocker is discovered.",
+      "The iteration budget is exhausted."
+    ]
+  },
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "orbital-rescue-design-001",
+      "objective": "Finalize game brief, core loop, controls, state list, and playtest scenarios.",
+      "owner": "game_designer",
+      "allowed_files": [
+        "docs/game-brief.md"
+      ]
+    },
+    {
+      "task_id": "orbital-rescue-engine-001",
+      "objective": "Implement the playable rescue loop, HUD, controls, scoring, state lifecycle, and local run target.",
+      "owner": "game_engine_worker",
+      "allowed_files": [
+        "src/game",
+        "src/ui",
+        "tests"
+      ]
+    },
+    {
+      "task_id": "orbital-rescue-assets-001",
+      "objective": "Create or normalize local placeholder assets and document provenance and load checks.",
+      "owner": "asset_worker",
+      "allowed_files": [
+        "public/assets",
+        "src/assets",
+        "docs/asset-inventory.md"
+      ]
+    },
+    {
+      "task_id": "orbital-rescue-playtest-001",
+      "objective": "Playtest desktop and mobile core-loop, failure, win/lose, pause/restart, input, performance, and asset integrity.",
+      "owner": "playtest_worker",
+      "allowed_files": [
+        "artifacts",
+        "docs/playtest-notes.md"
+      ]
+    },
+    {
+      "task_id": "orbital-rescue-polish-001",
+      "objective": "Review game feel, HUD readability, responsive layout, and evidence gaps without overriding final review gates.",
+      "owner": "polish_reviewer",
+      "allowed_files": [
+        "artifacts",
+        "docs/playtest-notes.md"
+      ]
+    },
+    {
+      "task_id": "orbital-rescue-review-001",
+      "objective": "Apply review gates, including app-quality, game-quality, playtest, asset, and performance blocking gates.",
+      "owner": "review_worker",
+      "allowed_files": [
+        "src/game",
+        "src/ui",
+        "public/assets",
+        "tests",
+        "artifacts",
+        "docs"
+      ]
+    }
+  ]
+}

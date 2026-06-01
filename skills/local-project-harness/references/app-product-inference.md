@@ -6,6 +6,15 @@ Use this when a user asks for an app, site, game, tool, dashboard, product, or o
 
 Convert the request into a concrete `work_type: app_product` Goal Contract without over-questioning. Ask only when no safe default exists for cost, regulated data, destructive actions, deployment, authentication, payments, or a hard-to-reverse product choice.
 
+Add `experience_kind` when the category affects routing or quality gates:
+
+- `app`: workflow-focused application surface
+- `site`: content or brand site with a first-viewport product, place, person, or offer signal
+- `tool`: input/output utility or creation surface
+- `web_game`: browser-playable game
+- `game`: game work that may include broader game runtime assumptions
+- `other_product`: user-facing product experience that does not fit the other labels
+
 ## Product Brief Requirements
 
 Reject briefs that could describe any app. A usable `product_brief` must include:
@@ -16,6 +25,24 @@ Reject briefs that could describe any app. A usable `product_brief` must include
 - `domain_assumptions`: domain rules, vocabulary, tone, constraints, and likely edge cases
 - `content_data_model_assumptions`: entities, fields, relationships, sample records, status values, validation, and empty data
 - `non_goals`: excluded integrations, admin surfaces, marketing pages, auth, persistence, analytics, or advanced automation
+
+## Game Brief Requirements
+
+For `experience_kind: web_game` or `game`, include `game_brief` with:
+
+- `target_player`: player type, context, device expectations, and session length
+- `genre`: familiar category and constraints
+- `core_loop`: repeated player action, challenge, reward, and progression
+- `mechanics`: movement, collision, puzzle, combat, resource, timing, AI, or physics behavior
+- `rules`: valid and invalid actions, boundaries, penalties, and success conditions
+- `controls`: desktop and mobile input model when applicable
+- `states`: start, playing, pause, win, lose, restart, transition, loading, and error or missing-asset states
+- `win_lose_restart`: how a run ends, advances, retries, or resets
+- `difficulty_progression`: level curve, speed, hazards, randomness, or tutorial ramp
+- `scoring`: points, timer, health, combo, progress, stars, or unlocks
+- `feedback`: HUD, animation, sound placeholder, hit/collect/invalid action feedback, and game feel
+- `assets`: local-only asset needs, placeholders, provenance, and integrity checks
+- `engine_constraints`: browser target, engine/library choice, performance budget, and device constraints
 
 ## First Usable Screen
 
@@ -49,6 +76,17 @@ Every app/product contract needs scenario flows covering:
 - responsive desktop and mobile interaction
 - one meaningful domain edge case
 
+Game scenario flows additionally need coverage for:
+
+- start or first playable state
+- one complete core-loop cycle
+- invalid, blocked, missed, or failure action
+- scoring, health, timer, progress, or level change
+- win, lose, or completion condition
+- pause and restart
+- desktop input
+- mobile input when applicable
+
 ## Evidence Plan
 
 Acceptance evidence must name concrete artifacts or checks:
@@ -59,6 +97,16 @@ Acceptance evidence must name concrete artifacts or checks:
 - accessibility basics check
 - state coverage for empty/loading/error/success or a reason a state is impossible
 - layout stability and text-overlap check
+
+Game evidence must also name:
+
+- local runnable target and browser/device used
+- full playthrough or complete-loop playtest notes
+- controls/input coverage for desktop and mobile when applicable
+- rules and invalid-action behavior
+- scoring/progression and win/lose/restart state coverage
+- performance or render stability check
+- asset integrity and missing-asset check
 
 ## Compact Examples
 

@@ -14,6 +14,7 @@ Treat `references/harness-readme.md` as the source of truth for the harness. It 
 - main session as orchestrator
 - Goal Contract creation and completeness checks
 - product brief inference and app-quality gates for app/product work
+- specialist routing for app, tool, product, web-game, and game requests
 - Goal Contract quality review before implementation
 - task decomposition
 - delegation to sub-agents
@@ -42,17 +43,19 @@ For non-trivial project work:
 2. Create or delegate a Goal Contract before implementation.
 3. Confirm the Goal Contract has the required fields and verification matrix.
 4. Use `goal_review_worker` to review Goal Contract substance before implementation; do not proceed when it reports `blocked`, `rejected`, or unresolved `needs_rework`.
-5. For abstract app/site/game/tool/product ideas, require `work_type: app_product`; reject generic product briefs. Infer a strong `product_brief` with target user, domain workflow, data model and states, responsive/accessibility/visual evidence plan, and non-goals; ask the user only for true blockers.
-6. Break work into bounded sub-tasks.
-7. Delegate to actual sub-agents when available and authorized.
-8. For non-trivial app or product work, require real-subagent review or verification as a hard gate when real sub-agent tools are available.
-9. If sub-agents are unavailable, simulate the same roles as explicit internal passes, mark review independence as `simulated_same_context`, downgrade final confidence, list missing independent checks, and do not describe the review as independent.
-10. Keep the main session focused on orchestration, integration, report completeness checks, and final decisions.
-11. Assign worker scopes with explicit `allowed_files`, prohibited actions, expected outputs, and verification.
-12. Rework from concrete `rework_items` when threshold or hard gates fail.
-13. Track and close consumed sub-agents before final response.
-14. After all work and prior sub-agent close handling finish, delegate final summarization to `summary_worker`.
-15. Report to the user from the Summary Report, including verification, review decision, unresolved risks, and unverified checks.
+5. For abstract app/site/game/tool/product ideas, require `work_type: app_product`; reject generic product briefs. Add `experience_kind` when useful, infer a strong `product_brief` with target user, domain workflow, data model and states, responsive/accessibility/visual evidence plan, and non-goals, and add `game_brief` for `experience_kind: web_game` or `game`; ask the user only for true blockers.
+6. Route app/tool/product work through `app_designer -> frontend_worker -> playtest_worker` or `verification_worker -> polish_reviewer -> review_worker` as appropriate for the scope.
+7. Route web-game/game work through `game_designer -> game_engine_worker -> asset_worker -> playtest_worker -> polish_reviewer -> review_worker`.
+8. Break work into bounded sub-tasks.
+9. Delegate to actual sub-agents when available and authorized.
+10. For non-trivial app, product, or game work, require real-subagent review or verification as a hard gate when real sub-agent tools are available.
+11. If sub-agents are unavailable, simulate the same roles as explicit internal passes, mark review independence as `simulated_same_context`, downgrade final confidence, list missing independent checks, and do not describe the review as independent.
+12. Keep the main session focused on orchestration, integration, report completeness checks, and final decisions.
+13. Assign worker scopes with explicit `allowed_files`, prohibited actions, expected outputs, and verification.
+14. Rework from concrete `rework_items` when threshold or hard gates fail.
+15. Track and close consumed sub-agents before final response.
+16. After all work and prior sub-agent close handling finish, delegate final summarization to `summary_worker`.
+17. Report to the user from the Summary Report, including verification, review decision, unresolved risks, and unverified checks.
 
 Keep trivial tasks lightweight. A direct answer, typo fix, narrow one-line change, or low-risk mechanical command may use a compact implicit contract rather than the full flow.
 
@@ -67,7 +70,14 @@ When the runtime offers only generic agent categories, map harness roles this wa
 - `goal_refiner`: default agent, no file edits.
 - `goal_review_worker`: default agent, no file edits; review the Goal Contract for testability, scope, assumptions, verification, and blocker quality.
 - `explorer_agent`: explorer agent for read-only codebase questions.
-- `subtask_worker`: worker agent with explicit file ownership and disjoint write scope.
+- `app_designer`: default agent, no file edits; product brief, workflow, IA, state, and evidence planning.
+- `frontend_worker`: worker agent with explicit file ownership and disjoint write scope for app/site/tool UI implementation.
+- `game_designer`: default agent, no file edits; game brief, rules, loop, states, difficulty, and playtest plan.
+- `game_engine_worker`: worker agent with explicit file ownership and disjoint write scope for playable runtime implementation.
+- `asset_worker`: worker agent with explicit local-only asset scope; no external asset fetch, paid AI generation, deployment, credentials, or non-local network unless separately approved.
+- `playtest_worker`: explorer or default agent for no-edit playtesting; worker agent only when the assignment explicitly owns local verification artifacts.
+- `polish_reviewer`: default agent, no file edits; advisory UX/game polish review that cannot override `review_worker` hard gates or final scoring.
+- `subtask_worker`: generic worker-agent fallback with explicit file ownership and disjoint write scope.
 - `verification_worker`: default or explorer agent unless the assignment explicitly needs a worker-owned verification artifact.
 - `review_worker`: default agent, no file edits.
 - `summary_worker`: default agent, no file edits or new verification.
@@ -80,6 +90,13 @@ If actual sub-agents cannot be used, keep the harness shape by running named int
 - `goal_refiner`
 - `goal_review_worker`
 - `explorer_agent`
+- `app_designer`
+- `frontend_worker`
+- `game_designer`
+- `game_engine_worker`
+- `asset_worker`
+- `playtest_worker`
+- `polish_reviewer`
 - `subtask_worker`
 - `verification_worker`
 - `review_worker`

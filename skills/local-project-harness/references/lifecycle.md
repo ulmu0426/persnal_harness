@@ -35,7 +35,10 @@ Close or mark complete when:
 
 - goal contract has been consumed by planning
 - goal review report has been consumed by breakdown, rework, or user-input decision
+- app or game design reports have been consumed by implementation planning
 - worker report has been consumed by integration or review
+- asset reports have been consumed by implementation, playtest, or review
+- playtest and polish reports have been consumed by rework, verification, or final review
 - verification report has been consumed by review or final decision
 - review report has been consumed by rework or completion decision
 - summary report has been consumed by the final user response

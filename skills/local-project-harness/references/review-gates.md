@@ -42,6 +42,23 @@ app_quality_check:
       status: passed | failed | not_run | not_applicable
       description:
       artifact:
+game_quality_check:
+  playable_core_loop:
+  rules_clarity:
+  controls_input_coverage:
+  game_state_lifecycle:
+  challenge_difficulty_progression:
+  feedback_game_feel:
+  hud_readability:
+  performance_render_stability:
+  asset_integrity:
+  browser_mobile_playability:
+  full_playthrough_evidence:
+  evidence:
+    - type: playtest_note | screenshot | video_capture | automated_test | performance_trace | asset_audit | responsive_check | manual_behavior_check | not_applicable
+      status: passed | failed | not_run | not_applicable
+      description:
+      artifact:
 security_check:
 secret_scan_result:
 scope_diff_result:
@@ -53,6 +70,8 @@ next_iteration_recommendation:
 risks_or_follow_up:
 recommendation:
 ```
+
+`game_quality_check` is optional in the schema and is used for `experience_kind: web_game` or `game`. Non-game reports omit it.
 
 ## Scoring
 
@@ -74,6 +93,8 @@ Use exact scoring only for large or high-risk tasks. For normal tasks, make a co
 
 For `work_type: app_product`, the score must include app-quality evidence, not only build/lint/test status. Review UX workflow completeness, visual polish, responsive desktop/mobile behavior, accessibility basics, loading/error/empty states, text overlap and layout stability, domain fit, and the requested screenshot or manual behavior evidence. For non-app work, set every `app_quality_check` item to `not_applicable` with a short reason.
 
+For `experience_kind: web_game` or `game`, the score must also include game-quality evidence. Review playable core loop, rules clarity, controls/input coverage, state lifecycle, difficulty progression, scoring and feedback/game feel, HUD readability, performance/render stability, asset integrity, browser/mobile playability, and full playthrough evidence. Build/lint/test success is insufficient for game acceptance.
+
 ## Blocking Gates
 
 Any of these block completion regardless of score:
@@ -87,6 +108,10 @@ Any of these block completion regardless of score:
 - required build, lint, test, run, or behavior check failure
 - any `scenario_flow_scores[].passed === false`; add `scenario_flow_failed`, set `passed_threshold: false`, use a non-accepted `status` and `recommendation`, and provide concrete `rework_items` unless the report is `blocked` or `rejected`
 - failed, missing, generic, or `not_run` required app-quality check for `work_type: app_product`
+- failed, missing, generic, or `not_run` required playable game-quality evidence for `experience_kind: web_game` or `game`; add `game_quality_failed`
+- failed, missing, generic, or `not_run` full playthrough or input coverage evidence; add `playtest_failed`
+- broken, missing, unapproved external, or provenance-unknown assets; add `asset_pipeline_failed`
+- blank, unstable, or unacceptably slow canvas/WebGL/animation/runtime behavior; add `performance_failed`
 - unresolved data-loss, migration, or security risk
 
 ## Logical Consistency
@@ -105,6 +130,9 @@ Review reports must be internally consistent:
 - Any failed required verification should appear in `blocking_gates`.
 - Any failed scenario flow score must add `scenario_flow_failed` to `blocking_gates`; a failed scenario flow requires `passed_threshold: false`, a non-accepted `status` and `recommendation`, and concrete `rework_items` unless the status is `blocked` or `rejected`.
 - Any failed app-quality check must add `app_quality_failed` to `blocking_gates`; `app_quality_failed` requires at least one failed or not-run app-quality item with evidence explaining the gap.
+- Any failed game-quality check must add `game_quality_failed` to `blocking_gates`; `game_quality_failed` requires at least one failed or not-run game-quality item with evidence explaining the gap.
+- Any failed playtest, asset pipeline, or performance evidence must add `playtest_failed`, `asset_pipeline_failed`, or `performance_failed` to `blocking_gates` as applicable.
+- Accepted game/web-game work must include playable evidence beyond build/lint/test: local runnable access, controls/input coverage, core-loop or full-playthrough notes, state lifecycle, performance/render stability, and asset integrity.
 - When all six default rubric entries use integer scores and max-score weights, `overall_completion_score` must match their score sum.
 - For non-app work, every required app-quality check must be present and marked `not_applicable` with evidence; `app_quality_check.evidence` must exist and may use `not_applicable`.
 - A same-context internal pass must set `independence: simulated_same_context` and report the missing independent review in `risks_or_follow_up` or a similar limitations field.

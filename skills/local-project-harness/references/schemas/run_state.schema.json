@@ -99,6 +99,28 @@
     }
   },
   "$defs": {
+    "role_id": {
+      "enum": [
+        "goal_refiner",
+        "goal_review_worker",
+        "explorer_agent",
+        "app_designer",
+        "frontend_worker",
+        "game_designer",
+        "game_engine_worker",
+        "asset_worker",
+        "playtest_worker",
+        "polish_reviewer",
+        "subtask_worker",
+        "review_worker",
+        "verification_worker",
+        "summary_worker",
+        "security_agent",
+        "technical_agent",
+        "management_agent",
+        "main_orchestrator"
+      ]
+    },
     "run_status": {
       "enum": [
         "pending",
@@ -225,8 +247,7 @@
           "minLength": 1
         },
         "role": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/role_id"
         },
         "task_id": {
           "type": "string",
@@ -287,8 +308,7 @@
           "minLength": 1
         },
         "role": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/role_id"
         },
         "task_id": {
           "type": "string",
