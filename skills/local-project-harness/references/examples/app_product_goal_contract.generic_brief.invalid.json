@@ -1,0 +1,158 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-generic-brief-budget-board",
+  "work_type": "app_product",
+  "raw_user_request": "Build a household budget tracker app.",
+  "concrete_goal": "Build a browser-based household budget tracker for roommates who need to record shared expenses, see settlement status, and resolve overdue reimbursements from the first screen.",
+  "success_criteria": [
+    "Roommates can add, edit, settle, and filter shared expense records without leaving the first screen.",
+    "The interface exposes payer, split members, due date, category, and settlement status with desktop and mobile evidence.",
+    "Empty, loading, error, validation, disabled, and saved-success states are represented or deliberately simulated."
+  ],
+  "scope_in": [
+    "Single-page household budget tracker UI with local client-side state.",
+    "Seeded fictional roommate expense data and responsive controls."
+  ],
+  "scope_out": [
+    "Real banking integrations, authentication, payment processing, and production deployment."
+  ],
+  "assumptions": [
+    "The prototype uses fictional roommate and expense data.",
+    "Local browser state is acceptable for the first usable version."
+  ],
+  "implementation_constraints": [
+    "Do not add external services, production deployment, or paid APIs.",
+    "Keep the primary expense workflow available on the first screen."
+  ],
+  "product_brief": {
+    "target_users": [
+      "Roommates who split rent, utilities, groceries, and one-off household purchases and need a shared view of who owes whom."
+    ],
+    "core_problem": "Shared household expenses become hard to reconcile when payer, category, due date, and settlement status are scattered across chats or spreadsheets.",
+    "primary_workflows": [
+      "Create or update a fictional shared expense with payer, participants, category, amount, due date, notes, and settlement status.",
+      "Filter expenses by overdue, unsettled, category, and payer so roommates can focus on reimbursement work.",
+      "Review empty, invalid, saved, and error states while preserving readable expense rows on desktop and mobile."
+    ],
+    "domain_assumptions": [
+      "Standard app assumptions"
+    ],
+    "content_data_model_assumptions": [
+      "Primary entity: expense record with fields id, payer, participants, category, amount, due date, note, settlement status, created time, and updated time.",
+      "Settlement records include member, owed amount, paid amount, and status values unpaid, partial, settled, or overdue; UI states include first-run empty list, loading seed data, save success, validation errors for missing payer or amount, disabled save while invalid, and recoverable local state error."
+    ],
+    "non_goals": [
+      "No extra features"
+    ]
+  },
+  "app_quality_gates": {
+    "ux_workflow_completeness": [
+      "Primary add/edit/filter expense workflow is usable from the first screen."
+    ],
+    "visual_polish": [
+      "Settlement status, overdue state, and category hierarchy are visually distinct without generic placeholder cards."
+    ],
+    "responsive_desktop_mobile": [
+      "Desktop table-style layout and mobile stacked layout are both inspected with concrete viewport evidence."
+    ],
+    "accessibility_basics": [
+      "Controls have labels, visible focus, keyboard-reachable workflow, and sufficient contrast."
+    ],
+    "error_loading_empty_states": [
+      "Empty, loading, error, validation, disabled, and saved-success states are represented."
+    ],
+    "text_overlap_layout_stability": [
+      "Long roommate names, category labels, notes, and action controls wrap without overlap or clipping."
+    ],
+    "domain_fit": [
+      "Labels, sample data, and interactions fit fictional shared household budgeting work."
+    ],
+    "evidence_requirements": [
+      "Desktop visual inspection artifact or screenshot, mobile visual inspection artifact or screenshot, primary workflow behavior check, accessibility basics check, and state coverage check."
+    ]
+  },
+  "quality_score_threshold": 90,
+  "scenario_flows": [
+    {
+      "id": "flow-create-expense",
+      "name": "Create shared expense",
+      "actor": "roommate",
+      "preconditions": [
+        "The budget tracker is loaded with fictional seed data."
+      ],
+      "steps": [
+        "Open the add expense form from the first screen.",
+        "Enter payer, participants, category, amount, due date, and note.",
+        "Save the record and confirm it appears with unsettled status."
+      ],
+      "expected_result": "The expense is visible with the selected split and can be filtered immediately.",
+      "failure_or_edge_cases": [
+        "Missing payer or invalid amount shows validation and disables save.",
+        "A simulated save error preserves draft values and shows recovery guidance."
+      ]
+    },
+    {
+      "id": "flow-filter-settle",
+      "name": "Filter and settle overdue expenses",
+      "actor": "household_lead",
+      "preconditions": [
+        "At least one expense is overdue and one is settled."
+      ],
+      "steps": [
+        "Filter by overdue expenses.",
+        "Open an expense detail area.",
+        "Mark one participant as settled and clear the filter."
+      ],
+      "expected_result": "Totals, visibility, and settlement labels update without hiding overdue items.",
+      "failure_or_edge_cases": [
+        "Empty filter results show an empty state with a reset control.",
+        "Long notes wrap on mobile without covering controls."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "Run the repository build command when present or document why no build command exists.",
+    "lint": "Run lint or equivalent static checks when present.",
+    "test": "Run automated tests when present, or add a focused behavior test if the project has a test harness.",
+    "run": "Start the local app or open the static artifact and report the URL or file path.",
+    "behavior_check": "Exercise create, filter, validation, empty, error, desktop, mobile, and keyboard/focus behavior."
+  },
+  "acceptance_evidence_plan": [
+    "Desktop 1440x900 screenshot or visual inspection artifact showing the expense tracker, filters, form, and detail area with no overlap.",
+    "Mobile 390x844 screenshot or visual inspection artifact showing stacked expense rows, reachable primary actions, and wrapped notes.",
+    "Behavior evidence for creating an expense, filtering overdue records, settling a participant, and observing updated totals.",
+    "Accessibility evidence covering labels, visible focus, keyboard operation, and contrast-sensitive settlement indicators.",
+    "State coverage evidence for empty, loading, error, saved-success, disabled, and validation states."
+  ],
+  "iteration_policy": {
+    "threshold_rule": "overall_completion_score must be at least quality_score_threshold.",
+    "rework_rule": "Any failed app-quality evidence creates concrete rework before acceptance.",
+    "stop_conditions": [
+      "Review is accepted with all app evidence present.",
+      "A payment, external cost, or production deployment blocker is discovered.",
+      "The iteration budget is exhausted."
+    ]
+  },
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "budget-app-worker-001",
+      "objective": "Implement the first-screen household budget tracker workflow.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "src",
+        "app",
+        "components",
+        "styles"
+      ]
+    }
+  ]
+}

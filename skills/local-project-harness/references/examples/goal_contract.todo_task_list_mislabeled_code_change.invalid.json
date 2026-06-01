@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-todo-task-list-mislabeled",
+  "work_type": "code_change",
+  "raw_user_request": "Make a todo list.",
+  "concrete_goal": "Create a browser-based to-do list for students to capture assignments, mark tasks complete, filter by due date, and review empty, validation, saved, and overdue states from the first screen.",
+  "success_criteria": [
+    "Users can add, edit, complete, delete, and filter task records.",
+    "The task list shows due dates, priority, completion state, and empty or validation guidance.",
+    "Desktop and mobile layouts keep task rows, filters, and action controls readable without overlap."
+  ],
+  "scope_in": [
+    "Single-page to-do list UI with local client-side task state.",
+    "Task list, checklist, and due-date interactions with seeded sample assignments.",
+    "Responsive controls, labels, keyboard focus, validation messages, and empty or saved states."
+  ],
+  "scope_out": [
+    "Authentication, external calendars, notifications, paid APIs, backend persistence, and production deployment."
+  ],
+  "assumptions": [
+    "Local browser state is enough for the prototype.",
+    "Sample tasks are fictional and do not require user accounts."
+  ],
+  "implementation_constraints": [
+    "Do not add external services or paid APIs.",
+    "Keep the primary task workflow available on the first screen."
+  ],
+  "quality_score_threshold": 90,
+  "scenario_flows": [
+    {
+      "id": "flow-add-complete-task",
+      "name": "Add and complete a task",
+      "actor": "student",
+      "preconditions": [
+        "The to-do list is open with seeded sample tasks."
+      ],
+      "steps": [
+        "Create a task with title, due date, and priority.",
+        "Save the task and mark it complete.",
+        "Filter the list to show remaining active tasks."
+      ],
+      "expected_result": "The saved task appears in the list, completion changes task counts, and filters update without hiding overdue items.",
+      "failure_or_edge_cases": [
+        "Missing task title shows validation and disables save.",
+        "Empty filter results show a reset option."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "Run the available build command for the task list app.",
+    "lint": "Run the available lint command.",
+    "test": "Run available tests or add a focused task-list behavior test if the project has a test harness.",
+    "run": "Open the local to-do list app and report the URL or file path.",
+    "behavior_check": "Check add, edit, complete, delete, filter, validation, empty state, desktop layout, mobile layout, and keyboard focus behavior."
+  },
+  "acceptance_evidence_plan": [
+    "Desktop 1440x900 screenshot or visual inspection artifact showing the to-do list, filters, task form, and complete/delete controls with no overlap.",
+    "Mobile 390x844 screenshot or visual inspection artifact showing stacked task controls and wrapped long task text.",
+    "Behavior evidence for creating a task, marking it complete, deleting a task, filtering active tasks, and observing count updates.",
+    "Accessibility evidence covering labels, visible focus, keyboard operation, and contrast-sensitive priority indicators.",
+    "State coverage evidence for empty, validation, disabled, saved-success, and overdue states."
+  ],
+  "iteration_policy": [
+    "Rework until the review score reaches the quality threshold."
+  ],
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "todo-task-list-worker-001",
+      "objective": "Build the to-do task list app.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "src",
+        "tests"
+      ]
+    }
+  ]
+}

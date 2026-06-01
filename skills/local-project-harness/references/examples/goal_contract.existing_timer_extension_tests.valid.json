@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-existing-timer-extension-tests",
+  "work_type": "code_change",
+  "raw_user_request": "Add regression tests for the existing timer browser extension.",
+  "concrete_goal": "Add unit and integration test coverage to the existing timer extension codebase for start, pause, reset, and toggle controls without changing product behavior.",
+  "success_criteria": [
+    "Tests cover the existing timer extension start, pause, reset, and mode toggle behavior.",
+    "Tests verify persisted timer state and invalid duration handling in the current codebase.",
+    "No user-facing timer UI, extension workflow, or product behavior is changed."
+  ],
+  "scope_in": [
+    "Tests for existing timer extension modules and popup behavior.",
+    "Minimal test fixtures or mocks needed to exercise existing timer state."
+  ],
+  "scope_out": [
+    "New timer features, UI redesign, product copy changes, browser store packaging, and production deployment."
+  ],
+  "assumptions": [
+    "The repository already contains the timer extension implementation.",
+    "Existing test tooling can run locally without adding paid services."
+  ],
+  "implementation_constraints": [
+    "Keep changes limited to tests and test fixtures.",
+    "Do not alter the existing extension runtime behavior."
+  ],
+  "quality_score_threshold": 85,
+  "scenario_flows": [
+    {
+      "id": "flow-test-existing-timer-controls",
+      "name": "Test existing timer controls",
+      "actor": "developer",
+      "preconditions": [
+        "The existing timer extension code and test harness are present."
+      ],
+      "steps": [
+        "Add tests that exercise start, pause, reset, and toggle behavior through existing APIs.",
+        "Run the focused timer extension test command.",
+        "Confirm the test output reports the covered behavior without source UI changes."
+      ],
+      "expected_result": "The existing timer extension behavior is covered by passing tests and product files remain unchanged except fixtures if needed.",
+      "failure_or_edge_cases": [
+        "Invalid duration state is covered by a regression test.",
+        "Persisted timer state is covered across a simulated reload."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "Run the existing build command only if the repository normally requires it for tests.",
+    "lint": "Run lint or equivalent static checks when present.",
+    "test": "Run the focused timer extension regression tests.",
+    "run": "Manual app run is not required because this is test-only work against an existing codebase.",
+    "behavior_check": "Review test assertions for start, pause, reset, toggle, invalid duration, and persisted state coverage."
+  },
+  "acceptance_evidence_plan": [
+    "Focused test command output showing the existing timer extension regression tests pass.",
+    "Diff review showing changes are limited to tests or test fixtures and do not alter the product UI."
+  ],
+  "iteration_policy": [
+    "Rework until the tests pass and changes stay test-only."
+  ],
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "timer-extension-tests-worker-001",
+      "objective": "Add regression tests for the existing timer extension.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "tests",
+        "src/**/*.test.*"
+      ]
+    }
+  ]
+}

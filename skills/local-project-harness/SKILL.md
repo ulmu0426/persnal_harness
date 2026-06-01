@@ -24,11 +24,13 @@ Treat `references/harness-readme.md` as the source of truth for the harness. It 
 - security gates
 - consensus for risky work
 - lifecycle tracking and close audit
-- minimal local audit checks for scope, secrets, close state, review logic, and README/reference drift
+- minimal local audit checks for scope, secrets, close state, review logic, and repo-root sync maintenance
 - final integration decision
 - final `summary_worker` report using the four required Korean fields defined in `harness-readme.md`
 
 If this `SKILL.md` conflicts with `references/harness-readme.md`, follow `references/harness-readme.md`.
+
+When root repository docs, prompts, schemas, or examples are unavailable, stale, or intentionally out of scope for the pass, use the skill-bundled references as the completeness baseline. Do not invent missing schemas or copy example payloads; load the smallest relevant reference instead.
 
 ## Required Behavior
 
@@ -40,7 +42,7 @@ For non-trivial project work:
 2. Create or delegate a Goal Contract before implementation.
 3. Confirm the Goal Contract has the required fields and verification matrix.
 4. Use `goal_review_worker` to review Goal Contract substance before implementation; do not proceed when it reports `blocked`, `rejected`, or unresolved `needs_rework`.
-5. For abstract app/product ideas, require `work_type: app_product`, an inferred `product_brief`, and `app_quality_gates`; ask the user only for true blockers.
+5. For abstract app/site/game/tool/product ideas, require `work_type: app_product`; reject generic product briefs. Infer a strong `product_brief` with target user, domain workflow, data model and states, responsive/accessibility/visual evidence plan, and non-goals; ask the user only for true blockers.
 6. Break work into bounded sub-tasks.
 7. Delegate to actual sub-agents when available and authorized.
 8. For non-trivial app or product work, require real-subagent review or verification as a hard gate when real sub-agent tools are available.
@@ -95,9 +97,17 @@ Load these only as needed after `harness-readme.md`:
 - `references/agent-roles.md`: role contracts and report shapes
 - `references/goal-contract.md`: compact and full Goal Contract templates
 - `references/review-gates.md`: scoring, blocking gates, and rework rules
+- `references/app-product-inference.md`: playbook for turning vague app/product requests into strong Goal Contracts
+- `references/ux-quality-gates.md`: pass/fail UX gates and required evidence for app/product outputs
+- `references/orchestration-modes.md`: real sub-agent versus simulated same-context mode rules and disclosure
 - `references/lifecycle.md`: sub-agent lifecycle states and close rules
 - `references/local-adoption.md`: how to install project-local harness policy files
-- `scripts/harness_checks.mjs`: optional local audits for scope, secret candidates, lifecycle close state, review logic, and README/reference drift
+- `references/schemas/`: skill-local copies of the core JSON Schemas for installed use when root `schemas/` is unavailable, including `goal_contract`, `delegation_contract`, `worker_report`, `review_report`, `summary_report`, `lifecycle_event`, `runner_policy`, and `run_state`
+- `references/policies/runner_policy.yaml`: skill-local runner policy copy for installed use when root `harness/runner_policy.yaml` is unavailable
+- `references/examples/`: skill-local example Goal Contract, Review Report, and Summary Report fixtures for app/product validation
+- `scripts/harness_checks.mjs`: optional local audits for scope, secret candidates, lifecycle close state, goal logic, review logic, app evidence, summary logic, plus repo-root runner policy and README/reference sync maintenance
+
+When using the skill-local runner policy from an installed skill, helper commands are relative to the skill directory (`node scripts/harness_checks.mjs ...`) and list only installed-safe helper audits. In a repository root that vendors this skill, use the repo-root helper path (`node skills/local-project-harness/scripts/harness_checks.mjs ...`); the root runner policy additionally lists repo-maintenance sync checks for comparing bundled references to root docs and policies.
 
 ## Final Response
 

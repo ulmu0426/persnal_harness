@@ -1,4 +1,4 @@
 interface:
   display_name: "Local Project Harness"
-  short_description: "Apply the README-defined orchestrator harness to local projects."
-  default_prompt: "Use local-project-harness. Read its bundled harness README first, then run this project task through the main-orchestrator, Goal Contract, goal review, delegation, verification, review, rework, lifecycle-close, optional local audits, and final summary_worker reporting flow."
+  short_description: "Apply the orchestrator harness with Goal Contracts, app/product inference, UX evidence gates, and review disclosure."
+  default_prompt: "Use local-project-harness. Read its bundled harness README first, infer app/product briefs when needed, then run this project task through the main-orchestrator, Goal Contract, goal review, delegation, verification, UX evidence gates, review, rework, lifecycle-close, optional local audits, real-vs-simulated review disclosure, and final summary_worker reporting flow."

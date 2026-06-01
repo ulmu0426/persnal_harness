@@ -1,0 +1,219 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "ko-handoff-app-review-001",
+  "work_type": "app_product",
+  "status": "accepted",
+  "reviewed_outputs": [
+    "src/App.tsx",
+    "src/App.css",
+    "tests/ko-handoff-flow.test.ts"
+  ],
+  "scope_check": {
+    "status": "passed",
+    "evidence": "검토한 산출물은 한국어 교대 인수인계 앱 화면, 스타일, 워크플로 테스트 범위 안에 있다.",
+    "findings": []
+  },
+  "goal_contract_check": {
+    "status": "passed",
+    "evidence": "구현은 병동 교대 리더, 인수인계 카드, 태스크 필터, 준비상태, 상태 커버리지 요구를 가진 Goal Contract와 일치한다.",
+    "findings": []
+  },
+  "overall_completion_score": 94,
+  "rubric_scores": {
+    "question_fulfillment": {
+      "score": 24,
+      "max_score": 25,
+      "evidence": "첫 화면의 한국어 인수인계 앱이 교대 리더의 환자 카드 작성과 미해결 태스크 확인 요구를 충족한다."
+    },
+    "functional_completeness": {
+      "score": 19,
+      "max_score": 20,
+      "evidence": "인수인계 생성, 편집, 저장, 필터, 태스크 완료, 검증, 로컬 상태 전환이 구현되어 확인됐다."
+    },
+    "scenario_flow_coverage": {
+      "score": 28,
+      "max_score": 30,
+      "evidence": "우선순위 인수인계 생성 흐름과 미해결 태스크 필터 완료 흐름이 엣지 상태와 함께 통과했다."
+    },
+    "edge_case_handling": {
+      "score": 9,
+      "max_score": 10,
+      "evidence": "빈 상태, 로딩 상태, 검증 오류, 비활성 저장, 저장 성공, 복구 가능한 오류 상태가 모두 확인됐다."
+    },
+    "regression_safety": {
+      "score": 5,
+      "max_score": 5,
+      "evidence": "집중 테스트가 인수인계 생성, 필터, 태스크 완료, 카운트 업데이트 동작을 보호한다."
+    },
+    "verification_completeness": {
+      "score": 9,
+      "max_score": 10,
+      "evidence": "빌드, 린트, 테스트, 실행, 데스크톱과 모바일 시각 검사, 접근성, 상태 커버리지 증거가 기록됐다."
+    }
+  },
+  "scenario_flow_scores": [
+    {
+      "id": "flow-ko-create-handoff",
+      "score": 95,
+      "passed": true,
+      "evidence": "병실 412B 인수인계 카드를 생성하고 긴급 준비상태, 우선순위 알림, 미해결 태스크를 저장했으며 카드가 표시됨; 병실 누락 입력은 검증 오류와 비활성 저장 버튼으로 확인됨."
+    },
+    {
+      "id": "flow-ko-filter-complete",
+      "score": 93,
+      "passed": true,
+      "evidence": "미해결 태스크 필터를 적용하고 인수인계 상세 영역을 열어 태스크 하나를 완료했으며 카드 카운트와 준비상태 라벨이 업데이트됨; 빈 결과 초기화 상태도 표시됨."
+    }
+  ],
+  "score_threshold": 90,
+  "passed_threshold": true,
+  "blocking_gates": [],
+  "verification_check": {
+    "build": {
+      "status": "passed",
+      "evidence": "`npm run build`가 한국어 인수인계 앱의 프로덕션 산출물을 생성하며 성공했다.",
+      "findings": []
+    },
+    "lint": {
+      "status": "passed",
+      "evidence": "`npm run lint`가 인수인계 화면과 테스트 파일을 오류 없이 검사했다.",
+      "findings": []
+    },
+    "test": {
+      "status": "passed",
+      "evidence": "`npm test -- ko-handoff-flow`가 생성, 필터, 태스크 완료, 상태 커버리지 테스트를 통과했다.",
+      "findings": []
+    },
+    "run": {
+      "status": "passed",
+      "evidence": "로컬 개발 서버 http://localhost:5173 에서 한국어 교대 인수인계 보드가 렌더링되어 카드와 필터 화면이 표시됨.",
+      "findings": []
+    },
+    "behavior_check": {
+      "status": "passed",
+      "evidence": "수동 동작 확인에서 병동 인수인계 카드를 생성하고 미해결 태스크 필터를 적용한 뒤 태스크를 완료했으며 카운트와 준비상태 라벨이 업데이트됨.",
+      "findings": []
+    }
+  },
+  "app_quality_check": {
+    "ux_workflow_completeness": {
+      "status": "passed",
+      "evidence": "첫 화면에 인수인계 보드, 우선순위 필터, 카드 추가 폼, 태스크 완료 버튼이 표시됨; 생성, 저장, 필터, 완료 워크플로가 한 화면에서 확인됨.",
+      "findings": []
+    },
+    "visual_polish": {
+      "status": "passed",
+      "evidence": "데스크톱과 모바일 검사에서 중증도, 준비상태, 우선순위 알림, 태스크 카운트 계층이 카드 레이아웃에 명확히 표시됨.",
+      "findings": []
+    },
+    "responsive_desktop_mobile": {
+      "status": "passed",
+      "evidence": "데스크톱 1440x900 보드는 다열 카드 레이아웃으로 표시됨; 모바일 390x844 화면은 카드와 저장 버튼이 세로로 쌓이고 긴 알림 문구가 잘림 없이 줄바꿈됨.",
+      "findings": []
+    },
+    "accessibility_basics": {
+      "status": "passed",
+      "evidence": "접근성 확인에서 필터 버튼, 폼 필드, 저장 버튼, 태스크 체크 컨트롤에 레이블과 키보드 포커스가 있으며 대비와 상태 메시지가 검사됨.",
+      "findings": []
+    },
+    "error_loading_empty_states": {
+      "status": "passed",
+      "evidence": "상태 검사에서 로딩 표시, 빈 필터 결과, 병실 누락 검증 오류, 비활성 저장 버튼, 저장 성공 메시지, 복구 가능한 오류 안내가 모두 표시됨.",
+      "findings": []
+    },
+    "text_overlap_layout_stability": {
+      "status": "passed",
+      "evidence": "긴 병실 라벨, 담당 간호사 이름, 우선순위 알림, 태스크 버튼이 데스크톱과 모바일 카드 안에서 겹침 없이 줄바꿈되어 표시됨.",
+      "findings": []
+    },
+    "domain_fit": {
+      "status": "passed",
+      "evidence": "교대 인수인계 화면의 카드와 필터 레이블이 병동, 환자, 간호사, 우선순위 알림, 준비상태 용어를 사용하며 샘플 데이터와 상호작용에 표시됨.",
+      "findings": []
+    },
+    "evidence": [
+      {
+        "type": "screenshot",
+        "status": "passed",
+        "description": "데스크톱 1440x900 스크린샷 검사: 인수인계 보드, 우선순위 필터, 추가 폼, 상세 카드가 표시됨; 카드와 버튼 겹침 없음.",
+        "artifact": "artifacts/ko-handoff-desktop-1440x900.png"
+      },
+      {
+        "type": "screenshot",
+        "status": "passed",
+        "description": "모바일 390x844 스크린샷 검사: 인수인계 카드, 저장 버튼, 긴 알림 문구가 세로로 쌓이고 잘림 없이 줄바꿈되어 표시됨.",
+        "artifact": "artifacts/ko-handoff-mobile-390x844.png"
+      },
+      {
+        "type": "manual_behavior_check",
+        "status": "passed",
+        "description": "수동 동작 확인: 병실 412B 인수인계 카드를 생성하고 미해결 태스크 필터를 적용한 뒤 태스크를 완료했으며 카운트와 준비상태가 업데이트됨.",
+        "artifact": "manual-check-notes/ko-handoff-workflow.md"
+      },
+      {
+        "type": "accessibility_check",
+        "status": "passed",
+        "description": "접근성 확인: 필터, 폼 필드, 저장 버튼, 태스크 컨트롤의 레이블, 키보드 포커스, 상태 메시지, 대비가 검사되어 표시됨.",
+        "artifact": "manual-check-notes/ko-accessibility.md"
+      },
+      {
+        "type": "automated_test",
+        "status": "passed",
+        "description": "상태 커버리지 테스트: 빈 필터 결과, 로딩, 복구 가능한 오류, 저장 성공, 비활성 저장 버튼, 검증 메시지가 표시됨을 확인함.",
+        "artifact": "tests/ko-handoff-flow.test.ts"
+      }
+    ]
+  },
+  "security_check": {
+    "status": "passed",
+    "evidence": "프로토타입은 허구 병동 샘플 기록만 사용하며 외부 서비스, 자격증명, 실제 환자정보를 포함하지 않는다.",
+    "findings": []
+  },
+  "secret_scan_result": {
+    "status": "passed",
+    "evidence": "변경 파일에서 API 키나 자격증명 형태의 문자열이 발견되지 않았다.",
+    "findings": []
+  },
+  "scope_diff_result": {
+    "status": "passed",
+    "evidence": "변경 파일은 한국어 인수인계 앱 구현, 스타일, 테스트 범위와 일치한다.",
+    "findings": []
+  },
+  "command_audit": [
+    {
+      "command": "npm run build",
+      "cwd": "C:/repo/ko-handoff-app",
+      "purpose": "프로덕션 빌드 검증.",
+      "exit_code": 0,
+      "output_summary": "Build completed."
+    },
+    {
+      "command": "npm run lint",
+      "cwd": "C:/repo/ko-handoff-app",
+      "purpose": "정적 검사 검증.",
+      "exit_code": 0,
+      "output_summary": "Lint completed without errors."
+    },
+    {
+      "command": "npm test -- ko-handoff-flow",
+      "cwd": "C:/repo/ko-handoff-app",
+      "purpose": "인수인계 워크플로와 상태 커버리지 검증.",
+      "exit_code": 0,
+      "output_summary": "Focused workflow test passed."
+    }
+  ],
+  "budget_used": {
+    "iterations": 2,
+    "rework_iterations": 1,
+    "consensus_rounds": 0,
+    "subagents_started": 3,
+    "open_subagents": 0
+  },
+  "independence": "real_subagent",
+  "rework_items": [],
+  "next_iteration_recommendation": "추가 재작업 없음.",
+  "risks_or_follow_up": [
+    "프로토타입은 로컬 전용이며 실제 환자정보와 함께 사용하면 안 된다."
+  ],
+  "recommendation": "accepted"
+}

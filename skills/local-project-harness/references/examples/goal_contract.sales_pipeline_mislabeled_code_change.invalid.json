@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-sales-pipeline-mislabeled",
+  "work_type": "code_change",
+  "raw_user_request": "Build a sales pipeline for reps.",
+  "concrete_goal": "Create a browser-based sales pipeline for reps to capture leads, move opportunities through stages, estimate quotes, track next actions, and review close dates from the first screen.",
+  "success_criteria": [
+    "Sales reps can add, edit, filter, and update lead records, opportunity stages, quote estimates, owner assignments, and next-action tasks.",
+    "The sales pipeline shows empty, loading, validation, disabled, saved-success, and mobile states."
+  ],
+  "scope_in": [
+    "Single-page sales pipeline UI with local client-side state."
+  ],
+  "scope_out": [
+    "External CRM integrations, email sending, payments, authentication, and production deployment."
+  ],
+  "assumptions": [
+    "Local browser state is acceptable for a prototype."
+  ],
+  "implementation_constraints": [
+    "Do not add paid services or external CRMs."
+  ],
+  "quality_score_threshold": 90,
+  "scenario_flows": [
+    {
+      "id": "flow-add-opportunity",
+      "name": "Add sales opportunity",
+      "actor": "sales_rep",
+      "preconditions": [
+        "The sales pipeline workspace is open."
+      ],
+      "steps": [
+        "Create a lead with company, contact, rep owner, opportunity stage, quote estimate, and next action.",
+        "Save the record and filter by stage."
+      ],
+      "expected_result": "The saved opportunity appears in the selected stage with quote and next-action details.",
+      "failure_or_edge_cases": [
+        "Missing company or contact shows validation."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "Run the available build command.",
+    "lint": "Run the available lint command.",
+    "test": "Run available tests.",
+    "run": "Open the local app.",
+    "behavior_check": "Check create, edit, filter, validation, and responsive behavior."
+  },
+  "acceptance_evidence_plan": [
+    "Desktop and mobile screenshots plus behavior, accessibility, and state coverage."
+  ],
+  "iteration_policy": [
+    "Rework until the review score reaches the quality threshold."
+  ],
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "sales-pipeline-worker-001",
+      "objective": "Build the sales pipeline workspace.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "src"
+      ]
+    }
+  ]
+}

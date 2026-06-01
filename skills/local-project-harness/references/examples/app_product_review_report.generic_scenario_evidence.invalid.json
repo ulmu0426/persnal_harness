@@ -1,0 +1,219 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "handoff-app-review-generic-scenario-evidence",
+  "work_type": "app_product",
+  "status": "accepted",
+  "reviewed_outputs": [
+    "src/App.tsx",
+    "src/App.css",
+    "tests/handoff-flow.test.ts"
+  ],
+  "scope_check": {
+    "status": "passed",
+    "evidence": "Reviewed outputs are within the assigned handoff board app scope.",
+    "findings": []
+  },
+  "goal_contract_check": {
+    "status": "passed",
+    "evidence": "The implementation matches the shift handoff Goal Contract, including target users, workflows, data entities, and state requirements.",
+    "findings": []
+  },
+  "overall_completion_score": 94,
+  "rubric_scores": {
+    "question_fulfillment": {
+      "score": 24,
+      "max_score": 25,
+      "evidence": "The first-screen handoff board satisfies the requested app experience for charge nurse shift handoffs."
+    },
+    "functional_completeness": {
+      "score": 19,
+      "max_score": 20,
+      "evidence": "Create, edit, complete, filter, validation, and local state transitions are implemented."
+    },
+    "scenario_flow_coverage": {
+      "score": 28,
+      "max_score": 30,
+      "evidence": "Both priority handoff creation and unresolved-task filtering flows passed with edge cases."
+    },
+    "edge_case_handling": {
+      "score": 9,
+      "max_score": 10,
+      "evidence": "Empty, loading, validation, disabled, saved, and recoverable error states were exercised."
+    },
+    "regression_safety": {
+      "score": 5,
+      "max_score": 5,
+      "evidence": "Focused behavior test covers the main workflow and count updates."
+    },
+    "verification_completeness": {
+      "score": 9,
+      "max_score": 10,
+      "evidence": "Build, test, run, desktop/mobile visual checks, accessibility basics, and state coverage evidence are recorded."
+    }
+  },
+  "scenario_flow_scores": [
+    {
+      "id": "flow-create-priority-handoff",
+      "score": 95,
+      "passed": true,
+      "evidence": "passed"
+    },
+    {
+      "id": "flow-filter-review",
+      "score": 93,
+      "passed": true,
+      "evidence": "checked"
+    }
+  ],
+  "score_threshold": 90,
+  "passed_threshold": true,
+  "blocking_gates": [],
+  "verification_check": {
+    "build": {
+      "status": "passed",
+      "evidence": "`npm run build` completed with production assets generated.",
+      "findings": []
+    },
+    "lint": {
+      "status": "passed",
+      "evidence": "`npm run lint` completed without errors.",
+      "findings": []
+    },
+    "test": {
+      "status": "passed",
+      "evidence": "`npm test -- handoff-flow` passed the create, filter, and complete-task workflow test.",
+      "findings": []
+    },
+    "run": {
+      "status": "passed",
+      "evidence": "Local dev server opened at http://localhost:5173 and rendered the shift handoff board.",
+      "findings": []
+    },
+    "behavior_check": {
+      "status": "passed",
+      "evidence": "Manual behavior check created a fictional patient handoff, filtered unresolved tasks, completed a task, triggered validation, and reset an empty filter state.",
+      "findings": []
+    }
+  },
+  "app_quality_check": {
+    "ux_workflow_completeness": {
+      "status": "passed",
+      "evidence": "The first screen contains the handoff board, priority filters, add/edit form, and task completion controls needed for the primary shift handoff workflow.",
+      "findings": []
+    },
+    "visual_polish": {
+      "status": "passed",
+      "evidence": "Desktop and mobile inspections show clear hierarchy for acuity, readiness, alerts, and task counts with deliberate spacing and non-generic clinical labels.",
+      "findings": []
+    },
+    "responsive_desktop_mobile": {
+      "status": "passed",
+      "evidence": "Desktop 1440x900 uses a multi-column board; mobile 390x844 stacks cards and wraps actions without overlap or clipped alert text.",
+      "findings": []
+    },
+    "accessibility_basics": {
+      "status": "passed",
+      "evidence": "Keyboard tab order reaches filters, form fields, save, edit, and task controls; visible focus, labels, aria-live status text, and contrast-sensitive priority badges were inspected.",
+      "findings": []
+    },
+    "error_loading_empty_states": {
+      "status": "passed",
+      "evidence": "Loading seed data, empty filter result, validation errors, disabled invalid save, save success message, and simulated local state error were all visible and recoverable.",
+      "findings": []
+    },
+    "text_overlap_layout_stability": {
+      "status": "passed",
+      "evidence": "Long room labels, assigned nurse names, and alert text wrapped inside cards at 1440x900 and 390x844 without moving controls or overlapping neighboring content.",
+      "findings": []
+    },
+    "domain_fit": {
+      "status": "passed",
+      "evidence": "Sample data and labels use fictional clinical handoff terms: room, acuity, assigned nurse, priority alert, open care task, and readiness status.",
+      "findings": []
+    },
+    "evidence": [
+      {
+        "type": "screenshot",
+        "status": "passed",
+        "description": "Desktop 1440x900 screenshot inspected: handoff board, priority filters, add form, and details card are visible with no overlap.",
+        "artifact": "artifacts/handoff-desktop-1440x900.png"
+      },
+      {
+        "type": "screenshot",
+        "status": "passed",
+        "description": "Mobile 390x844 screenshot inspected: stacked cards, wrapped alert text, and reachable add/save controls remain usable.",
+        "artifact": "artifacts/handoff-mobile-390x844.png"
+      },
+      {
+        "type": "manual_behavior_check",
+        "status": "passed",
+        "description": "Primary workflow behavior check: created a room 412B handoff, filtered unresolved tasks, completed one task, and confirmed counts updated.",
+        "artifact": "manual-check-notes/handoff-workflow.md"
+      },
+      {
+        "type": "accessibility_check",
+        "status": "passed",
+        "description": "Accessibility basics check: labels, visible focus, keyboard operation, aria-live save status, and contrast of readiness badges inspected.",
+        "artifact": "manual-check-notes/accessibility.md"
+      },
+      {
+        "type": "automated_test",
+        "status": "passed",
+        "description": "State coverage test exercised empty filter results, loading seed data, recoverable error, saved-success message, disabled invalid save, and validation messages.",
+        "artifact": "tests/handoff-flow.test.ts"
+      }
+    ]
+  },
+  "security_check": {
+    "status": "passed",
+    "evidence": "The prototype uses fictional sample records and no external services, credentials, or protected health information.",
+    "findings": []
+  },
+  "secret_scan_result": {
+    "status": "passed",
+    "evidence": "Secret scan found no API keys or credential-like values in changed files.",
+    "findings": []
+  },
+  "scope_diff_result": {
+    "status": "passed",
+    "evidence": "Changed files matched the assigned app implementation and test scope.",
+    "findings": []
+  },
+  "command_audit": [
+    {
+      "command": "npm run build",
+      "cwd": "C:/repo/handoff-app",
+      "purpose": "Verify production build.",
+      "exit_code": 0,
+      "output_summary": "Build completed."
+    },
+    {
+      "command": "npm run lint",
+      "cwd": "C:/repo/handoff-app",
+      "purpose": "Verify static lint checks.",
+      "exit_code": 0,
+      "output_summary": "Lint completed without errors."
+    },
+    {
+      "command": "npm test -- handoff-flow",
+      "cwd": "C:/repo/handoff-app",
+      "purpose": "Verify primary workflow behavior and state coverage.",
+      "exit_code": 0,
+      "output_summary": "Focused workflow test passed."
+    }
+  ],
+  "budget_used": {
+    "iterations": 2,
+    "rework_iterations": 1,
+    "consensus_rounds": 0,
+    "subagents_started": 3,
+    "open_subagents": 0
+  },
+  "independence": "real_subagent",
+  "rework_items": [],
+  "next_iteration_recommendation": "No rework required.",
+  "risks_or_follow_up": [
+    "The prototype is local-only and must not be used with real patient data."
+  ],
+  "recommendation": "accepted"
+}

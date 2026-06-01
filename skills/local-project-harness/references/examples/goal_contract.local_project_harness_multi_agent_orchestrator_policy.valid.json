@@ -1,0 +1,109 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-local-project-harness-multi-agent-orchestrator-policy",
+  "work_type": "schema_policy",
+  "raw_user_request": "Improve local-project-harness as a multi-agent orchestrator policy and skill validation harness.",
+  "concrete_goal": "Update local-project-harness policy and skill validation rules for multi-agent orchestration so contracts, review reports, and runner checks distinguish harness governance work from end-user feature work.",
+  "success_criteria": [
+    "The policy rules describe how multi-agent orchestration contracts, review independence, lifecycle closeout, and runner checks should be validated.",
+    "Schema and policy examples keep classification separate from harness, orchestrator, agent lifecycle, and skill documentation changes.",
+    "Runner sync and README sync checks continue to pass after the policy fixture updates."
+  ],
+  "scope_in": [
+    "Harness policy examples, schema-policy validation text, and targeted fixtures for multi-agent orchestrator behavior.",
+    "Validation checks that protect review lifecycle, delegation budget, and runner policy sync behavior."
+  ],
+  "scope_out": [
+    "End-user feature implementation, runtime previews, and presentation deliverables.",
+    "Changes to unrelated source files or external service integrations."
+  ],
+  "assumptions": [
+    "The work improves a local validation harness and not a shipped end-user deliverable.",
+    "Multi-agent terminology refers to orchestration policy and lifecycle governance, not an operator runtime."
+  ],
+  "implementation_constraints": [
+    "Keep changes scoped to local-project-harness policy, script, schema, or fixture files.",
+    "Do not weaken end-user evidence requirements while fixing orchestrator policy classification."
+  ],
+  "quality_score_threshold": 90,
+  "scenario_flows": [
+    {
+      "id": "flow-orchestrator-policy-classification",
+      "name": "Classify harness orchestrator policy work as schema policy",
+      "actor": "harness_validator",
+      "preconditions": [
+        "A Goal Contract describes local-project-harness multi-agent orchestration policy work."
+      ],
+      "steps": [
+        "Run goal-logic on the schema_policy contract.",
+        "Inspect whether classification inference treats bare agent terminology as an end-user noun."
+      ],
+      "expected_result": "The contract remains schema_policy because it is about harness governance, runner checks, and lifecycle policy rather than end-user feature implementation.",
+      "failure_or_edge_cases": [
+        "Bare agent or multi-agent wording must not trigger an end-user runtime class when no explicit end-user runtime context is present.",
+        "Orchestrator policy and lifecycle language should remain schema_policy even when it discusses subagents and review workers."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "Run syntax checks for changed validation scripts.",
+    "lint": "Run available static validation if present.",
+    "test": "Run goal-logic fixtures covering classification boundaries.",
+    "run": "Not applicable for schema_policy harness work; no user-facing runtime is produced.",
+    "behavior_check": "Verify the multi-agent orchestrator policy fixture passes goal-logic while mislabeled creation fixtures still fail."
+  },
+  "acceptance_evidence_plan": [
+    "Record node --check output for the harness validation script.",
+    "Record goal-logic output for this schema_policy orchestrator fixture.",
+    "Record invalid fixture failures for the known mislabeled creation and improvement requests.",
+    "Record runner-policy-sync and README sync output."
+  ],
+  "iteration_policy": {
+    "threshold_rule": "overall_completion_score must be at least quality_score_threshold.",
+    "rework_rule": "Any failed validation command requires a targeted fixture or script correction before acceptance.",
+    "stop_conditions": [
+      "All targeted harness checks pass.",
+      "A pre-existing unrelated dirty worktree change blocks sync verification.",
+      "The validation budget is exhausted."
+    ]
+  },
+  "iteration_budget": {
+    "max_iterations": 6,
+    "max_rework_iterations": 4,
+    "default_consensus_rounds": 2,
+    "max_consensus_rounds": 3,
+    "max_subagents_per_task": 8,
+    "max_open_subagents": 4,
+    "max_validation_failures": 3,
+    "max_wall_clock_minutes": 120,
+    "min_completion_score": 90
+  },
+  "security_policy": {
+    "allowed_files_required": true,
+    "path_normalization_required": true,
+    "symlink_escape_rejected": true,
+    "secret_scan_required": true,
+    "scope_diff_required": true,
+    "unauthorized_network_or_cost_rejected": true
+  },
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "orchestrator-policy-worker-001",
+      "objective": "Update local-project-harness validation policy without treating multi-agent orchestrator wording as an end-user deliverable.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "skills/local-project-harness/scripts/harness_checks.mjs",
+        "skills/local-project-harness/references/examples"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-mixed-budget-tracker",
+  "work_type": "code_change",
+  "raw_user_request": "Build a budget tracker app and add tests and docs.",
+  "concrete_goal": "Create a browser-based budget tracker app for households to enter income, expenses, category budgets, and monthly savings progress, with basic tests and README documentation.",
+  "success_criteria": [
+    "Users can add, edit, delete, and filter budget entries from a first-screen workflow.",
+    "The tracker shows monthly totals, category status, validation states, and empty-state guidance.",
+    "The implementation includes focused tests and documentation for the budget tracker workflow."
+  ],
+  "scope_in": [
+    "Single-page budget tracker app UI.",
+    "Local state for budget records.",
+    "Tests and README updates for the created app."
+  ],
+  "scope_out": [
+    "Authentication, banking integrations, paid APIs, and backend deployment."
+  ],
+  "assumptions": [
+    "Local browser state is enough for the prototype."
+  ],
+  "implementation_constraints": [
+    "Do not add external financial services."
+  ],
+  "quality_score_threshold": 90,
+  "scenario_flows": [
+    {
+      "id": "flow-add-expense",
+      "name": "Add and review expense",
+      "actor": "household_budget_owner",
+      "preconditions": [
+        "The budget tracker app is open."
+      ],
+      "steps": [
+        "Create an expense with amount, date, category, and note.",
+        "Save the entry and filter by category."
+      ],
+      "expected_result": "The expense appears in monthly totals and category progress.",
+      "failure_or_edge_cases": [
+        "Missing amount or category shows validation."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "Run the available build command.",
+    "lint": "Run the available lint command.",
+    "test": "Run available tests.",
+    "run": "Open the local app.",
+    "behavior_check": "Check create, edit, filter, validation, and responsive behavior."
+  },
+  "acceptance_evidence_plan": [
+    "Desktop and mobile screenshots plus behavior, accessibility, test, docs, and state coverage."
+  ],
+  "iteration_policy": [
+    "Rework until the review score reaches the quality threshold."
+  ],
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "budget-tracker-worker-001",
+      "objective": "Build the budget tracker app, tests, and docs.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "src",
+        "tests",
+        "README.md"
+      ]
+    }
+  ]
+}

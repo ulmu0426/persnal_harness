@@ -1,0 +1,9 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "accepted-missing-contract",
+  "work_type": "docs",
+  "status": "accepted",
+  "overall_completion_score": 90,
+  "score_threshold": 85,
+  "recommendation": "accepted"
+}

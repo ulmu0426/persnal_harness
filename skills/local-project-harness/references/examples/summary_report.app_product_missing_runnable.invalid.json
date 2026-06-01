@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "summary-handoff-app-missing-runnable-001",
+  "linked_review": "app_product_review_report.accepted.valid.json",
+  "status": "completed",
+  "명령": [
+    "User request: Make me an app for shift handoffs.",
+    "Concrete goal: deliver a local first-screen shift handoff board for fictional charge nurse workflows with create, filter, complete-task, responsive, accessibility, and state coverage."
+  ],
+  "수행 사전 작업": [
+    "Created an app_product Goal Contract with target users, workflows, content/data/state assumptions, scope boundaries, verification matrix, and evidence plan.",
+    "Delegated implementation, verification, and review around the handoff board app surface and protected against real patient data or external services."
+  ],
+  "수행 내용": [
+    "Implemented the handoff board, fictional records, priority filters, add/edit form, task completion, and empty/loading/error/validation/success states.",
+    "Verification recorded build, lint, focused behavior test, local run, desktop 1440x900 visual evidence, mobile 390x844 visual evidence, primary workflow behavior, accessibility basics, and state coverage.",
+    "Review used real_subagent independence and accepted the app_product result with score 94 against a threshold of 90."
+  ],
+  "수행 결과": [
+    "Integration decision: accepted.",
+    "Verification outcome: build, lint, test, run, behavior, security, secret scan, and scope checks passed.",
+    "The reviewer said to run the app for local inspection.",
+    "Unverified checks: none recorded in the accepted review.",
+    "Remaining risk: this is a local fictional prototype and must not be used with real patient data."
+  ],
+  "risks_or_follow_up": [
+    "The prototype is local-only and must not be used with real patient data."
+  ]
+}

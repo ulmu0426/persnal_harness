@@ -385,40 +385,40 @@ workflow:
       output: "Goal Contract"
     - id: goal_contract_completeness_check
       owner: main_orchestrator
-      output: "Goal Contract 필수 필드와 verification_matrix 필수 항목 존재 확인 메타 결과"
+      output: "Completeness check result confirming required Goal Contract fields and verification_matrix entries"
     - id: goal_contract_quality_review
       owner: goal_review_worker
-      output: "Goal Contract 구현 가능성, 테스트 가능성, 범위, 가정, 검증 계획, 시나리오 품질 검토 보고서"
+      output: "Goal Contract quality review report covering feasibility, testability, scope, assumptions, verification plan, and scenario risk"
     - id: schema_validation
       owner: verification_worker
-      output: "Goal Contract, 위임 계약, 보고서, lifecycle event의 schema validation report"
+      output: "Schema validation report for Goal Contract, delegation contract, reports, and lifecycle events"
     - id: consensus_when_required
       owner: main_orchestrator
-      output: "보안, 기술, 관리 역할 에이전트의 순차 토론 결과와 합의 또는 consensus_failed 상태"
+      output: "Consensus result or consensus_failed status for security, technical, or management decision points"
     - id: breakdown
       owner: main_orchestrator
-      output: "Goal Contract 기반 하위 작업 목록과 의존성"
+      output: "Subtask list and dependencies based on the Goal Contract"
     - id: delegation
       owner: main_orchestrator
-      output: "워커별 작업 지시"
+      output: "Worker-specific task instructions"
     - id: execution
       owner: subtask_worker
-      output: "변경 사항, 산출물, 검증 결과"
+      output: "Changes, deliverables, and verification results"
     - id: review
       owner: review_worker
-      output: "완성도 점수, 시나리오 플로우 점수, 검수 보고서와 재작업 권고"
+      output: "Completion score, scenario flow score, verification report, and rework recommendations"
     - id: rework_iteration
       owner: main_orchestrator
-      output: "overall_completion_score가 threshold 미만이거나 passed_threshold가 false일 때 rework_items 기반 재위임"
+      output: "Rework instructions based on rework_items when overall_completion_score is below threshold or passed_threshold is false"
     - id: integration_decision
       owner: main_orchestrator
-      output: "threshold 통과 검수 보고서 기반 통합, 재위임, 완료 중 하나의 결정"
+      output: "Decision to integrate, rework, complete, or stop based on threshold and verification reports"
     - id: final_summary
       owner: summary_worker
-      output: "명령, 수행 사전 작업, 수행 내용, 수행 결과를 포함한 Summary Report"
+      output: "Summary Report including command, prior work, execution details, and execution results"
     - id: final_user_report
       owner: main_orchestrator
-      output: "Summary Report 기반 최종 사용자 보고"
+      output: "Final user report based on the Summary Report"
 
 delegation_contract:
   required_fields:
@@ -553,7 +553,7 @@ schema_validation:
 
 runner_policy:
   file: harness/runner_policy.yaml
-  mode: dry_run_record_audit_v1
+  mode: dry_run_record_audit
   commands:
     validate:
       - "harness-runner validate --type goal-contract --input <file>"
@@ -574,10 +574,13 @@ runner_policy:
       - "harness-runner audit-scope --assignment <file> --report <file>"
       - "harness-runner finalize --state <file>"
     helper_audit:
-      - "node skills/local-project-harness/scripts/harness_checks.mjs audit-scope --assignment <delegation.json> --report <worker-report.json>"
+      - "node skills/local-project-harness/scripts/harness_checks.mjs audit-scope --assignment <delegation.json> --report <worker-report.json> [--workspace <path>]"
       - "node skills/local-project-harness/scripts/harness_checks.mjs secret-scan <file> [<file> ...]"
       - "node skills/local-project-harness/scripts/harness_checks.mjs audit-close --lifecycle-log <events.jsonl>"
-      - "node skills/local-project-harness/scripts/harness_checks.mjs review-logic --report <review-report.json>"
+      - "node skills/local-project-harness/scripts/harness_checks.mjs goal-logic --contract <goal.json>"
+      - "node skills/local-project-harness/scripts/harness_checks.mjs review-logic --report <review-report.json> --contract <goal.json>"
+      - "node skills/local-project-harness/scripts/harness_checks.mjs app-evidence --review <review.json>"
+      - "node skills/local-project-harness/scripts/harness_checks.mjs summary-logic --summary <summary.json> --review <review.json>"
       - "node skills/local-project-harness/scripts/harness_checks.mjs sync-check --source README.md --copy skills/local-project-harness/references/harness-readme.md"
   non_execution_scope_v1:
     - no_file_creation_or_modification

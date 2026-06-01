@@ -1,0 +1,349 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://make-harness.local/schemas/run_state.schema.json",
+  "title": "Run State",
+  "description": "Persisted state snapshot for one orchestrated harness run.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "run_id",
+    "status",
+    "goal_contract_ref",
+    "iteration_budget",
+    "budget_used",
+    "subagents",
+    "lifecycle_events",
+    "validation_status",
+    "security_status",
+    "consensus_status",
+    "close_audit_status",
+    "review_summary"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "default": "1.0.0"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "$ref": "#/$defs/run_status"
+    },
+    "goal_contract_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "iteration_budget": {
+      "$ref": "#/$defs/iteration_budget"
+    },
+    "budget_used": {
+      "$ref": "#/$defs/budget_used"
+    },
+    "subagents": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/subagent_state"
+      }
+    },
+    "lifecycle_events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/lifecycle_event"
+      }
+    },
+    "validation_status": {
+      "$ref": "#/$defs/check_result"
+    },
+    "security_status": {
+      "$ref": "#/$defs/check_result"
+    },
+    "consensus_status": {
+      "$ref": "#/$defs/check_result"
+    },
+    "close_audit_status": {
+      "$ref": "#/$defs/check_result"
+    },
+    "review_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "overall_completion_score",
+        "score_threshold",
+        "passed_threshold",
+        "blocking_gates"
+      ],
+      "properties": {
+        "overall_completion_score": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "score_threshold": {
+          "type": "integer",
+          "minimum": 85,
+          "maximum": 100
+        },
+        "passed_threshold": {
+          "type": "boolean"
+        },
+        "blocking_gates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "run_status": {
+      "enum": [
+        "pending",
+        "in_progress",
+        "needs_rework",
+        "accepted",
+        "blocked",
+        "validation_failed",
+        "security_failed",
+        "budget_exceeded",
+        "consensus_failed"
+      ]
+    },
+    "iteration_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_iterations",
+        "max_rework_iterations",
+        "default_consensus_rounds",
+        "max_consensus_rounds",
+        "max_subagents_per_task",
+        "max_open_subagents",
+        "max_validation_failures",
+        "max_wall_clock_minutes",
+        "min_completion_score"
+      ],
+      "properties": {
+        "max_iterations": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 8
+        },
+        "max_rework_iterations": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 6
+        },
+        "default_consensus_rounds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 2
+        },
+        "max_consensus_rounds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 3
+        },
+        "max_subagents_per_task": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 16
+        },
+        "max_open_subagents": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 6
+        },
+        "max_validation_failures": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 3
+        },
+        "max_wall_clock_minutes": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 180
+        },
+        "min_completion_score": {
+          "type": "integer",
+          "minimum": 85,
+          "maximum": 100,
+          "default": 85
+        }
+      }
+    },
+    "budget_used": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "iterations",
+        "rework_iterations",
+        "consensus_rounds",
+        "subagents_started",
+        "open_subagents"
+      ],
+      "properties": {
+        "iterations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rework_iterations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "consensus_rounds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "subagents_started": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "open_subagents": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "subagent_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "agent_id",
+        "role",
+        "task_id",
+        "status"
+      ],
+      "properties": {
+        "agent_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "$ref": "#/$defs/lifecycle_status"
+        }
+      }
+    },
+    "lifecycle_status": {
+      "enum": [
+        "spawned",
+        "assigned",
+        "running",
+        "report_received",
+        "consumed",
+        "close_pending",
+        "closed",
+        "blocked",
+        "validation_failed",
+        "security_failed",
+        "budget_exceeded",
+        "consensus_failed"
+      ]
+    },
+    "lifecycle_event": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "event_id",
+        "event_time",
+        "run_id",
+        "agent_id",
+        "role",
+        "task_id",
+        "status",
+        "previous_status",
+        "close_condition",
+        "close_deferred_reason",
+        "budget_used"
+      ],
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "agent_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "$ref": "#/$defs/lifecycle_status"
+        },
+        "previous_status": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/lifecycle_status"
+            },
+            {
+              "const": ""
+            }
+          ]
+        },
+        "close_condition": {
+          "type": "string"
+        },
+        "close_deferred_reason": {
+          "type": "string"
+        },
+        "budget_used": {
+          "$ref": "#/$defs/budget_used"
+        },
+        "hash": {
+          "type": "string"
+        },
+        "previous_hash": {
+          "type": "string"
+        }
+      }
+    },
+    "check_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "evidence"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "not_run",
+            "not_applicable"
+          ]
+        },
+        "evidence": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,147 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-restock-dashboard-weak-evidence-plan",
+  "work_type": "app_product",
+  "raw_user_request": "Build an inventory restock dashboard for warehouse coordinators.",
+  "concrete_goal": "Build a browser-based inventory restock dashboard for warehouse coordinators to add supplier reorder requests, filter by risk, and update restock status from the first screen.",
+  "success_criteria": [
+    "Warehouse coordinators can add, edit, save, and filter supplier reorder requests without leaving the first screen.",
+    "The dashboard shows SKU, supplier, quantity, risk level, reorder status, validation, empty, loading, error, and saved-success states.",
+    "Desktop and mobile layouts keep restock cards, supplier filters, and status controls readable without overlap."
+  ],
+  "scope_in": [
+    "Single-page inventory restock dashboard UI with local client-side state.",
+    "Seeded warehouse data for SKUs, suppliers, stock risk, quantities, and reorder statuses.",
+    "Responsive controls, accessible labels, keyboard focus, validation messages, and state views."
+  ],
+  "scope_out": [
+    "Authentication, purchasing integrations, real supplier APIs, payments, and backend deployment."
+  ],
+  "assumptions": [
+    "Fictional supplier and SKU data is acceptable for the prototype.",
+    "Local browser state is enough for the first usable version."
+  ],
+  "implementation_constraints": [
+    "Do not add external supplier services or paid APIs.",
+    "Keep the primary restock workflow available on the first screen."
+  ],
+  "product_brief": {
+    "target_users": [
+      "Warehouse coordinators who track SKU shortages, supplier requests, reorder risk, and restock readiness during daily inventory review."
+    ],
+    "core_problem": "Warehouse coordinators need a concise restock workspace so urgent supplier reorder requests and incomplete stock actions are not missed.",
+    "primary_workflows": [
+      "Create or update a supplier restock request with SKU, supplier, quantity, risk level, due date, and reorder status.",
+      "Filter restock cards by high risk, supplier, and open status so coordinators can focus on urgent shortages."
+    ],
+    "domain_assumptions": [
+      "Use warehouse vocabulary such as SKU, supplier, reorder request, risk level, quantity, due date, and restock status.",
+      "High-risk shortages and blocked reorder statuses must be visible before secondary notes."
+    ],
+    "content_data_model_assumptions": [
+      "Primary entity: restock request with fields id, SKU, supplier, quantity, risk level, due date, owner, status, updated time, and notes.",
+      "Status values include draft, pending supplier, ordered, received, and blocked; UI states include empty queue, loading suppliers, validation errors, disabled invalid save, saved-success, and recoverable supplier error."
+    ],
+    "non_goals": [
+      "No purchasing integration, supplier API connection, authentication, analytics, or backend persistence."
+    ]
+  },
+  "app_quality_gates": {
+    "ux_workflow_completeness": [
+      "Primary supplier restock workflow covers adding, filtering, and updating stock request records from the first screen."
+    ],
+    "visual_polish": [
+      "Visual hierarchy distinguishes SKU, supplier, risk level, quantity, and reorder status without placeholder cards."
+    ],
+    "responsive_desktop_mobile": [
+      "Desktop board and mobile stacked restock cards are inspected with concrete viewport evidence."
+    ],
+    "accessibility_basics": [
+      "Controls have labels, visible focus, keyboard reachability, aria status text, and contrast for risk badges."
+    ],
+    "error_loading_empty_states": [
+      "Empty, loading, validation, disabled, saved-success, and recoverable supplier error states are represented."
+    ],
+    "text_overlap_layout_stability": [
+      "Long supplier names, SKU labels, and reorder notes wrap without overlap or clipping beside controls."
+    ],
+    "domain_fit": [
+      "Labels, sample data, and interactions fit warehouse inventory restock work with SKU and supplier vocabulary."
+    ],
+    "evidence_requirements": [
+      "Evidence must include desktop screenshot, mobile screenshot, behavior check, accessibility check, and state coverage artifact."
+    ]
+  },
+  "quality_score_threshold": 90,
+  "scenario_flows": [
+    {
+      "id": "flow-create-restock-request",
+      "name": "Create urgent restock request",
+      "actor": "warehouse_coordinator",
+      "preconditions": [
+        "The restock dashboard is loaded with fictional SKU data."
+      ],
+      "steps": [
+        "Open the add restock form.",
+        "Enter SKU, supplier, quantity, risk level, due date, and reorder status.",
+        "Save the request and confirm it appears in the high-risk queue."
+      ],
+      "expected_result": "The saved restock request is visible with supplier, quantity, risk badge, and status details.",
+      "failure_or_edge_cases": [
+        "Missing SKU or supplier quantity shows validation and disables save.",
+        "Simulated supplier API error preserves the draft and shows retry guidance."
+      ]
+    },
+    {
+      "id": "flow-filter-high-risk",
+      "name": "Filter high-risk restocks",
+      "actor": "warehouse_coordinator",
+      "preconditions": [
+        "At least one restock request is high risk and at least one is received."
+      ],
+      "steps": [
+        "Filter by high-risk requests.",
+        "Open a restock card details area.",
+        "Update one request status and clear the filter."
+      ],
+      "expected_result": "Counts, card visibility, and reorder status labels update without hiding urgent shortages.",
+      "failure_or_edge_cases": [
+        "Empty high-risk filter results show reset guidance.",
+        "Long supplier notes wrap on mobile without overlap."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "Run the repository build command when present.",
+    "lint": "Run lint or equivalent static checks when present.",
+    "test": "Run automated tests when present.",
+    "run": "Start the local app or open the static artifact and report the URL or file path.",
+    "behavior_check": "Exercise create, filter, save, validation, empty, error, desktop, mobile, and keyboard/focus behavior."
+  },
+  "acceptance_evidence_plan": [
+    "Desktop and mobile screenshots plus behavior workflow, accessibility keyboard focus labels aria contrast, and empty loading error state coverage will be checked for the inventory restock dashboard."
+  ],
+  "iteration_policy": [
+    "Rework until all app quality gates and evidence categories pass."
+  ],
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "restock-dashboard-worker-001",
+      "objective": "Build the inventory restock dashboard app.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "src",
+        "tests"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,196 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-shift-handoff-board",
+  "work_type": "app_product",
+  "raw_user_request": "Make me an app for shift handoffs.",
+  "concrete_goal": "Build a browser-based shift handoff board for charge nurses who need to record active patients, unresolved tasks, priority alerts, and readiness for the incoming shift from the first screen.",
+  "success_criteria": [
+    "Charge nurses can add, edit, complete, and filter patient handoff cards without leaving the first screen.",
+    "The interface exposes priority alerts, outstanding task counts, and shift readiness in terminology suited to a clinical handoff workflow.",
+    "Desktop and mobile layouts preserve readable patient cards, controls, and priority indicators without overlap or clipped text.",
+    "Empty, loading, error, validation, disabled, and saved-success states are represented or deliberately simulated."
+  ],
+  "scope_in": [
+    "Single-page handoff board UI and local client-side state for patient handoff records.",
+    "Seeded domain data for active patients, tasks, alerts, and readiness states.",
+    "Responsive controls, accessible form labels, keyboard focus, validation messages, and state views."
+  ],
+  "scope_out": [
+    "Real patient health information, authentication, audit logging, integrations, paging systems, or production deployment.",
+    "Backend persistence beyond local browser state or static seed data."
+  ],
+  "assumptions": [
+    "The prototype uses fictional patient records and must not request or store real protected health information.",
+    "Local browser state is acceptable for the first usable version.",
+    "The incoming shift needs a scan-first work surface rather than a marketing landing page."
+  ],
+  "implementation_constraints": [
+    "Do not add external services, production deployment, or paid APIs.",
+    "Do not use real patient data or examples that resemble actual protected health information.",
+    "Keep the primary workflow available on the first screen."
+  ],
+  "product_brief": {
+    "target_users": [
+      "Charge nurses and shift leads preparing an incoming team for patient status, unresolved care tasks, and immediate safety priorities."
+    ],
+    "core_problem": "Incoming clinical staff need a concise, reliable view of active patient handoff details so urgent alerts and incomplete care tasks are not lost between shifts.",
+    "primary_workflows": [
+      "Create or update a fictional patient handoff card with room, acuity, assigned nurse, alerts, tasks, and readiness status.",
+      "Filter the board by priority, unresolved tasks, and readiness so the incoming shift can focus on unsafe or incomplete handoffs.",
+      "Review empty, invalid, saved, and error states while preserving a readable board on desktop and mobile."
+    ],
+    "domain_assumptions": [
+      "Use clinical handoff vocabulary such as room, acuity, alert, task, readiness, and assigned nurse while avoiding real medical advice.",
+      "High-priority alerts and overdue tasks must be visible before secondary details."
+    ],
+    "content_data_model_assumptions": [
+      "Primary entity: handoff record with fields id, room, fictional patient initials, acuity, assigned nurse, alert summary, task list, readiness status, updated time, and notes.",
+      "Task records include label, owner, due window, and status values open or complete; readiness states include ready, needs review, and critical.",
+      "UI states include first-run empty board, loading seed data, save success, validation errors for missing room or task label, disabled save while invalid, and recoverable local state error."
+    ],
+    "non_goals": [
+      "No PHI handling, clinical decision support, external integrations, analytics, staff scheduling, or admin configuration."
+    ]
+  },
+  "app_quality_gates": {
+    "ux_workflow_completeness": [
+      "Primary add/edit/filter handoff workflow is usable from the first screen."
+    ],
+    "visual_polish": [
+      "Priority, readiness, and task hierarchy are visually distinct without generic placeholder cards."
+    ],
+    "responsive_desktop_mobile": [
+      "Desktop board and mobile stacked layout are both inspected with concrete viewport evidence."
+    ],
+    "accessibility_basics": [
+      "Controls have labels, visible focus, keyboard-reachable workflow, and sufficient contrast."
+    ],
+    "error_loading_empty_states": [
+      "Empty, loading, error, validation, disabled, and saved-success states are represented."
+    ],
+    "text_overlap_layout_stability": [
+      "Long room labels, nurse names, alert text, and action controls wrap without overlap or clipping."
+    ],
+    "domain_fit": [
+      "Labels, sample data, and interactions fit fictional clinical shift handoff work."
+    ],
+    "evidence_requirements": [
+      "Desktop visual inspection artifact or screenshot, mobile visual inspection artifact or screenshot, primary workflow behavior check, accessibility basics check, and state coverage check."
+    ]
+  },
+  "quality_score_threshold": 90,
+  "scenario_flows": [
+    {
+      "id": "flow-create-priority-handoff",
+      "name": "Create a priority handoff",
+      "actor": "charge_nurse",
+      "preconditions": [
+        "The handoff board is loaded with fictional seed data."
+      ],
+      "steps": [
+        "Open the add handoff form from the first screen.",
+        "Enter room, fictional patient initials, acuity, assigned nurse, alert summary, and one unresolved task.",
+        "Save the record and confirm it appears in the priority lane with updated task count."
+      ],
+      "expected_result": "The new fictional handoff is visible, marked with the selected priority/readiness state, and can be filtered immediately.",
+      "failure_or_edge_cases": [
+        "Missing room or task label shows validation and disables save.",
+        "A simulated save error preserves draft values and shows recovery guidance."
+      ]
+    },
+    {
+      "id": "flow-filter-review",
+      "name": "Filter unresolved handoffs",
+      "actor": "incoming_shift_lead",
+      "preconditions": [
+        "At least one handoff has open tasks and at least one is ready."
+      ],
+      "steps": [
+        "Filter by unresolved tasks.",
+        "Open a handoff card details area.",
+        "Complete one task and clear the filter."
+      ],
+      "expected_result": "Counts, card visibility, and readiness labels update without hiding urgent alerts.",
+      "failure_or_edge_cases": [
+        "Empty filter results show a first-run style empty state with a reset control.",
+        "Long alert text wraps on mobile without covering controls."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "Run the repository build command when present or document why no build command exists.",
+    "lint": "Run lint or equivalent static checks when present.",
+    "test": "Run automated tests when present, or add a focused behavior test if the project has a test harness.",
+    "run": "Start the local app or open the static artifact and report the URL or file path.",
+    "behavior_check": "Exercise create, filter, validation, empty, error, desktop, mobile, and keyboard/focus behavior."
+  },
+  "acceptance_evidence_plan": [
+    "Desktop 1440x900 screenshot or visual inspection artifact showing the handoff board, filters, form, and detail card with no overlap.",
+    "Mobile 390x844 screenshot or visual inspection artifact showing stacked cards, reachable primary actions, and wrapped alert text.",
+    "Behavior evidence for creating a handoff, filtering unresolved tasks, completing a task, and observing updated counts.",
+    "Accessibility evidence covering labels, visible focus, keyboard operation, and contrast-sensitive priority indicators.",
+    "State coverage evidence for the handoff board empty, loading, error, saved-success, disabled, and validation states."
+  ],
+  "iteration_policy": {
+    "threshold_rule": "overall_completion_score must be at least quality_score_threshold.",
+    "rework_rule": "Any failed app-quality evidence creates concrete rework before acceptance.",
+    "stop_conditions": [
+      "Review is accepted with all app evidence present.",
+      "A PHI, external cost, or production deployment blocker is discovered.",
+      "The iteration budget is exhausted."
+    ]
+  },
+  "iteration_budget": {
+    "max_iterations": 8,
+    "max_rework_iterations": 6,
+    "default_consensus_rounds": 2,
+    "max_consensus_rounds": 3,
+    "max_subagents_per_task": 16,
+    "max_open_subagents": 6,
+    "max_validation_failures": 3,
+    "max_wall_clock_minutes": 180,
+    "min_completion_score": 90
+  },
+  "security_policy": {
+    "allowed_files_required": true,
+    "path_normalization_required": true,
+    "symlink_escape_rejected": true,
+    "secret_scan_required": true,
+    "scope_diff_required": true,
+    "unauthorized_network_or_cost_rejected": true
+  },
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "handoff-app-worker-001",
+      "objective": "Implement the first-screen shift handoff board and stateful workflow.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "src",
+        "app",
+        "components",
+        "styles"
+      ]
+    },
+    {
+      "task_id": "handoff-app-review-001",
+      "objective": "Review app/product evidence for desktop, mobile, behavior, accessibility, and states.",
+      "owner": "review_worker",
+      "allowed_files": [
+        "src",
+        "app",
+        "components",
+        "styles",
+        "tests"
+      ]
+    }
+  ]
+}

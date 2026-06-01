@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-mislabeled-sales-crm",
+  "work_type": "code_change",
+  "raw_user_request": "Build a CRM for sales teams",
+  "concrete_goal": "Create a browser-based CRM for sales teams to manage leads, accounts, contacts, pipeline stages, follow-ups, and sales activity from a first-screen workflow.",
+  "success_criteria": [
+    "Sales reps can add, edit, filter, and update lead or account records.",
+    "The CRM shows pipeline stage, next action, owner, empty state, validation state, and saved-success state."
+  ],
+  "scope_in": [
+    "Single-page sales CRM UI with local client-side state."
+  ],
+  "scope_out": [
+    "Authentication, paid integrations, email sending, and backend deployment."
+  ],
+  "assumptions": [
+    "Local browser state is enough for the prototype."
+  ],
+  "implementation_constraints": [
+    "Do not add paid services or external CRMs."
+  ],
+  "quality_score_threshold": 90,
+  "scenario_flows": [
+    {
+      "id": "flow-add-lead",
+      "name": "Add and qualify a lead",
+      "actor": "sales_rep",
+      "preconditions": [
+        "The CRM workspace is open."
+      ],
+      "steps": [
+        "Create a lead with company, contact, owner, pipeline stage, and next action.",
+        "Save the record and filter by pipeline stage."
+      ],
+      "expected_result": "The saved lead appears in the selected pipeline stage with next-action details.",
+      "failure_or_edge_cases": [
+        "Missing company or contact shows validation."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "Run the available build command.",
+    "lint": "Run the available lint command.",
+    "test": "Run available tests.",
+    "run": "Open the local app.",
+    "behavior_check": "Check create, edit, filter, validation, and responsive behavior."
+  },
+  "acceptance_evidence_plan": [
+    "Desktop and mobile screenshots plus behavior, accessibility, and state coverage."
+  ],
+  "iteration_policy": [
+    "Rework until the review score reaches the quality threshold."
+  ],
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "sales-crm-worker-001",
+      "objective": "Build the sales CRM workspace.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "src"
+      ]
+    }
+  ]
+}

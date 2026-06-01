@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-mislabeled-meal-planner",
+  "work_type": "code_change",
+  "raw_user_request": "Make me a meal planner dashboard app.",
+  "concrete_goal": "Create a browser-based meal planner dashboard for busy parents to plan dinners, grocery needs, and prep status from a first-screen workflow.",
+  "success_criteria": [
+    "Users can create, edit, and filter weekly meal plan records.",
+    "The dashboard shows grocery status, prep state, and empty or validation states."
+  ],
+  "scope_in": [
+    "Single-page meal planner dashboard UI."
+  ],
+  "scope_out": [
+    "Authentication, payments, and backend deployment."
+  ],
+  "assumptions": [
+    "Local browser state is enough for the prototype."
+  ],
+  "implementation_constraints": [
+    "Do not add paid services or external APIs."
+  ],
+  "quality_score_threshold": 90,
+  "scenario_flows": [
+    {
+      "id": "flow-create-meal",
+      "name": "Create dinner plan",
+      "actor": "parent",
+      "preconditions": [
+        "The planner is open."
+      ],
+      "steps": [
+        "Add a dinner entry with ingredients and prep status.",
+        "Save the entry and filter by grocery-needed status."
+      ],
+      "expected_result": "The saved dinner appears in the planner with grocery and prep indicators.",
+      "failure_or_edge_cases": [
+        "Missing dinner name shows validation."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "Run the available build command.",
+    "lint": "Run the available lint command.",
+    "test": "Run available tests.",
+    "run": "Open the local app.",
+    "behavior_check": "Check create, edit, filter, validation, and responsive behavior."
+  },
+  "acceptance_evidence_plan": [
+    "Desktop and mobile screenshots plus behavior, accessibility, and state coverage."
+  ],
+  "iteration_policy": [
+    "Rework until the review score reaches the quality threshold."
+  ],
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "meal-planner-worker-001",
+      "objective": "Build the meal planner dashboard.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "src"
+      ]
+    }
+  ]
+}

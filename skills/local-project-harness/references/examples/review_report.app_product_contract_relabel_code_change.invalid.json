@@ -1,0 +1,187 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "handoff-app-review-001",
+  "work_type": "code_change",
+  "status": "accepted",
+  "reviewed_outputs": [
+    "src/App.tsx",
+    "src/App.css"
+  ],
+  "scope_check": {
+    "status": "passed",
+    "evidence": "Reviewed source outputs are within the assigned shift handoff app scope.",
+    "findings": []
+  },
+  "goal_contract_check": {
+    "status": "passed",
+    "evidence": "The review incorrectly relabeled an app_product Goal Contract as a code_change report.",
+    "findings": []
+  },
+  "overall_completion_score": 90,
+  "rubric_scores": {
+    "question_fulfillment": {
+      "score": 23,
+      "max_score": 25,
+      "evidence": "The report claims the requested handoff app changes are complete."
+    },
+    "functional_completeness": {
+      "score": 18,
+      "max_score": 20,
+      "evidence": "The report claims add, edit, filter, and task completion behavior exists."
+    },
+    "scenario_flow_coverage": {
+      "score": 27,
+      "max_score": 30,
+      "evidence": "The report claims primary handoff creation and filtering flows passed."
+    },
+    "edge_case_handling": {
+      "score": 8,
+      "max_score": 10,
+      "evidence": "The report claims validation and empty states were reviewed."
+    },
+    "regression_safety": {
+      "score": 5,
+      "max_score": 5,
+      "evidence": "The report claims focused verification covered the workflow."
+    },
+    "verification_completeness": {
+      "score": 9,
+      "max_score": 10,
+      "evidence": "The report claims build, lint, test, and behavior checks passed."
+    }
+  },
+  "scenario_flow_scores": [
+    {
+      "id": "flow-create-priority-handoff",
+      "score": 90,
+      "passed": true,
+      "evidence": "The report claims the priority handoff creation flow passed."
+    }
+  ],
+  "score_threshold": 90,
+  "passed_threshold": true,
+  "blocking_gates": [],
+  "verification_check": {
+    "build": {
+      "status": "passed",
+      "evidence": "`npm run build` completed with the handoff app bundle generated.",
+      "findings": []
+    },
+    "lint": {
+      "status": "passed",
+      "evidence": "`npm run lint` completed without reported lint errors.",
+      "findings": []
+    },
+    "test": {
+      "status": "passed",
+      "evidence": "`npm test -- handoff-flow` completed the handoff workflow test.",
+      "findings": []
+    },
+    "run": {
+      "status": "not_applicable",
+      "evidence": "The mislabeled code_change report treats the app run check as not applicable.",
+      "findings": []
+    },
+    "behavior_check": {
+      "status": "not_applicable",
+      "evidence": "The mislabeled code_change report treats app behavior checks as not applicable.",
+      "findings": []
+    }
+  },
+  "app_quality_check": {
+    "ux_workflow_completeness": {
+      "status": "not_applicable",
+      "evidence": "The mislabeled report hides the handoff app workflow review as non-app work.",
+      "findings": []
+    },
+    "visual_polish": {
+      "status": "not_applicable",
+      "evidence": "The mislabeled report hides the handoff app visual review as non-app work.",
+      "findings": []
+    },
+    "responsive_desktop_mobile": {
+      "status": "not_applicable",
+      "evidence": "The mislabeled report hides desktop and mobile app review as non-app work.",
+      "findings": []
+    },
+    "accessibility_basics": {
+      "status": "not_applicable",
+      "evidence": "The mislabeled report hides app accessibility review as non-app work.",
+      "findings": []
+    },
+    "error_loading_empty_states": {
+      "status": "not_applicable",
+      "evidence": "The mislabeled report hides loading, empty, error, and validation states.",
+      "findings": []
+    },
+    "text_overlap_layout_stability": {
+      "status": "not_applicable",
+      "evidence": "The mislabeled report hides text wrapping and layout stability checks.",
+      "findings": []
+    },
+    "domain_fit": {
+      "status": "not_applicable",
+      "evidence": "The mislabeled report hides clinical handoff domain-fit checks.",
+      "findings": []
+    },
+    "evidence": [
+      {
+        "type": "not_applicable",
+        "status": "not_applicable",
+        "description": "The report is incorrectly presented as non-app work even though the linked contract is app_product."
+      }
+    ]
+  },
+  "security_check": {
+    "status": "passed",
+    "evidence": "The report claims no credentials, PHI, external services, or unsafe behaviors are present.",
+    "findings": []
+  },
+  "secret_scan_result": {
+    "status": "passed",
+    "evidence": "The report claims no API keys or credential-like values were found.",
+    "findings": []
+  },
+  "scope_diff_result": {
+    "status": "passed",
+    "evidence": "The report claims changed files stayed inside the assigned app source scope.",
+    "findings": []
+  },
+  "command_audit": [
+    {
+      "command": "npm run build",
+      "cwd": "C:/repo/handoff-app",
+      "purpose": "Verify production build.",
+      "exit_code": 0,
+      "output_summary": "Build completed."
+    },
+    {
+      "command": "npm run lint",
+      "cwd": "C:/repo/handoff-app",
+      "purpose": "Verify lint checks.",
+      "exit_code": 0,
+      "output_summary": "Lint completed."
+    },
+    {
+      "command": "npm test -- handoff-flow",
+      "cwd": "C:/repo/handoff-app",
+      "purpose": "Verify handoff workflow behavior.",
+      "exit_code": 0,
+      "output_summary": "Workflow test completed."
+    }
+  ],
+  "budget_used": {
+    "iterations": 1,
+    "rework_iterations": 0,
+    "consensus_rounds": 0,
+    "subagents_started": 2,
+    "open_subagents": 0
+  },
+  "independence": "real_subagent",
+  "rework_items": [],
+  "next_iteration_recommendation": "No rework required.",
+  "risks_or_follow_up": [
+    "This fixture must fail when linked to an app_product Goal Contract."
+  ],
+  "recommendation": "accepted"
+}

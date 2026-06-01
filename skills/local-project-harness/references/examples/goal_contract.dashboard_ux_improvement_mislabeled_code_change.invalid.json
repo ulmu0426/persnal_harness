@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-dashboard-ux-improvement-mislabeled",
+  "work_type": "code_change",
+  "raw_user_request": "Improve the dashboard UX for the sales pipeline app.",
+  "concrete_goal": "Improve the sales pipeline dashboard UX so account executives can scan deal risk, filter opportunities, update stage status, and recover from empty or validation states without leaving the first screen.",
+  "success_criteria": [
+    "Account executives can filter opportunities by stage, owner, and risk level from the dashboard.",
+    "The dashboard improves hierarchy for deal amount, next step, close date, stalled status, and stage movement.",
+    "Desktop and mobile layouts preserve readable cards, filters, and stage controls without overlap."
+  ],
+  "scope_in": [
+    "User-facing dashboard UX improvements for the existing sales pipeline app.",
+    "Responsive layout, visual hierarchy, empty state, validation state, and accessibility basics for dashboard controls."
+  ],
+  "scope_out": [
+    "Backend CRM integrations, authentication, billing, and production deployment."
+  ],
+  "assumptions": [
+    "Local sample opportunity data is enough for the UX improvement pass."
+  ],
+  "implementation_constraints": [
+    "Do not add paid services or external CRM API calls."
+  ],
+  "quality_score_threshold": 90,
+  "scenario_flows": [
+    {
+      "id": "flow-review-at-risk-deals",
+      "name": "Review at-risk sales opportunities",
+      "actor": "account_executive",
+      "preconditions": [
+        "The dashboard is loaded with sample opportunity records."
+      ],
+      "steps": [
+        "Filter the dashboard to at-risk deals.",
+        "Update one opportunity stage and inspect the next-step panel."
+      ],
+      "expected_result": "Risk badges, deal amounts, stage status, and next steps remain visible and readable after the update.",
+      "failure_or_edge_cases": [
+        "Empty filtered results show reset guidance.",
+        "Missing next-step text shows validation without moving controls."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "Run the available build command.",
+    "lint": "Run the available lint command.",
+    "test": "Run available dashboard behavior tests.",
+    "run": "Open the local dashboard and report the concrete URL or static path.",
+    "behavior_check": "Check filtering, stage update, validation, empty state, responsive desktop/mobile, and keyboard focus behavior."
+  },
+  "acceptance_evidence_plan": [
+    "Desktop and mobile dashboard screenshots plus behavior, accessibility, and state coverage for the sales pipeline workflow."
+  ],
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "sales-dashboard-ux-worker-001",
+      "objective": "Improve the user-facing sales pipeline dashboard UX.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "src"
+      ]
+    }
+  ]
+}

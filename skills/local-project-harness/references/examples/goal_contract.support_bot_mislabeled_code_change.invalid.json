@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-support-bot-mislabeled",
+  "work_type": "code_change",
+  "raw_user_request": "Build a bot that helps a support team triage tickets",
+  "concrete_goal": "Build a support triage bot for support agents to classify incoming tickets, suggest priority, surface missing customer context, and route urgent issues to the right queue.",
+  "success_criteria": [
+    "Support agents can submit a ticket summary and receive a priority, category, routing queue, and missing-context prompt.",
+    "The bot shows ticket status, confidence, escalation reason, empty state, validation state, and saved triage history."
+  ],
+  "scope_in": [
+    "Single-page support bot interaction flow with local client-side ticket triage state."
+  ],
+  "scope_out": [
+    "Production help desk integrations, external AI calls, authentication, billing, and deployment."
+  ],
+  "assumptions": [
+    "Local deterministic sample responses are sufficient for the prototype."
+  ],
+  "implementation_constraints": [
+    "Do not add paid services or external support system integrations."
+  ],
+  "quality_score_threshold": 90,
+  "scenario_flows": [
+    {
+      "id": "flow-triage-ticket",
+      "name": "Triage a support ticket",
+      "actor": "support_agent",
+      "preconditions": [
+        "The support bot workspace is open with sample ticket categories."
+      ],
+      "steps": [
+        "Enter a customer ticket summary with product area and impact.",
+        "Run triage and review the priority, category, routing queue, and missing-context prompt."
+      ],
+      "expected_result": "The bot returns a triage recommendation with visible confidence, status, escalation reason, and saved ticket history.",
+      "failure_or_edge_cases": [
+        "Missing ticket summary shows validation and disables triage.",
+        "Low-confidence triage shows a human-review state with escalation guidance."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "Run the available build command.",
+    "lint": "Run the available lint command.",
+    "test": "Run available tests.",
+    "run": "Open the local support bot.",
+    "behavior_check": "Check triage, validation, low-confidence escalation, saved history, and responsive behavior."
+  },
+  "acceptance_evidence_plan": [
+    "Desktop and mobile screenshots plus behavior, accessibility, and state coverage for the support bot ticket triage workflow."
+  ],
+  "iteration_policy": [
+    "Rework until the review score reaches the quality threshold."
+  ],
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "support-bot-worker-001",
+      "objective": "Build the support ticket triage bot workspace.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "src"
+      ]
+    }
+  ]
+}

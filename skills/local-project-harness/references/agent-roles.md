@@ -69,8 +69,10 @@ Checks:
 - `verification_matrix` uses real project checks where possible
 - `scenario_flows` cover primary behavior and meaningful failure cases
 - `open_questions` contains only real blockers
-- for `work_type: app_product`, `product_brief` identifies target users, core problem, primary workflows, domain assumptions, content/data model assumptions, and non-goals
-- for `work_type: app_product`, `app_quality_gates` cover UX workflow completeness, visual polish, responsive desktop/mobile, accessibility basics, loading/error/empty states, text overlap/layout stability, domain fit, and required screenshot or manual behavior evidence
+- for `work_type: app_product`, reject generic product briefs and require target users, core problem, primary workflows, domain assumptions, content/data model assumptions that include state assumptions, and non-goals
+- for `work_type: app_product`, scenario flows cover the first usable screen, happy path, empty/loading/error or validation states, responsive desktop/mobile behavior, and at least one domain edge case
+- for `work_type: app_product`, `app_quality_gates` require UX workflow completeness, visual polish, responsive desktop/mobile, accessibility basics, loading/error/empty states, text overlap/layout stability, domain fit, and concrete screenshot or manual behavior evidence
+- review mode is disclosed as `real_subagent` or `simulated_same_context`, and simulated reviews list missing independent checks
 
 Prohibited:
 
@@ -97,7 +99,7 @@ Purpose: implement a bounded slice.
 
 `subtask_worker` is the canonical implementation role id for prompts, schemas, lifecycle records, and reports.
 
-For app/product tasks, implement the assigned workflow as a usable product surface, not a placeholder or marketing shell. Respect the `product_brief`, include expected empty/loading/error states in scope when assigned, keep desktop and mobile layouts stable, avoid text overlap, and gather the assigned screenshot or manual behavior evidence when verification asks for it.
+For app/product tasks, implement the assigned workflow as a usable product surface, not a placeholder, generic template, or marketing shell. Respect the `product_brief`, domain data model, and state assumptions. Put the primary workflow on the first usable screen, include assigned empty/loading/error/success or validation states, keep desktop and mobile layouts stable, avoid text overlap, and gather the assigned screenshot or manual behavior evidence when verification asks for it.
 
 Delegation must include:
 
@@ -122,6 +124,8 @@ risks_or_follow_up:
 
 Purpose: run checks and inspect behavior without changing implementation. When assigned to a real sub-agent, this is an independent verification pass; when simulated in the main context, report `independence: simulated_same_context` and do not call it independent.
 
+For app/product work, verification must include available deterministic commands plus concrete UX evidence: desktop view, mobile view, primary workflow behavior, accessibility basics, and state coverage. If screenshot tooling, browser access, or a state is impossible, keep the report schema-valid with `not_run` or a failed gate plus a concrete reason instead of silently omitting it.
+
 Report:
 
 ```yaml
@@ -140,6 +144,8 @@ findings:
 ## Review Worker
 
 Purpose: judge whether the integrated result satisfies the Goal Contract.
+
+For app/product work, accept only when every app-quality key has concrete evidence and the product is usable on the first screen for the target workflow. Build/lint/test success is insufficient by itself. Reject generic "looks good" evidence, placeholder-only UI, missing state coverage, missing responsive evidence, or same-context review that is described as independent.
 
 Report:
 
@@ -175,6 +181,8 @@ For non-app work, `app_quality_check` is required with `not_applicable` statuses
 ## Summary Worker
 
 Purpose: produce the final user-facing summary after all work, verification, review, rework, integration decisions, and lifecycle close audit are complete.
+
+For app/product work, summarize the actual product outcome, UX evidence gathered, runnable URL or static path, and any unverified desktop/mobile/accessibility/state checks. Disclose whether review and verification used real sub-agents or same-context internal passes, and do not raise confidence beyond the recorded review mode.
 
 Allowed:
 

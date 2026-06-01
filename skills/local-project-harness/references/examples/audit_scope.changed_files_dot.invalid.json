@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "audit-scope-changed-dot",
+  "status": "completed",
+  "changed_files": [
+    {
+      "path": ".",
+      "action": "modified"
+    }
+  ],
+  "summary": "Invalid scope fixture with current-directory pseudo-root changed file.",
+  "verification": {
+    "build": {
+      "status": "not_applicable",
+      "evidence": "Scope audit regression fixture.",
+      "findings": []
+    },
+    "lint": {
+      "status": "not_applicable",
+      "evidence": "Scope audit regression fixture.",
+      "findings": []
+    },
+    "test": {
+      "status": "passed",
+      "evidence": "audit-scope should reject changed_files path dot.",
+      "findings": []
+    },
+    "run": {
+      "status": "not_applicable",
+      "evidence": "Scope audit regression fixture.",
+      "findings": []
+    },
+    "behavior_check": {
+      "status": "passed",
+      "evidence": "Current-directory pseudo-root path is rejected.",
+      "findings": []
+    }
+  },
+  "security_check": {
+    "status": "passed",
+    "evidence": "No secrets are present in this fixture.",
+    "findings": []
+  },
+  "secret_scan_result": {
+    "status": "passed",
+    "evidence": "No secret candidates are present in this fixture.",
+    "findings": []
+  },
+  "scope_diff_result": {
+    "status": "failed",
+    "evidence": "The changed file path is a pseudo-root and must be rejected.",
+    "findings": [
+      "changed_files.path must not be ."
+    ]
+  },
+  "command_audit": [],
+  "budget_used": {
+    "iterations": 1,
+    "rework_iterations": 0,
+    "consensus_rounds": 0,
+    "subagents_started": 0,
+    "open_subagents": 0
+  },
+  "risks_or_follow_up": []
+}

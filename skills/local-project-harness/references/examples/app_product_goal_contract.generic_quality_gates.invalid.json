@@ -1,0 +1,154 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-generic-quality-gates-client-intake",
+  "work_type": "app_product",
+  "raw_user_request": "Build a client intake form for a tax prep office.",
+  "concrete_goal": "Build a browser-based client intake form for tax preparers who need to collect filing status, document checklist progress, appointment readiness, and follow-up tasks from the first screen.",
+  "success_criteria": [
+    "Tax preparers can add, edit, validate, and filter client intake records without leaving the first screen.",
+    "The interface exposes filing status, document checklist, appointment readiness, follow-up task, empty state, loading state, validation state, and saved-success state."
+  ],
+  "scope_in": [
+    "Single-page tax client intake UI with local client-side state.",
+    "Seeded fictional client records, checklist items, readiness statuses, and responsive controls."
+  ],
+  "scope_out": [
+    "Real tax filing, e-signature, payments, authentication, document upload storage, and production deployment."
+  ],
+  "assumptions": [
+    "The prototype uses fictional client records and does not collect real tax documents.",
+    "Local browser state is acceptable for the first usable version."
+  ],
+  "implementation_constraints": [
+    "Do not add paid APIs, real tax advice, or production storage.",
+    "Keep the primary intake workflow available on the first screen."
+  ],
+  "product_brief": {
+    "target_users": [
+      "Tax preparers and office intake coordinators who track fictional clients, required filing documents, appointment readiness, and follow-up tasks."
+    ],
+    "core_problem": "Tax office intake work is easy to lose across emails and spreadsheets when preparers cannot see missing documents, filing status, and appointment readiness together.",
+    "primary_workflows": [
+      "Create or update a fictional client intake record with filing status, document checklist, appointment date, owner, readiness status, and next follow-up task.",
+      "Filter clients by missing documents, urgent follow-up, and appointment readiness so preparers can prioritize intake work.",
+      "Review empty, loading, validation, disabled, saved-success, and recoverable error states on desktop and mobile."
+    ],
+    "domain_assumptions": [
+      "Use tax office intake vocabulary such as filing status, W-2 checklist, appointment readiness, preparer owner, follow-up task, and missing document."
+    ],
+    "content_data_model_assumptions": [
+      "Primary entity: intake record with fields id, fictional client name, filing status, preparer owner, appointment date, readiness status, checklist items, follow-up task, notes, updated time, and validation state.",
+      "Checklist items include label, required flag, received flag, and status values missing, received, or waived; UI states include first-run empty queue, loading seed records, save success, validation error for missing filing status, disabled save while invalid, and recoverable local state error."
+    ],
+    "non_goals": [
+      "No real taxpayer information, tax advice, document upload storage, payment processing, authentication, or production deployment."
+    ]
+  },
+  "app_quality_gates": {
+    "ux_workflow_completeness": [
+      "Passed."
+    ],
+    "visual_polish": [
+      "Looks good."
+    ],
+    "responsive_desktop_mobile": [
+      "Layout visible."
+    ],
+    "accessibility_basics": [
+      "Checked."
+    ],
+    "error_loading_empty_states": [
+      "As needed."
+    ],
+    "text_overlap_layout_stability": [
+      "Best practices."
+    ],
+    "domain_fit": [
+      "Standard app."
+    ],
+    "evidence_requirements": [
+      "Screenshot inspected."
+    ]
+  },
+  "quality_score_threshold": 90,
+  "scenario_flows": [
+    {
+      "id": "flow-create-intake",
+      "name": "Create tax client intake",
+      "actor": "intake_coordinator",
+      "preconditions": [
+        "The intake queue is loaded with fictional seed records."
+      ],
+      "steps": [
+        "Open the add client form from the first screen.",
+        "Enter fictional client name, filing status, preparer owner, appointment date, checklist items, and follow-up task.",
+        "Save the record and confirm it appears in the missing-documents queue."
+      ],
+      "expected_result": "The saved intake record appears with readiness status, checklist count, and next follow-up task.",
+      "failure_or_edge_cases": [
+        "Missing filing status shows validation and disables save.",
+        "A simulated save error preserves draft values and shows recovery guidance."
+      ]
+    },
+    {
+      "id": "flow-filter-readiness",
+      "name": "Filter readiness queue",
+      "actor": "tax_preparer",
+      "preconditions": [
+        "At least one fictional client has missing documents and one is ready."
+      ],
+      "steps": [
+        "Filter by missing W-2 checklist items.",
+        "Open a client details area.",
+        "Mark one checklist item received and clear the filter."
+      ],
+      "expected_result": "Readiness counts, client visibility, and checklist status update without hiding urgent follow-up tasks.",
+      "failure_or_edge_cases": [
+        "Empty filter results show a reset control.",
+        "Long follow-up notes wrap on mobile without covering controls."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "Run the repository build command when present or document why no build command exists.",
+    "lint": "Run lint or equivalent static checks when present.",
+    "test": "Run automated tests when present.",
+    "run": "Start the local app or open the static artifact and report the URL or file path.",
+    "behavior_check": "Exercise create, filter, validation, empty, error, desktop, mobile, and keyboard/focus behavior."
+  },
+  "acceptance_evidence_plan": [
+    "Desktop 1440x900 screenshot or visual inspection artifact showing the tax intake queue, checklist filters, form, and detail area with no overlap.",
+    "Mobile 390x844 screenshot or visual inspection artifact showing stacked intake records, reachable save controls, and wrapped follow-up notes.",
+    "Behavior evidence for creating a client intake record, filtering missing documents, marking a checklist item received, and observing updated readiness counts.",
+    "Accessibility evidence covering labels, visible focus, keyboard operation, and contrast-sensitive readiness indicators.",
+    "State coverage evidence for empty, loading, error, saved-success, disabled, and validation states."
+  ],
+  "iteration_policy": {
+    "threshold_rule": "overall_completion_score must be at least quality_score_threshold.",
+    "rework_rule": "Any failed app-quality evidence creates concrete rework before acceptance.",
+    "stop_conditions": [
+      "Review is accepted with all app evidence present.",
+      "A real taxpayer data or production storage blocker is discovered.",
+      "The iteration budget is exhausted."
+    ]
+  },
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "tax-intake-worker-001",
+      "objective": "Implement the first-screen tax client intake workflow.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "src"
+      ]
+    }
+  ]
+}

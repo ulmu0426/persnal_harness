@@ -1,0 +1,120 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "review-passed-no-command",
+  "work_type": "schema_policy",
+  "status": "accepted",
+  "reviewed_outputs": [
+    "schemas/review_report.schema.json"
+  ],
+  "scope_check": {
+    "status": "passed",
+    "evidence": "Reviewed schema artifacts stayed within the assigned review-report policy scope.",
+    "findings": []
+  },
+  "goal_contract_check": {
+    "status": "passed",
+    "evidence": "The review artifact matches the schema-policy goal contract and required report fields.",
+    "findings": []
+  },
+  "overall_completion_score": 90,
+  "scenario_flow_scores": [
+    {
+      "id": "flow-schema-review",
+      "passed": true,
+      "evidence": "The schema-policy review flow checked required review fields and acceptance gates."
+    }
+  ],
+  "score_threshold": 85,
+  "passed_threshold": true,
+  "blocking_gates": [],
+  "verification_check": {
+    "build": {
+      "status": "not_applicable",
+      "evidence": "No application build command exists for this schema-policy-only artifact.",
+      "findings": []
+    },
+    "lint": {
+      "status": "passed",
+      "evidence": "No lint command exists in package.json, so the lint check was not run.",
+      "findings": []
+    },
+    "test": {
+      "status": "not_applicable",
+      "evidence": "No automated test harness exists for this schema-policy-only artifact.",
+      "findings": []
+    },
+    "run": {
+      "status": "not_applicable",
+      "evidence": "No runnable app exists for this schema-policy-only artifact.",
+      "findings": []
+    },
+    "behavior_check": {
+      "status": "passed",
+      "evidence": "Manual behavior check inspected the schema-policy acceptance flow and rework gate behavior.",
+      "findings": []
+    }
+  },
+  "app_quality_check": {
+    "ux_workflow_completeness": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review has no app workflow surface to inspect.",
+      "findings": []
+    },
+    "visual_polish": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review has no app visual surface to inspect.",
+      "findings": []
+    },
+    "responsive_desktop_mobile": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review has no desktop or mobile app surface to inspect.",
+      "findings": []
+    },
+    "accessibility_basics": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review has no interactive app controls to inspect.",
+      "findings": []
+    },
+    "error_loading_empty_states": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review has no app loading, error, or empty states to inspect.",
+      "findings": []
+    },
+    "text_overlap_layout_stability": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review has no rendered app layout to inspect.",
+      "findings": []
+    },
+    "domain_fit": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review has no app product domain vocabulary to inspect.",
+      "findings": []
+    },
+    "evidence": [
+      {
+        "type": "not_applicable",
+        "status": "not_applicable",
+        "description": "App-quality evidence is not required for this schema-policy review."
+      }
+    ]
+  },
+  "security_check": {
+    "status": "passed",
+    "evidence": "The reviewed schema artifact contains no secrets, external calls, or destructive behavior.",
+    "findings": []
+  },
+  "secret_scan_result": {
+    "status": "passed",
+    "evidence": "Secret scan found no credential-like values in the schema-policy artifact.",
+    "findings": []
+  },
+  "scope_diff_result": {
+    "status": "passed",
+    "evidence": "Changed artifacts matched the assigned schema-policy review scope.",
+    "findings": []
+  },
+  "command_audit": [],
+  "independence": "real_subagent",
+  "rework_items": [],
+  "recommendation": "accepted"
+}

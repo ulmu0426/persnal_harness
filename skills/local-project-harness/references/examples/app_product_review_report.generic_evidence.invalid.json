@@ -1,0 +1,213 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "sales-pipeline-review-generic-evidence",
+  "work_type": "app_product",
+  "status": "accepted",
+  "reviewed_outputs": [
+    "src/App.tsx",
+    "src/App.css",
+    "tests/sales-pipeline-flow.test.ts"
+  ],
+  "scope_check": {
+    "status": "passed",
+    "evidence": "Reviewed outputs are within the assigned sales pipeline app scope.",
+    "findings": []
+  },
+  "goal_contract_check": {
+    "status": "passed",
+    "evidence": "The implementation matches the sales pipeline Goal Contract, including reps, opportunity stages, quote estimates, next actions, and state requirements.",
+    "findings": []
+  },
+  "overall_completion_score": 94,
+  "rubric_scores": {
+    "question_fulfillment": {
+      "score": 24,
+      "max_score": 25,
+      "evidence": "The first-screen sales pipeline satisfies the requested app experience for reps."
+    },
+    "functional_completeness": {
+      "score": 19,
+      "max_score": 20,
+      "evidence": "Create, edit, stage update, filter, validation, and local state transitions are implemented."
+    },
+    "scenario_flow_coverage": {
+      "score": 28,
+      "max_score": 30,
+      "evidence": "Opportunity creation and stage filtering flows passed with edge cases."
+    },
+    "edge_case_handling": {
+      "score": 9,
+      "max_score": 10,
+      "evidence": "Empty, loading, validation, disabled, saved, and recoverable quote error states were exercised."
+    },
+    "regression_safety": {
+      "score": 5,
+      "max_score": 5,
+      "evidence": "Focused behavior test covers the main sales pipeline workflow and stage counts."
+    },
+    "verification_completeness": {
+      "score": 9,
+      "max_score": 10,
+      "evidence": "Build, lint, test, run, desktop/mobile visual checks, accessibility basics, and state coverage evidence are recorded."
+    }
+  },
+  "scenario_flow_scores": [
+    {
+      "id": "flow-add-opportunity",
+      "score": 95,
+      "passed": true,
+      "evidence": "Created Acme renewal opportunity with qualified stage, quote estimate, rep owner, and next action; saved card appeared in the pipeline lane and invalid missing company disabled save."
+    }
+  ],
+  "score_threshold": 90,
+  "passed_threshold": true,
+  "blocking_gates": [],
+  "verification_check": {
+    "build": {
+      "status": "passed",
+      "evidence": "`npm run build` completed with production sales pipeline assets generated.",
+      "findings": []
+    },
+    "lint": {
+      "status": "passed",
+      "evidence": "`npm run lint` completed without errors.",
+      "findings": []
+    },
+    "test": {
+      "status": "passed",
+      "evidence": "`npm test -- sales-pipeline-flow` passed the create, filter, and stage update workflow test.",
+      "findings": []
+    },
+    "run": {
+      "status": "passed",
+      "evidence": "Local dev server opened at http://localhost:5173 and rendered the sales pipeline board.",
+      "findings": []
+    },
+    "behavior_check": {
+      "status": "passed",
+      "evidence": "Manual behavior check created a lead opportunity, filtered qualified deals, moved one card to proposal, triggered validation, and reset an empty stage filter.",
+      "findings": []
+    }
+  },
+  "app_quality_check": {
+    "ux_workflow_completeness": {
+      "status": "passed",
+      "evidence": "The first screen contains the lead board, stage filters, quote form, and save controls needed for the sales pipeline workflow.",
+      "findings": []
+    },
+    "visual_polish": {
+      "status": "passed",
+      "evidence": "Desktop and mobile inspections show clear hierarchy for lead value, pipeline stage, next action, and owner badges with deliberate spacing.",
+      "findings": []
+    },
+    "responsive_desktop_mobile": {
+      "status": "passed",
+      "evidence": "Desktop 1440x900 rendered a stage board; mobile 390x844 stacked lead cards and wrapped quote notes without overlap.",
+      "findings": []
+    },
+    "accessibility_basics": {
+      "status": "passed",
+      "evidence": "Keyboard inspection reached stage filters, lead form fields, save buttons, and quote controls with visible focus and labels.",
+      "findings": []
+    },
+    "error_loading_empty_states": {
+      "status": "passed",
+      "evidence": "Loading leads, empty stage, validation error, disabled save, saved-success message, and recoverable quote error states were visible.",
+      "findings": []
+    },
+    "text_overlap_layout_stability": {
+      "status": "passed",
+      "evidence": "Long company names, next action notes, and quote labels wrapped inside cards at 1440x900 and 390x844 without overlap.",
+      "findings": []
+    },
+    "domain_fit": {
+      "status": "passed",
+      "evidence": "Sample data and labels use sales pipeline vocabulary: lead, account, opportunity stage, rep owner, next action, quote estimate, and close date.",
+      "findings": []
+    },
+    "evidence": [
+      {
+        "type": "screenshot",
+        "status": "passed",
+        "description": "Passed with evidence.",
+        "artifact": "artifacts/sales-pipeline-desktop-1440x900.png"
+      },
+      {
+        "type": "screenshot",
+        "status": "passed",
+        "description": "Mobile 390x844 screenshot inspected: sales pipeline cards stacked, quote notes wrapped, and save controls remained reachable.",
+        "artifact": "artifacts/sales-pipeline-mobile-390x844.png"
+      },
+      {
+        "type": "manual_behavior_check",
+        "status": "passed",
+        "description": "Primary workflow behavior check: created Acme opportunity, filtered qualified deals, moved one card to proposal, and confirmed stage counts updated.",
+        "artifact": "manual-check-notes/sales-pipeline-workflow.md"
+      },
+      {
+        "type": "accessibility_check",
+        "status": "passed",
+        "description": "Accessibility basics check: labels, visible focus, keyboard operation, aria-live save status, and contrast of stage badges inspected.",
+        "artifact": "manual-check-notes/sales-pipeline-accessibility.md"
+      },
+      {
+        "type": "automated_test",
+        "status": "passed",
+        "description": "State coverage test exercised empty stage results, loading lead data, recoverable quote error, saved-success message, disabled invalid save, and validation messages.",
+        "artifact": "tests/sales-pipeline-flow.test.ts"
+      }
+    ]
+  },
+  "security_check": {
+    "status": "passed",
+    "evidence": "The prototype uses fictional lead records and no external services or credentials.",
+    "findings": []
+  },
+  "secret_scan_result": {
+    "status": "passed",
+    "evidence": "Secret scan found no API keys or credential-like values in changed files.",
+    "findings": []
+  },
+  "scope_diff_result": {
+    "status": "passed",
+    "evidence": "Changed files matched the assigned sales pipeline app implementation and test scope.",
+    "findings": []
+  },
+  "command_audit": [
+    {
+      "command": "npm run build",
+      "cwd": "C:/repo/sales-pipeline-app",
+      "purpose": "Verify production build.",
+      "exit_code": 0,
+      "output_summary": "Build completed."
+    },
+    {
+      "command": "npm run lint",
+      "cwd": "C:/repo/sales-pipeline-app",
+      "purpose": "Verify static lint checks.",
+      "exit_code": 0,
+      "output_summary": "Lint completed without errors."
+    },
+    {
+      "command": "npm test -- sales-pipeline-flow",
+      "cwd": "C:/repo/sales-pipeline-app",
+      "purpose": "Verify primary workflow behavior and state coverage.",
+      "exit_code": 0,
+      "output_summary": "Focused workflow test passed."
+    }
+  ],
+  "budget_used": {
+    "iterations": 2,
+    "rework_iterations": 1,
+    "consensus_rounds": 0,
+    "subagents_started": 3,
+    "open_subagents": 0
+  },
+  "independence": "real_subagent",
+  "rework_items": [],
+  "next_iteration_recommendation": "No rework required.",
+  "risks_or_follow_up": [
+    "The prototype is local-only and does not sync with a real CRM."
+  ],
+  "recommendation": "accepted"
+}

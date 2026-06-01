@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-pricing-page-mislabeled",
+  "work_type": "code_change",
+  "raw_user_request": "Build a pricing page for a subscription service.",
+  "concrete_goal": "Create a browser-based pricing page for a subscription service with plan comparison, monthly and annual billing states, trial call to action, and checkout handoff messaging.",
+  "success_criteria": [
+    "Visitors can compare Basic, Pro, and Team plans, switch billing cadence, and see the selected plan call to action.",
+    "The pricing page includes empty, loading, validation, responsive desktop, and responsive mobile states."
+  ],
+  "scope_in": [
+    "Single-page pricing page UI with local client-side state."
+  ],
+  "scope_out": [
+    "Payment processing, authentication, external billing integrations, and production deployment."
+  ],
+  "quality_score_threshold": 90,
+  "scenario_flows": [
+    {
+      "id": "flow-compare-plans",
+      "name": "Compare subscription plans",
+      "actor": "trial_visitor",
+      "preconditions": [
+        "The pricing page is open."
+      ],
+      "steps": [
+        "Switch from monthly to annual billing.",
+        "Select the Pro plan and inspect the checkout handoff message."
+      ],
+      "expected_result": "The page updates plan prices, highlights the selected plan, and shows the checkout handoff message.",
+      "failure_or_edge_cases": [
+        "Unavailable plan selection shows a recoverable validation message."
+      ]
+    }
+  ],
+  "verification_matrix": {
+    "build": "Run the available build command.",
+    "lint": "Run the available lint command.",
+    "test": "Run available tests.",
+    "run": "Open the local page.",
+    "behavior_check": "Check billing toggle, plan selection, checkout handoff, validation, and responsive behavior."
+  },
+  "acceptance_evidence_plan": [
+    "Desktop and mobile screenshots plus behavior, accessibility, and state coverage."
+  ],
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "pricing-page-worker-001",
+      "objective": "Build the subscription pricing page.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "src"
+      ]
+    }
+  ]
+}

@@ -168,6 +168,20 @@
       "purpose": "Validate artifact syntax without claiming executable runner validation.",
       "exit_code": 0,
       "output_summary": "All syntax checks passed."
+    },
+    {
+      "command": "node -e <lint markdown fences and required key fields>",
+      "cwd": "C:/Users/kcor2/Desktop/make_fun/persnal_harness",
+      "purpose": "Run lint-style checks for markdown fences and required schema/example keys.",
+      "exit_code": 0,
+      "output_summary": "Lint-style documentation and key-field checks passed."
+    },
+    {
+      "command": "node -e <test json jsonl yaml syntax fixtures>",
+      "cwd": "C:/Users/kcor2/Desktop/make_fun/persnal_harness",
+      "purpose": "Run syntax test coverage for JSON, JSONL, and YAML review artifacts.",
+      "exit_code": 0,
+      "output_summary": "Test-style syntax fixture checks passed."
     }
   ],
   "budget_used": {

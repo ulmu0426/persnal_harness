@@ -81,7 +81,7 @@
     "verification_completeness": 10
   },
   "verification_matrix": {
-    "build": "No application build is required for docs and schema v1; JSON and YAML syntax checks must pass.",
+    "build": "No software build is required for docs and schema v1; JSON and YAML syntax checks must pass.",
     "lint": "Markdown fence checks and key policy field searches must pass.",
     "test": "JSON and YAML syntax checks must pass; schema validation evidence is accepted only from a pinned dependency and lockfile-backed validator.",
     "run": "Runner execution is out of scope; dry-run command contracts must be documented.",

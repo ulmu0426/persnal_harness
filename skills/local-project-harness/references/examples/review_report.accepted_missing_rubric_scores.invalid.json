@@ -1,0 +1,154 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "accepted-missing-rubric-scores",
+  "work_type": "schema_policy",
+  "status": "accepted",
+  "reviewed_outputs": [
+    "schemas/review_report.schema.json",
+    "skills/local-project-harness/scripts/harness_checks.mjs"
+  ],
+  "scope_check": {
+    "status": "passed",
+    "evidence": "Reviewed outputs are limited to the rubric scoring schema-policy audit scope.",
+    "findings": []
+  },
+  "goal_contract_check": {
+    "status": "passed",
+    "evidence": "The review compared schema-policy scoring behavior with the Goal Contract scenario flows.",
+    "findings": []
+  },
+  "overall_completion_score": 92,
+  "scenario_flow_scores": [
+    {
+      "id": "flow-goal-to-review-loop",
+      "score": 92,
+      "passed": true,
+      "evidence": "The scored review loop was checked against accepted threshold and empty blocking-gate requirements."
+    },
+    {
+      "id": "flow-close-audit",
+      "score": 90,
+      "passed": true,
+      "evidence": "The close-audit flow was checked against terminal lifecycle status requirements."
+    }
+  ],
+  "score_threshold": 85,
+  "passed_threshold": true,
+  "blocking_gates": [],
+  "verification_check": {
+    "build": {
+      "status": "not_applicable",
+      "evidence": "No build command exists for this schema-policy-only review fixture.",
+      "findings": []
+    },
+    "lint": {
+      "status": "passed",
+      "evidence": "`node scripts/lint-schema-docs.mjs` passed required schema-policy lint checks.",
+      "findings": []
+    },
+    "test": {
+      "status": "passed",
+      "evidence": "`node scripts/parse-fixtures.mjs` passed JSON and fixture syntax checks.",
+      "findings": []
+    },
+    "run": {
+      "status": "not_applicable",
+      "evidence": "Runner execution is outside this schema-policy review fixture.",
+      "findings": []
+    },
+    "behavior_check": {
+      "status": "passed",
+      "evidence": "Manual behavior review inspected accepted scoring, threshold, and blocking-gate outcomes.",
+      "findings": []
+    }
+  },
+  "app_quality_check": {
+    "ux_workflow_completeness": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review fixture has no app workflow surface to inspect.",
+      "findings": []
+    },
+    "visual_polish": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review fixture has no visual product surface to inspect.",
+      "findings": []
+    },
+    "responsive_desktop_mobile": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review fixture has no desktop or mobile UI surface to inspect.",
+      "findings": []
+    },
+    "accessibility_basics": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review fixture has no interactive accessibility surface to inspect.",
+      "findings": []
+    },
+    "error_loading_empty_states": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review fixture has no app loading, empty, or error states.",
+      "findings": []
+    },
+    "text_overlap_layout_stability": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review fixture has no app text layout surface to inspect.",
+      "findings": []
+    },
+    "domain_fit": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review fixture has no product domain vocabulary surface.",
+      "findings": []
+    },
+    "evidence": [
+      {
+        "type": "not_applicable",
+        "status": "not_applicable",
+        "description": "App-quality evidence is not required for this schema-policy review fixture."
+      }
+    ]
+  },
+  "security_check": {
+    "status": "passed",
+    "evidence": "No raw secrets, workspace escape, unauthorized network, or external-cost behavior is present.",
+    "findings": []
+  },
+  "secret_scan_result": {
+    "status": "passed",
+    "evidence": "Secret scanning found no API keys or credential-like values in the reviewed schema-policy files.",
+    "findings": []
+  },
+  "scope_diff_result": {
+    "status": "passed",
+    "evidence": "Changed artifacts stay within the agreed rubric scoring schema-policy scope.",
+    "findings": []
+  },
+  "command_audit": [
+    {
+      "command": "node scripts/lint-schema-docs.mjs",
+      "cwd": "C:/repo/harness",
+      "purpose": "Run lint checks for schema-policy review artifacts.",
+      "exit_code": 0,
+      "output_summary": "Lint checks passed."
+    },
+    {
+      "command": "node scripts/parse-fixtures.mjs",
+      "cwd": "C:/repo/harness",
+      "purpose": "Run fixture syntax tests.",
+      "exit_code": 0,
+      "output_summary": "JSON fixture parsing passed."
+    }
+  ],
+  "budget_used": {
+    "iterations": 1,
+    "rework_iterations": 0,
+    "consensus_rounds": 0,
+    "subagents_started": 2,
+    "open_subagents": 0
+  },
+  "independence": "real_subagent",
+  "rework_items": [],
+  "next_iteration_recommendation": "No rework required.",
+  "risks_or_follow_up": [
+    "This fixture must fail because accepted reviews require rubric_scores."
+  ],
+  "recommendation": "accepted"
+}

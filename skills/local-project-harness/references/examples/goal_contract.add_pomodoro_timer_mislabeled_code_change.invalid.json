@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-add-pomodoro-timer-mislabeled",
+  "work_type": "code_change",
+  "raw_user_request": "Add a Pomodoro timer",
+  "concrete_goal": "Add a Pomodoro timer for students to manage focus and break sessions with start, pause, reset, and completed-session tracking.",
+  "success_criteria": [
+    "Students can start, pause, and reset focus or break sessions.",
+    "The timer displays the active mode, remaining time, and completed session count.",
+    "The timer preserves readable controls across desktop and mobile layouts."
+  ],
+  "scope_in": [
+    "Pomodoro timer UI with focus and break modes.",
+    "Local timer state for active mode, remaining time, paused state, reset state, and completed sessions."
+  ],
+  "scope_out": [
+    "User accounts, notifications, calendar integrations, analytics, paid APIs, and production deployment."
+  ],
+  "assumptions": [
+    "Local browser state is sufficient for this timer.",
+    "Default focus and break durations can be used without external configuration."
+  ],
+  "implementation_constraints": [
+    "Do not add external services or paid APIs.",
+    "Keep timer controls directly reachable from the timer view."
+  ],
+  "quality_score_threshold": 90,
+  "scenario_flows": [
+    {
+      "id": "flow-run-pomodoro-session",
+      "name": "Run Pomodoro session",
+      "actor": "student",
+      "preconditions": [
+        "The Pomodoro timer is open with default focus and break durations."
+      ],
+      "steps": [
+        "Start the focus session.",
+        "Pause and resume the timer.",
+        "Reset the timer and complete a focus session."
+      ],
+      "expected_result": "Remaining time, active mode, pause state, reset state, and completed-session count update correctly.",
+      "failure_or_edge_cases": [
+        "Invalid duration input shows validation and blocks saving.",
+        "A small mobile viewport keeps start, pause, reset, and mode controls readable."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "Run the available build command.",
+    "lint": "Run the available lint command.",
+    "test": "Run available tests or add a focused timer behavior test if the project has a test harness.",
+    "run": "Open the local Pomodoro timer.",
+    "behavior_check": "Check start, pause, reset, validation, completed-session count, desktop layout, mobile layout, and keyboard focus behavior."
+  },
+  "acceptance_evidence_plan": [
+    "Desktop and mobile screenshots plus behavior, accessibility, and state coverage for the Pomodoro timer controls."
+  ],
+  "iteration_policy": [
+    "Rework until the review score reaches the quality threshold."
+  ],
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "add-pomodoro-timer-worker-001",
+      "objective": "Add the Pomodoro timer product surface.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "src",
+        "tests"
+      ]
+    }
+  ]
+}

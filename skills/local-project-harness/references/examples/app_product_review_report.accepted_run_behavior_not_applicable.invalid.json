@@ -1,0 +1,219 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "meal-planner-review-run-behavior-na",
+  "work_type": "app_product",
+  "status": "accepted",
+  "reviewed_outputs": [
+    "src/App.tsx",
+    "src/App.css",
+    "tests/meal-planner.test.ts"
+  ],
+  "scope_check": {
+    "status": "passed",
+    "evidence": "Reviewed app files are within the assigned meal planner implementation scope.",
+    "findings": []
+  },
+  "goal_contract_check": {
+    "status": "passed",
+    "evidence": "The meal planner implementation was compared with target user workflows, data states, and quality gates.",
+    "findings": []
+  },
+  "overall_completion_score": 91,
+  "rubric_scores": {
+    "question_fulfillment": {
+      "score": 23,
+      "max_score": 25,
+      "evidence": "The requested meal planner app experience is represented."
+    },
+    "functional_completeness": {
+      "score": 18,
+      "max_score": 20,
+      "evidence": "Recipe card, weekly plan, shopping list, and filtering behavior are implemented."
+    },
+    "scenario_flow_coverage": {
+      "score": 28,
+      "max_score": 30,
+      "evidence": "Meal creation, filtering, and state coverage flows were reviewed."
+    },
+    "edge_case_handling": {
+      "score": 8,
+      "max_score": 10,
+      "evidence": "Empty, loading, validation, disabled, and saved states were represented."
+    },
+    "regression_safety": {
+      "score": 5,
+      "max_score": 5,
+      "evidence": "Focused meal-planner workflow tests are recorded."
+    },
+    "verification_completeness": {
+      "score": 9,
+      "max_score": 10,
+      "evidence": "The report incorrectly hides app run and behavior verification as not applicable."
+    }
+  },
+  "scenario_flow_scores": [
+    {
+      "id": "flow-plan-week",
+      "score": 92,
+      "passed": true,
+      "evidence": "Created a vegetarian dinner plan, filtered recipes by prep time, and saw shopping counts update."
+    },
+    {
+      "id": "flow-empty-validation",
+      "score": 90,
+      "passed": true,
+      "evidence": "Empty plan, missing recipe validation, disabled save, loading recipes, and saved success states were reviewed."
+    }
+  ],
+  "score_threshold": 90,
+  "passed_threshold": true,
+  "blocking_gates": [],
+  "verification_check": {
+    "build": {
+      "status": "passed",
+      "evidence": "`npm run build` completed with meal planner production assets generated.",
+      "findings": []
+    },
+    "lint": {
+      "status": "passed",
+      "evidence": "`npm run lint` completed without reported lint errors.",
+      "findings": []
+    },
+    "test": {
+      "status": "passed",
+      "evidence": "`npm test -- meal-planner` passed the recipe filter and shopping-list update workflow tests.",
+      "findings": []
+    },
+    "run": {
+      "status": "not_applicable",
+      "evidence": "The accepted app review incorrectly marks local app run verification as not applicable.",
+      "findings": []
+    },
+    "behavior_check": {
+      "status": "not_applicable",
+      "evidence": "The accepted app review incorrectly marks manual app workflow behavior as not applicable.",
+      "findings": []
+    }
+  },
+  "app_quality_check": {
+    "ux_workflow_completeness": {
+      "status": "passed",
+      "evidence": "Desktop inspection shows recipe cards, week filters, add-meal form, and shopping-list controls visible for the primary meal-planning workflow.",
+      "findings": []
+    },
+    "visual_polish": {
+      "status": "passed",
+      "evidence": "Desktop and mobile screenshots show meal tags, prep-time badges, and shopping counts with clear hierarchy and wrapped card text.",
+      "findings": []
+    },
+    "responsive_desktop_mobile": {
+      "status": "passed",
+      "evidence": "Responsive check shows desktop 1440 and mobile 390 viewports stack cards and wrap controls without overlap.",
+      "findings": []
+    },
+    "accessibility_basics": {
+      "status": "passed",
+      "evidence": "Keyboard check reached labeled form fields, filter buttons, save controls, and visible focus states in the planner workflow.",
+      "findings": []
+    },
+    "error_loading_empty_states": {
+      "status": "passed",
+      "evidence": "State check triggered empty plan, loading recipes, validation error, disabled save, and saved success message.",
+      "findings": []
+    },
+    "text_overlap_layout_stability": {
+      "status": "passed",
+      "evidence": "Long recipe names and grocery notes wrapped inside cards at desktop and mobile sizes without overlap or clipped controls.",
+      "findings": []
+    },
+    "domain_fit": {
+      "status": "passed",
+      "evidence": "Meal-planning labels use recipe, ingredient, serving, prep time, grocery aisle, and weekly plan vocabulary in visible cards.",
+      "findings": []
+    },
+    "evidence": [
+      {
+        "type": "screenshot",
+        "status": "passed",
+        "description": "Desktop 1440x900 screenshot inspected: recipe cards, weekly filters, shopping counts, and add-meal form are visible without overlap.",
+        "artifact": "artifacts/meal-planner-desktop.png"
+      },
+      {
+        "type": "screenshot",
+        "status": "passed",
+        "description": "Mobile 390x844 screenshot inspected: stacked meal cards, wrapped grocery notes, and reachable save controls remain usable.",
+        "artifact": "artifacts/meal-planner-mobile.png"
+      },
+      {
+        "type": "manual_behavior_check",
+        "status": "passed",
+        "description": "Primary workflow behavior check created a dinner plan, filtered quick recipes, updated servings, and confirmed shopping counts changed.",
+        "artifact": "manual-checks/meal-workflow.md"
+      },
+      {
+        "type": "accessibility_check",
+        "status": "passed",
+        "description": "Accessibility check inspected labels, keyboard focus, filter button names, form validation messages, and contrast on meal tags.",
+        "artifact": "manual-checks/meal-accessibility.md"
+      },
+      {
+        "type": "automated_test",
+        "status": "passed",
+        "description": "State coverage test exercised empty plan, loading recipes, validation error, disabled save, saved success, and recoverable error states.",
+        "artifact": "tests/meal-planner.test.ts"
+      }
+    ]
+  },
+  "security_check": {
+    "status": "passed",
+    "evidence": "The app uses fictional recipe data and no credentials, external services, or paid APIs.",
+    "findings": []
+  },
+  "secret_scan_result": {
+    "status": "passed",
+    "evidence": "Secret scan found no API keys or credential-like values in the meal planner files.",
+    "findings": []
+  },
+  "scope_diff_result": {
+    "status": "passed",
+    "evidence": "Changed files matched the assigned meal planner app and test scope.",
+    "findings": []
+  },
+  "command_audit": [
+    {
+      "command": "npm run build",
+      "cwd": "C:/repo/meal-planner",
+      "purpose": "Verify production build.",
+      "exit_code": 0,
+      "output_summary": "Build completed."
+    },
+    {
+      "command": "npm run lint",
+      "cwd": "C:/repo/meal-planner",
+      "purpose": "Verify lint checks.",
+      "exit_code": 0,
+      "output_summary": "Lint completed."
+    },
+    {
+      "command": "npm test -- meal-planner",
+      "cwd": "C:/repo/meal-planner",
+      "purpose": "Verify meal planner workflow tests.",
+      "exit_code": 0,
+      "output_summary": "Workflow tests completed."
+    }
+  ],
+  "budget_used": {
+    "iterations": 1,
+    "rework_iterations": 0,
+    "consensus_rounds": 0,
+    "subagents_started": 3,
+    "open_subagents": 0
+  },
+  "independence": "real_subagent",
+  "rework_items": [],
+  "next_iteration_recommendation": "No rework required.",
+  "risks_or_follow_up": [
+    "This fixture must fail because accepted app reviews require run and behavior_check to pass."
+  ],
+  "recommendation": "accepted"
+}

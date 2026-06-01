@@ -1,0 +1,83 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-chrome-snippet-extension-mislabeled",
+  "work_type": "code_change",
+  "raw_user_request": "Build a Chrome extension that saves article snippets.",
+  "concrete_goal": "Create a Chrome extension for researchers to save article snippets, tag sources, search saved notes, and reopen source pages from a user-facing browser toolbar workflow.",
+  "success_criteria": [
+    "Users can add, edit, save, tag, filter, and reopen article snippet records from the extension popup.",
+    "The extension shows saved snippets, empty state guidance, validation for missing snippet text, and saved-success status.",
+    "The popup layout remains readable at browser-extension dimensions without clipped controls."
+  ],
+  "scope_in": [
+    "Chrome extension popup UI for saving article snippets.",
+    "Local browser storage for fictional snippet records.",
+    "Search, tag, edit, save, delete, validation, and empty states."
+  ],
+  "scope_out": [
+    "Account sync, paid APIs, external bookmarking services, and production store submission."
+  ],
+  "assumptions": [
+    "Local browser storage is acceptable for a prototype.",
+    "Snippet examples use fictional article titles and source URLs."
+  ],
+  "implementation_constraints": [
+    "Do not add paid services or external article APIs.",
+    "Keep the popup workflow usable without a backend."
+  ],
+  "quality_score_threshold": 90,
+  "scenario_flows": [
+    {
+      "id": "flow-save-snippet",
+      "name": "Save article snippet",
+      "actor": "researcher",
+      "preconditions": [
+        "The extension popup is open on an article page."
+      ],
+      "steps": [
+        "Create a snippet with selected text, source title, URL, and tags.",
+        "Save the snippet and filter by one tag.",
+        "Open the saved source link from the popup."
+      ],
+      "expected_result": "The saved snippet appears in the popup list, matches the tag filter, and preserves the source URL.",
+      "failure_or_edge_cases": [
+        "Missing snippet text shows validation and disables save.",
+        "Empty search results show reset guidance."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "Run the extension build command when present.",
+    "lint": "Run lint or equivalent static checks when present.",
+    "test": "Run available tests.",
+    "run": "Load or open the extension popup locally.",
+    "behavior_check": "Check save, edit, filter, validation, empty, and popup layout behavior."
+  },
+  "acceptance_evidence_plan": [
+    "Popup screenshot and behavior evidence for saving, filtering, reopening, validation, accessibility, and state coverage."
+  ],
+  "iteration_policy": [
+    "Rework until the review score reaches the quality threshold."
+  ],
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "snippet-extension-worker-001",
+      "objective": "Build the Chrome article snippet extension.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "src",
+        "extension",
+        "tests"
+      ]
+    }
+  ]
+}

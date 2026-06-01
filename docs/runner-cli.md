@@ -2,7 +2,7 @@
 
 `harness-runner`는 하네스 정책을 사람이 일관되게 운용할 수 있도록 돕는 명령 계약이다. v1은 dry-run, report recording, audit만 정의한다. 실제 파일 수정, 워커 프로세스 생성, 빌드/린트/테스트/실행 명령 수행은 v1 범위가 아니다.
 
-스킬 배포본에는 전체 `harness-runner` 대신 좁은 보조 감사 스크립트가 포함된다. `skills/local-project-harness/scripts/harness_checks.mjs`는 기존 계약과 보고서를 읽어 scope, secret 후보, close 상태, review 논리, README/reference 동기화만 확인한다.
+스킬 배포본에는 전체 `harness-runner` 대신 좁은 보조 감사 스크립트가 포함된다. `skills/local-project-harness/scripts/harness_checks.mjs`는 기존 계약과 보고서를 읽어 scope, secret 후보, close 상태, goal 논리, review 논리, 앱 증거, summary/review 일관성, runner policy sync, README/reference 동기화를 확인한다.
 
 ## v1 명령
 
@@ -40,13 +40,26 @@ v1 러너는 다음을 하지 않는다.
 node skills/local-project-harness/scripts/harness_checks.mjs audit-scope --assignment <delegation.json> --report <worker-report.json> [--workspace <path>]
 node skills/local-project-harness/scripts/harness_checks.mjs secret-scan <file> [<file> ...]
 node skills/local-project-harness/scripts/harness_checks.mjs audit-close --lifecycle-log <events.jsonl>
-node skills/local-project-harness/scripts/harness_checks.mjs review-logic --report <review-report.json>
+node skills/local-project-harness/scripts/harness_checks.mjs goal-logic --contract <goal.json>
+node skills/local-project-harness/scripts/harness_checks.mjs review-logic --report <review-report.json> --contract <goal.json>
+node skills/local-project-harness/scripts/harness_checks.mjs app-evidence --review <review.json>
+node skills/local-project-harness/scripts/harness_checks.mjs summary-logic --summary <summary.json> --review <review.json>
+```
+
+The installed skill-local runner policy lists only those installed-safe helper audits, using `node scripts/harness_checks.mjs ...` relative to the skill directory. The repo-root runner policy additionally lists repo-maintenance sync checks that require root files:
+
+```text
+node skills/local-project-harness/scripts/harness_checks.mjs runner-policy-sync
 node skills/local-project-harness/scripts/harness_checks.mjs sync-check --source README.md --copy skills/local-project-harness/references/harness-readme.md
 ```
 
 `audit-scope` defaults `--workspace` to the current working directory. Existing allowed or changed paths are resolved with realpath so workspace escapes and symlink targets outside the workspace fail. Newly added changed files that do not exist yet are still string-checked and compared as normalized relative paths.
 
-`review-logic` fails reports missing the full `app_quality_check` key set or the required `evidence` array. For `work_type: app_product`, every required app-quality check must be `passed` with non-empty evidence, and the evidence array must include at least one passed item with a non-empty description or artifact. For non-app work, every required app-quality check must be `not_applicable` with evidence, and the evidence array must exist. The command still fails accepted reports that contain failed verification, app-quality, security, scope, secret, or scenario-flow checks, enforces `app_quality_failed` and `scenario_flow_failed` consistency, checks default rubric score sums when practical, and requires disclosure of `simulated_same_context` review limitations.
+`review-logic` requires `--contract <goal.json>` for accepted/final review auditing; accepted reports fail when the Goal Contract is omitted. Contract-linked reviews must have matching `report.work_type` and `contract.work_type`, and `app_product` in either record triggers app gates. It fails reports missing the full `app_quality_check` key set or required `evidence` array. For `work_type: app_product`, every required app-quality check must be `passed` with non-empty evidence, and the evidence array must include typed desktop, mobile, behavior, accessibility, and state coverage evidence. For non-app work, every required app-quality check must be `not_applicable` with evidence, and the evidence array must exist. Accepted reports must have passed hard gates (`scope_check`, `goal_contract_check`, `security_check`, `secret_scan_result`, `scope_diff_result`); accepted app reports must have passed `run` and `behavior_check`; and accepted `build`, `lint`, or `test` can be `not_applicable` only when evidence says no command, script, check, or harness exists.
+
+`goal-logic` checks app/product Goal Contracts for concrete target users, workflows, content/data/state assumptions, non-happy-path scenario flows, concrete acceptance evidence plans, and blocker-only open questions. App/product classification covers both creation requests and user-facing product-surface improvement requests such as UX improvement, redesign, polish, revamp, modernization, and app UI upgrades; test/docs/config/bugfix/refactor-only maintenance remains non-app when it does not change product surface. `app-evidence` checks app/product review reports for desktop visual evidence, mobile visual evidence, behavior evidence, accessibility evidence, state coverage evidence, and rejects generic or placeholder-only evidence. `summary-logic` compares a Summary Report with its Review Report and fails when the summary hides a non-accepted review, failed or unrun checks, `simulated_same_context` limitations, or runnable access for an accepted `app_product` result. Runnable access must include a concrete dev-server URL, localhost URL, static HTML path, preview URL, or command plus concrete URL/path target.
+
+`runner-policy-sync` compares `harness/runner_policy.yaml` with `skills/local-project-harness/references/policies/runner_policy.yaml`. It allows only expected root-to-skill-local path mappings: root `schemas/<name>.schema.json` equals skill-local `references/schemas/<name>.schema.json`, root helper commands use `node skills/local-project-harness/scripts/harness_checks.mjs`, and installed-skill commands use `node scripts/harness_checks.mjs` from the skill directory. Root-only maintenance helper commands for root-vs-skill runner policy sync and root README/reference sync may be omitted from the installed skill-local helper list; ordinary helper commands, budgets, gates, and other policy values must stay in sync.
 
 이 스크립트는 기존 기록을 감사하는 도구이며, 워커 생성이나 빌드/린트/테스트/실행을 하지 않는다.
 

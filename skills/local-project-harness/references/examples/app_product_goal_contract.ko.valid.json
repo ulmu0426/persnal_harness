@@ -1,0 +1,196 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-ko-shift-handoff-app",
+  "work_type": "app_product",
+  "raw_user_request": "교대 인수인계 앱 만들어줘",
+  "concrete_goal": "병동 교대 리더와 책임 간호사가 첫 화면에서 환자 인수인계 카드, 미해결 태스크, 우선순위 알림, 준비상태를 기록하고 다음 교대에게 전달할 수 있는 브라우저 기반 앱을 만든다.",
+  "success_criteria": [
+    "간호사는 첫 화면에서 가상의 환자 인수인계 카드를 생성, 편집, 저장, 완료 처리하고 미해결 태스크로 필터링할 수 있다.",
+    "화면은 병동, 병실, 중증도, 담당 간호사, 우선순위 알림, 태스크 카운트, 준비상태 용어를 명확히 표시한다.",
+    "데스크톱과 모바일 레이아웃에서 카드, 필터, 폼 필드, 버튼, 알림 문구가 겹침이나 잘림 없이 줄바꿈된다.",
+    "빈 상태, 로딩 상태, 오류 상태, 검증 상태, 비활성 저장 버튼, 저장 성공 상태가 화면에서 확인된다."
+  ],
+  "scope_in": [
+    "가상의 병동 인수인계 기록을 관리하는 단일 페이지 앱 화면과 로컬 클라이언트 상태.",
+    "환자 카드, 미해결 태스크, 우선순위 알림, 준비상태 필터, 저장 성공 메시지, 오류 복구 상태.",
+    "반응형 레이아웃, 접근성 레이블, 키보드 포커스, 검증 메시지, 상태 커버리지 화면."
+  ],
+  "scope_out": [
+    "실제 환자정보, 인증, 감사 로그, 병원 시스템 연동, 호출 시스템, 결제, 운영 배포.",
+    "브라우저 로컬 상태를 넘는 백엔드 영구 저장소나 외부 API 호출."
+  ],
+  "assumptions": [
+    "모든 샘플은 허구 환자와 병동 데이터이며 실제 진료 판단이나 환자정보를 다루지 않는다.",
+    "첫 버전은 로컬 브라우저 상태와 정적 시드 데이터로 충분하다.",
+    "다음 교대는 마케팅 페이지보다 스캔하기 쉬운 업무 화면이 필요하다."
+  ],
+  "implementation_constraints": [
+    "외부 서비스, 유료 API, 운영 배포를 추가하지 않는다.",
+    "실제 환자정보나 실제 사람을 유추할 수 있는 샘플 데이터를 사용하지 않는다.",
+    "주요 인수인계 워크플로는 첫 화면에서 완료 가능해야 한다."
+  ],
+  "product_brief": {
+    "target_users": [
+      "병동 교대 리더와 책임 간호사가 다음 근무팀에게 환자 상태, 미해결 태스크, 안전 우선순위를 전달한다."
+    ],
+    "core_problem": "다음 교대 근무자는 짧은 시간 안에 병동 환자별 인수인계 기록과 미완료 태스크를 확인해야 하므로, 중요한 알림과 준비상태가 화면에서 빠지면 업무 위험이 커진다.",
+    "primary_workflows": [
+      "병실, 가상 환자 이니셜, 중증도, 담당 간호사, 알림 요약, 태스크 목록, 준비상태를 가진 인수인계 카드를 생성하거나 수정한다.",
+      "미해결 태스크, 우선순위, 준비상태 필터로 병동 보드를 좁히고 다음 교대가 먼저 확인할 카드를 찾는다.",
+      "빈 결과, 잘못된 입력, 저장 성공, 복구 가능한 오류, 모바일 줄바꿈 상태를 확인하면서 인수인계 흐름을 유지한다."
+    ],
+    "domain_assumptions": [
+      "병동, 병실, 중증도, 담당 간호사, 알림, 태스크, 준비상태, 인수인계 같은 현장 용어를 쓰되 의료 조언은 제공하지 않는다.",
+      "우선순위 알림과 미해결 태스크는 보조 메모보다 먼저 보이는 계층을 가진다."
+    ],
+    "content_data_model_assumptions": [
+      "주요 엔티티는 인수인계 기록이며 필드는 id, 병실, 가상 환자 이니셜, 중증도, 담당 간호사, 알림 요약, 태스크 목록, 준비상태, 갱신 시간, 메모를 포함한다.",
+      "태스크 레코드는 라벨, 담당자, 마감 구간, open 또는 complete 상태를 가진다. 준비상태는 준비됨, 검토 필요, 긴급 값을 가진다.",
+      "UI 상태는 첫 실행 빈 보드, 시드 데이터 로딩, 저장 성공, 병실 누락 검증 오류, 유효하지 않은 저장 버튼 비활성, 복구 가능한 로컬 상태 오류를 포함한다."
+    ],
+    "non_goals": [
+      "실제 환자정보 처리, 임상 의사결정 지원, 외부 병원 시스템 연동, 분석, 스태프 스케줄링, 관리자 설정은 포함하지 않는다."
+    ]
+  },
+  "app_quality_gates": {
+    "ux_workflow_completeness": [
+      "첫 화면에서 인수인계 카드 생성, 편집, 저장, 필터, 태스크 완료 워크플로가 끊기지 않고 확인된다."
+    ],
+    "visual_polish": [
+      "병동 우선순위, 준비상태, 태스크 카운트, 알림 계층이 카드와 필터 레이아웃에서 명확하게 표시된다."
+    ],
+    "responsive_desktop_mobile": [
+      "데스크톱 보드와 모바일 스택 레이아웃을 각각 스크린샷이나 시각 검사 산출물로 확인한다."
+    ],
+    "accessibility_basics": [
+      "폼 필드와 필터 버튼은 레이블, 키보드 포커스, 대비, 상태 메시지 접근성 확인 증거를 가진다."
+    ],
+    "error_loading_empty_states": [
+      "빈 상태, 로딩 상태, 오류 상태, 검증 상태, 저장 성공 상태, 비활성 버튼 상태가 화면에서 확인된다."
+    ],
+    "text_overlap_layout_stability": [
+      "긴 병실 라벨, 담당 간호사 이름, 알림 문구, 태스크 버튼이 데스크톱과 모바일 카드 안에서 겹침 없이 줄바꿈된다."
+    ],
+    "domain_fit": [
+      "교대 인수인계, 병동, 간호사, 환자, 우선순위 알림, 준비상태 용어와 샘플 데이터가 앱 화면과 상호작용에 반영된다."
+    ],
+    "evidence_requirements": [
+      "데스크톱 스크린샷, 모바일 스크린샷, 주요 워크플로 동작 확인, 접근성 확인, 상태 커버리지 테스트 산출물이 필요하다."
+    ]
+  },
+  "quality_score_threshold": 90,
+  "scenario_flows": [
+    {
+      "id": "flow-ko-create-handoff",
+      "name": "우선순위 인수인계 생성",
+      "actor": "charge_nurse",
+      "preconditions": [
+        "인수인계 보드가 허구 병동 시드 데이터로 로딩되어 있다."
+      ],
+      "steps": [
+        "첫 화면에서 인수인계 추가 폼을 연다.",
+        "병실, 가상 환자 이니셜, 중증도, 담당 간호사, 우선순위 알림, 미해결 태스크를 입력한다.",
+        "저장하고 새 카드가 긴급 준비상태와 태스크 카운트를 가진 우선순위 영역에 표시되는지 확인한다."
+      ],
+      "expected_result": "새 인수인계 카드가 저장 성공 상태와 함께 표시되고 미해결 태스크 필터에서 즉시 찾을 수 있다.",
+      "failure_or_edge_cases": [
+        "병실이나 태스크 라벨이 누락되면 검증 오류가 표시되고 저장 버튼이 비활성화된다.",
+        "저장 오류를 시뮬레이션하면 입력값이 유지되고 복구 안내 메시지가 표시된다."
+      ]
+    },
+    {
+      "id": "flow-ko-filter-complete",
+      "name": "미해결 인수인계 필터와 완료",
+      "actor": "incoming_shift_lead",
+      "preconditions": [
+        "미해결 태스크가 있는 카드와 준비 완료 카드가 각각 하나 이상 있다."
+      ],
+      "steps": [
+        "미해결 태스크 필터를 적용한다.",
+        "인수인계 카드의 상세 영역을 열고 태스크 하나를 완료 처리한다.",
+        "필터를 해제하고 카운트와 준비상태 라벨이 업데이트되는지 확인한다."
+      ],
+      "expected_result": "카드 가시성, 태스크 카운트, 준비상태 라벨이 업데이트되고 우선순위 알림은 숨겨지지 않는다.",
+      "failure_or_edge_cases": [
+        "필터 결과가 비면 빈 상태와 초기화 버튼이 표시된다.",
+        "긴 알림 문구가 모바일 화면에서 컨트롤을 가리지 않고 줄바꿈된다."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "가능한 빌드 명령을 실행하고 결과를 기록한다.",
+    "lint": "가능한 정적 검사나 린트 명령을 실행한다.",
+    "test": "테스트 하네스가 있으면 인수인계 워크플로 테스트를 실행한다.",
+    "run": "로컬 앱이나 정적 HTML 산출물을 열고 URL 또는 파일 경로를 기록한다.",
+    "behavior_check": "생성, 필터, 완료, 검증, 빈 상태, 오류 상태, 데스크톱, 모바일, 키보드 포커스를 확인한다."
+  },
+  "acceptance_evidence_plan": [
+    "데스크톱 1440x900 스크린샷 또는 시각 검사 산출물로 인수인계 보드, 필터, 폼, 상세 카드가 겹침 없이 표시됨을 확인한다.",
+    "모바일 390x844 스크린샷 또는 시각 검사 산출물로 인수인계 카드, 저장 버튼, 긴 알림 문구가 잘림 없이 줄바꿈됨을 확인한다.",
+    "수동 동작 확인에서 인수인계 카드를 생성하고 미해결 태스크 필터를 적용한 뒤 태스크를 완료하면 준비상태와 카운트가 업데이트됨을 기록한다.",
+    "접근성 확인에서 인수인계 폼 레이블, 키보드 포커스, 대비, 상태 메시지 접근성을 검사한다.",
+    "상태 커버리지 테스트 산출물로 인수인계 보드의 빈 상태, 로딩 상태, 오류 상태, 저장 성공, 비활성 저장 버튼, 검증 메시지를 확인한다."
+  ],
+  "iteration_policy": {
+    "threshold_rule": "overall_completion_score는 quality_score_threshold 이상이어야 한다.",
+    "rework_rule": "앱 품질 증거가 실패하면 구체적 재작업 후 다시 검토한다.",
+    "stop_conditions": [
+      "모든 앱 증거가 있는 accepted 리뷰가 나온다.",
+      "실제 환자정보, 외부 비용, 운영 배포 차단 요인이 발견된다.",
+      "반복 예산을 모두 사용한다."
+    ]
+  },
+  "iteration_budget": {
+    "max_iterations": 8,
+    "max_rework_iterations": 6,
+    "default_consensus_rounds": 2,
+    "max_consensus_rounds": 3,
+    "max_subagents_per_task": 16,
+    "max_open_subagents": 6,
+    "max_validation_failures": 3,
+    "max_wall_clock_minutes": 180,
+    "min_completion_score": 90
+  },
+  "security_policy": {
+    "allowed_files_required": true,
+    "path_normalization_required": true,
+    "symlink_escape_rejected": true,
+    "secret_scan_required": true,
+    "scope_diff_required": true,
+    "unauthorized_network_or_cost_rejected": true
+  },
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "ko-handoff-app-worker-001",
+      "objective": "한국어 교대 인수인계 앱 화면과 상태 워크플로를 구현한다.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "src",
+        "app",
+        "components",
+        "styles"
+      ]
+    },
+    {
+      "task_id": "ko-handoff-app-review-001",
+      "objective": "한국어 앱 증거가 데스크톱, 모바일, 동작, 접근성, 상태를 충족하는지 검토한다.",
+      "owner": "review_worker",
+      "allowed_files": [
+        "src",
+        "app",
+        "components",
+        "styles",
+        "tests"
+      ]
+    }
+  ]
+}

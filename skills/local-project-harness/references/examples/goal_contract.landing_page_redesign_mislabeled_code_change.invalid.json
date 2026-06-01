@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-landing-page-redesign-mislabeled",
+  "work_type": "code_change",
+  "raw_user_request": "Redesign the landing page for a subscription analytics product.",
+  "concrete_goal": "Redesign the subscription analytics landing page so trial visitors can understand the product promise, inspect plan-oriented proof points, start signup, and see responsive visual hierarchy from the first viewport.",
+  "success_criteria": [
+    "Trial visitors can scan the analytics product offer, customer proof, signup call to action, and pricing handoff without confusion.",
+    "The landing page includes meaningful empty or loading state handling for testimonials or proof-point content.",
+    "Desktop and mobile layouts preserve readable headings, calls to action, and product vocabulary without overlap."
+  ],
+  "scope_in": [
+    "User-facing landing page redesign for the subscription analytics product.",
+    "Responsive hero, proof, signup call to action, loading state, empty state, visual polish, and accessibility basics."
+  ],
+  "scope_out": [
+    "Payment processing, account provisioning, external analytics integrations, and production deployment."
+  ],
+  "assumptions": [
+    "Fictional product metrics and customer proof points are acceptable for the local prototype."
+  ],
+  "implementation_constraints": [
+    "Do not add paid services, real customer data, or external tracking."
+  ],
+  "quality_score_threshold": 90,
+  "scenario_flows": [
+    {
+      "id": "flow-trial-visitor-signup",
+      "name": "Trial visitor evaluates product offer",
+      "actor": "trial_visitor",
+      "preconditions": [
+        "The landing page is open."
+      ],
+      "steps": [
+        "Scan the first viewport product message.",
+        "Open the signup call to action.",
+        "Inspect proof-point and plan handoff sections."
+      ],
+      "expected_result": "The redesigned page communicates the analytics product value, keeps the signup path visible, and preserves readable proof-point content.",
+      "failure_or_edge_cases": [
+        "Missing proof-point data shows an empty state instead of broken cards.",
+        "Long analytics feature names wrap on mobile without covering the signup control."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "Run the available build command.",
+    "lint": "Run the available lint command.",
+    "test": "Run available landing page tests.",
+    "run": "Open the local landing page and report the concrete URL or static path.",
+    "behavior_check": "Check first viewport, signup call to action, proof-point state coverage, responsive desktop/mobile, and keyboard focus behavior."
+  },
+  "acceptance_evidence_plan": [
+    "Desktop and mobile landing page screenshots plus signup behavior, accessibility, visual hierarchy, and state coverage."
+  ],
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "landing-page-redesign-worker-001",
+      "objective": "Redesign the user-facing subscription analytics landing page.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "src"
+      ]
+    }
+  ]
+}

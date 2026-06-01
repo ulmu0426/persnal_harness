@@ -1,0 +1,401 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://make-harness.local/schemas/runner_policy.schema.json",
+  "title": "Runner Policy",
+  "description": "Dry-run, record, audit, and finalize policy for harness-runner v1.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "policy",
+    "schema_validation",
+    "commands",
+    "non_execution_scope_v1",
+    "iteration_budget_defaults",
+    "security_gates",
+    "reporting_requirements",
+    "lifecycle",
+    "finalize_requirements"
+  ],
+  "properties": {
+    "policy": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "id",
+        "version",
+        "mode"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "language": {
+          "type": "string"
+        },
+        "mode": {
+          "const": "dry_run_record_audit"
+        },
+        "summary": {
+          "type": "string"
+        }
+      }
+    },
+    "schema_validation": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "dialect",
+        "validator",
+        "schemas"
+      ],
+      "properties": {
+        "dialect": {
+          "const": "https://json-schema.org/draft/2020-12/schema"
+        },
+        "validator": {
+          "type": "object"
+        },
+        "schemas": {
+          "type": "object",
+          "minProperties": 1
+        }
+      }
+    },
+    "commands": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "validate",
+        "dry_run",
+        "record",
+        "audit"
+      ],
+      "properties": {
+        "validate": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "dry_run": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "record": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "audit": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "helper_audit": {
+          "$ref": "#/$defs/string_list_nonempty"
+        }
+      }
+    },
+    "non_execution_scope_v1": {
+      "$ref": "#/$defs/string_list_nonempty"
+    },
+    "iteration_budget_defaults": {
+      "$ref": "#/$defs/iteration_budget"
+    },
+    "security_gates": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "hard_fail_statuses",
+        "path_policy",
+        "scope_policy",
+        "secret_policy",
+        "network_cost_policy"
+      ],
+      "properties": {
+        "hard_fail_statuses": {
+          "type": "array",
+          "minItems": 4,
+          "allOf": [
+            {
+              "contains": {
+                "const": "validation_failed"
+              }
+            },
+            {
+              "contains": {
+                "const": "security_failed"
+              }
+            },
+            {
+              "contains": {
+                "const": "budget_exceeded"
+              }
+            },
+            {
+              "contains": {
+                "const": "consensus_failed"
+              }
+            }
+          ],
+          "items": {
+            "$ref": "#/$defs/hard_fail_status"
+          }
+        },
+        "path_policy": {
+          "$ref": "#/$defs/path_policy"
+        },
+        "scope_policy": {
+          "$ref": "#/$defs/scope_policy"
+        },
+        "secret_policy": {
+          "$ref": "#/$defs/secret_policy"
+        },
+        "network_cost_policy": {
+          "$ref": "#/$defs/network_cost_policy"
+        }
+      }
+    },
+    "reporting_requirements": {
+      "type": "object"
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "event_log_format",
+        "active_statuses",
+        "terminal_statuses",
+        "close_audit"
+      ],
+      "properties": {
+        "event_log_format": {
+          "const": "jsonl"
+        },
+        "active_statuses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/lifecycle_status"
+          }
+        },
+        "terminal_statuses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/lifecycle_status"
+          }
+        },
+        "close_audit": {
+          "type": "object"
+        }
+      }
+    },
+    "finalize_requirements": {
+      "$ref": "#/$defs/string_list_nonempty"
+    }
+  },
+  "$defs": {
+    "string_list_nonempty": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "iteration_budget": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "max_iterations",
+        "max_rework_iterations",
+        "default_consensus_rounds",
+        "max_consensus_rounds",
+        "max_subagents_per_task",
+        "max_open_subagents",
+        "max_validation_failures",
+        "max_wall_clock_minutes",
+        "max_command_count",
+        "min_completion_score"
+      ],
+      "properties": {
+        "max_iterations": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 8
+        },
+        "max_rework_iterations": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 6
+        },
+        "default_consensus_rounds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 2
+        },
+        "max_consensus_rounds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 3
+        },
+        "max_subagents_per_task": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 16
+        },
+        "max_open_subagents": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 6
+        },
+        "max_validation_failures": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 3
+        },
+        "max_wall_clock_minutes": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 180
+        },
+        "max_command_count": {
+          "type": "object"
+        },
+        "min_completion_score": {
+          "type": "integer",
+          "minimum": 85,
+          "maximum": 100,
+          "default": 85
+        }
+      }
+    },
+    "hard_fail_status": {
+      "enum": [
+        "validation_failed",
+        "security_failed",
+        "budget_exceeded",
+        "consensus_failed"
+      ]
+    },
+    "path_policy": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "require_workspace_relative_paths",
+        "normalize_paths_before_compare",
+        "reject_parent_directory_segments",
+        "reject_absolute_paths",
+        "reject_workspace_escape",
+        "reject_globs",
+        "symlink_policy"
+      ],
+      "properties": {
+        "require_workspace_relative_paths": {
+          "const": true
+        },
+        "normalize_paths_before_compare": {
+          "const": true
+        },
+        "reject_parent_directory_segments": {
+          "const": true
+        },
+        "reject_absolute_paths": {
+          "const": true
+        },
+        "reject_workspace_escape": {
+          "const": true
+        },
+        "reject_globs": {
+          "const": true
+        },
+        "symlink_policy": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "scope_policy": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "require_allowed_files",
+        "require_scope_diff_result",
+        "compare_changed_files_to_allowed_files",
+        "reject_unapproved_deletes",
+        "reject_unapproved_reverts"
+      ],
+      "properties": {
+        "require_allowed_files": {
+          "const": true
+        },
+        "require_scope_diff_result": {
+          "const": true
+        },
+        "compare_changed_files_to_allowed_files": {
+          "const": true
+        },
+        "reject_unapproved_deletes": {
+          "const": true
+        },
+        "reject_unapproved_reverts": {
+          "const": true
+        }
+      }
+    },
+    "secret_policy": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "require_secret_scan_result",
+        "mask_secret_candidates",
+        "reject_raw_secret_output"
+      ],
+      "properties": {
+        "require_secret_scan_result": {
+          "const": true
+        },
+        "mask_secret_candidates": {
+          "const": true
+        },
+        "reject_raw_secret_output": {
+          "const": true
+        }
+      }
+    },
+    "network_cost_policy": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "default_network",
+        "default_external_cost",
+        "require_explicit_approval_for_network_or_cost"
+      ],
+      "properties": {
+        "default_network": {
+          "const": "denied"
+        },
+        "default_external_cost": {
+          "const": "denied"
+        },
+        "require_explicit_approval_for_network_or_cost": {
+          "const": true
+        }
+      }
+    },
+    "lifecycle_status": {
+      "enum": [
+        "spawned",
+        "assigned",
+        "running",
+        "report_received",
+        "consumed",
+        "close_pending",
+        "closed",
+        "blocked",
+        "validation_failed",
+        "security_failed",
+        "budget_exceeded",
+        "consensus_failed"
+      ]
+    }
+  }
+}

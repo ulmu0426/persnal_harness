@@ -46,7 +46,11 @@ commands:
     - "node skills/local-project-harness/scripts/harness_checks.mjs audit-scope --assignment <delegation.json> --report <worker-report.json> [--workspace <path>]"
     - "node skills/local-project-harness/scripts/harness_checks.mjs secret-scan <file> [<file> ...]"
     - "node skills/local-project-harness/scripts/harness_checks.mjs audit-close --lifecycle-log <events.jsonl>"
-    - "node skills/local-project-harness/scripts/harness_checks.mjs review-logic --report <review-report.json>"
+    - "node skills/local-project-harness/scripts/harness_checks.mjs review-logic --report <review-report.json> --contract <goal.json>"
+    - "node skills/local-project-harness/scripts/harness_checks.mjs goal-logic --contract <goal.json>"
+    - "node skills/local-project-harness/scripts/harness_checks.mjs app-evidence --review <review.json>"
+    - "node skills/local-project-harness/scripts/harness_checks.mjs summary-logic --summary <summary.json> --review <review.json>"
+    - "node skills/local-project-harness/scripts/harness_checks.mjs runner-policy-sync"
     - "node skills/local-project-harness/scripts/harness_checks.mjs sync-check --source README.md --copy skills/local-project-harness/references/harness-readme.md"
 
 non_execution_scope_v1:

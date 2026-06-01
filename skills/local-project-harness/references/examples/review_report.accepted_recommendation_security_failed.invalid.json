@@ -1,0 +1,179 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "review-accepted-recommendation-security-failed",
+  "work_type": "schema_policy",
+  "status": "security_failed",
+  "reviewed_outputs": [
+    "schemas/review_report.schema.json"
+  ],
+  "scope_check": {
+    "status": "passed",
+    "evidence": "Reviewed schema artifacts stayed within the assigned review-report policy scope.",
+    "findings": []
+  },
+  "goal_contract_check": {
+    "status": "passed",
+    "evidence": "The review artifact matches the schema-policy goal contract and required report fields.",
+    "findings": []
+  },
+  "overall_completion_score": 90,
+  "rubric_scores": {
+    "question_fulfillment": {
+      "score": 23,
+      "max_score": 25,
+      "evidence": "The requested schema-policy review scope is covered."
+    },
+    "functional_completeness": {
+      "score": 18,
+      "max_score": 20,
+      "evidence": "Required policy fields and report sections are present."
+    },
+    "scenario_flow_coverage": {
+      "score": 27,
+      "max_score": 30,
+      "evidence": "Review acceptance and rework scenario flows were inspected."
+    },
+    "edge_case_handling": {
+      "score": 8,
+      "max_score": 10,
+      "evidence": "Hard-gate and recommendation edge cases were reviewed."
+    },
+    "regression_safety": {
+      "score": 5,
+      "max_score": 5,
+      "evidence": "Existing schema-policy behavior was preserved."
+    },
+    "verification_completeness": {
+      "score": 9,
+      "max_score": 10,
+      "evidence": "Syntax and lint-style checks are recorded with command evidence."
+    }
+  },
+  "scenario_flow_scores": [
+    {
+      "id": "flow-review-acceptance",
+      "score": 90,
+      "passed": true,
+      "evidence": "Accepted review flow was checked against threshold and blocking-gate requirements."
+    }
+  ],
+  "score_threshold": 90,
+  "passed_threshold": true,
+  "blocking_gates": [],
+  "verification_check": {
+    "build": {
+      "status": "not_applicable",
+      "evidence": "No build command exists for this schema-policy-only artifact.",
+      "findings": []
+    },
+    "lint": {
+      "status": "passed",
+      "evidence": "`node scripts/lint-schema-docs.mjs` passed markdown and required-key checks.",
+      "findings": []
+    },
+    "test": {
+      "status": "passed",
+      "evidence": "`node scripts/parse-fixtures.mjs` parsed JSON, JSONL, and YAML review fixtures.",
+      "findings": []
+    },
+    "run": {
+      "status": "not_applicable",
+      "evidence": "No runnable app exists for this schema-policy-only artifact.",
+      "findings": []
+    },
+    "behavior_check": {
+      "status": "passed",
+      "evidence": "Manual behavior check inspected accepted, rejected, and rework gate documentation flows.",
+      "findings": []
+    }
+  },
+  "app_quality_check": {
+    "ux_workflow_completeness": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review has no app workflow surface to inspect.",
+      "findings": []
+    },
+    "visual_polish": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review has no app visual surface to inspect.",
+      "findings": []
+    },
+    "responsive_desktop_mobile": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review has no desktop or mobile app surface to inspect.",
+      "findings": []
+    },
+    "accessibility_basics": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review has no interactive app controls to inspect.",
+      "findings": []
+    },
+    "error_loading_empty_states": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review has no app loading, empty, error, or validation states.",
+      "findings": []
+    },
+    "text_overlap_layout_stability": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review has no app text layout surface to inspect.",
+      "findings": []
+    },
+    "domain_fit": {
+      "status": "not_applicable",
+      "evidence": "This schema-policy review has no product domain vocabulary to inspect.",
+      "findings": []
+    },
+    "evidence": [
+      {
+        "type": "not_applicable",
+        "status": "not_applicable",
+        "description": "App-quality evidence is not required for this non-app schema-policy review."
+      }
+    ]
+  },
+  "security_check": {
+    "status": "passed",
+    "evidence": "No raw secrets, workspace escape, unauthorized network, or external-cost behavior is present.",
+    "findings": []
+  },
+  "secret_scan_result": {
+    "status": "passed",
+    "evidence": "Secret scan found no API keys or credential-like values in reviewed fixtures.",
+    "findings": []
+  },
+  "scope_diff_result": {
+    "status": "passed",
+    "evidence": "Changed artifacts are within the agreed schema-policy review scope.",
+    "findings": []
+  },
+  "command_audit": [
+    {
+      "command": "node scripts/lint-schema-docs.mjs",
+      "cwd": "C:/repo/harness",
+      "purpose": "Run lint-style schema documentation checks.",
+      "exit_code": 0,
+      "output_summary": "Lint-style checks passed."
+    },
+    {
+      "command": "node scripts/parse-fixtures.mjs",
+      "cwd": "C:/repo/harness",
+      "purpose": "Run fixture syntax tests.",
+      "exit_code": 0,
+      "output_summary": "JSON, JSONL, and YAML fixture parsing passed."
+    }
+  ],
+  "budget_used": {
+    "iterations": 1,
+    "rework_iterations": 0,
+    "consensus_rounds": 0,
+    "subagents_started": 2,
+    "open_subagents": 0
+  },
+  "independence": "real_subagent",
+  "rework_items": [],
+  "next_iteration_recommendation": "No rework required.",
+  "risks_or_follow_up": [
+    "This fixture must fail because recommendation accepted cannot be paired with a security_failed status."
+  ],
+  "recommendation": "accepted"
+}

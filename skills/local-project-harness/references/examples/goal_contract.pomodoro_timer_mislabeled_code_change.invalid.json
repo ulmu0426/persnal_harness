@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0.0",
+  "goal_id": "goal-pomodoro-timer-mislabeled",
+  "work_type": "code_change",
+  "raw_user_request": "Build a Pomodoro timer for focus sessions.",
+  "concrete_goal": "Create a browser-based Pomodoro timer for students to start, pause, reset, and toggle focus or break intervals from the first screen while tracking completed focus sessions.",
+  "success_criteria": [
+    "Users can start, pause, reset, and toggle between focus and break modes without leaving the timer screen.",
+    "The timer shows remaining time, active mode, completed session count, empty first-run guidance, and saved settings state.",
+    "Desktop and mobile layouts keep timer controls readable without overlap or clipped labels."
+  ],
+  "scope_in": [
+    "Single-page Pomodoro timer UI with local client-side state.",
+    "Focus, short break, long break, start, pause, reset, toggle, session count, validation, and responsive behavior."
+  ],
+  "scope_out": [
+    "User accounts, calendar integrations, notifications, paid APIs, backend persistence, and production deployment."
+  ],
+  "assumptions": [
+    "Local browser state is enough for the prototype.",
+    "Focus session lengths can use preset values without external configuration."
+  ],
+  "implementation_constraints": [
+    "Do not add external services or paid APIs.",
+    "Keep the primary timer controls available on the first screen."
+  ],
+  "quality_score_threshold": 90,
+  "scenario_flows": [
+    {
+      "id": "flow-run-focus-session",
+      "name": "Run focus timer session",
+      "actor": "student",
+      "preconditions": [
+        "The Pomodoro timer is open with default focus and break durations."
+      ],
+      "steps": [
+        "Start the focus timer.",
+        "Pause and resume the countdown.",
+        "Reset the timer and toggle to break mode."
+      ],
+      "expected_result": "The timer updates remaining time, mode label, and completed session count while controls remain usable.",
+      "failure_or_edge_cases": [
+        "Invalid duration input shows validation and disables save.",
+        "Small mobile viewport keeps start, pause, reset, and toggle controls reachable without overlap."
+      ]
+    }
+  ],
+  "completion_rubric": {
+    "question_fulfillment": 25,
+    "functional_completeness": 20,
+    "scenario_flow_coverage": 30,
+    "edge_case_handling": 10,
+    "regression_safety": 5,
+    "verification_completeness": 10
+  },
+  "verification_matrix": {
+    "build": "Run the available build command.",
+    "lint": "Run the available lint command.",
+    "test": "Run available tests or add a focused timer behavior test if the project has a test harness.",
+    "run": "Open the local Pomodoro timer.",
+    "behavior_check": "Check start, pause, reset, toggle, validation, session count, desktop layout, mobile layout, and keyboard focus behavior."
+  },
+  "acceptance_evidence_plan": [
+    "Desktop and mobile screenshots plus behavior, accessibility, and state coverage for the timer controls."
+  ],
+  "iteration_policy": [
+    "Rework until the review score reaches the quality threshold."
+  ],
+  "open_questions": [],
+  "delegation_plan_seed": [
+    {
+      "task_id": "pomodoro-timer-worker-001",
+      "objective": "Build the Pomodoro timer app.",
+      "owner": "subtask_worker",
+      "allowed_files": [
+        "src",
+        "tests"
+      ]
+    }
+  ]
+}

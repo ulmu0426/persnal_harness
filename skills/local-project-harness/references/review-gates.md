@@ -38,6 +38,10 @@ app_quality_check:
   text_overlap_layout_stability:
   domain_fit:
   evidence:
+    - type: screenshot | manual_behavior_check | automated_test | accessibility_check | responsive_check | not_applicable
+      status: passed | failed | not_run | not_applicable
+      description:
+      artifact:
 security_check:
 secret_scan_result:
 scope_diff_result:
@@ -82,7 +86,7 @@ Any of these block completion regardless of score:
 - unauthorized network, external cost, deployment, or destructive command
 - required build, lint, test, run, or behavior check failure
 - any `scenario_flow_scores[].passed === false`; add `scenario_flow_failed`, set `passed_threshold: false`, use a non-accepted `status` and `recommendation`, and provide concrete `rework_items` unless the report is `blocked` or `rejected`
-- failed required app-quality check for `work_type: app_product`
+- failed, missing, generic, or `not_run` required app-quality check for `work_type: app_product`
 - unresolved data-loss, migration, or security risk
 
 ## Logical Consistency
@@ -95,7 +99,9 @@ Review reports must be internally consistent:
 - `app_quality_check` must be present in every review report with all required check keys: `ux_workflow_completeness`, `visual_polish`, `responsive_desktop_mobile`, `accessibility_basics`, `error_loading_empty_states`, `text_overlap_layout_stability`, and `domain_fit`.
 - `app_quality_check.evidence` must be present as an array.
 - An accepted report must not contain failed verification, app-quality, security, scope, or secret checks.
-- For `work_type: app_product`, every required app-quality check must be `passed` with non-empty evidence, and `app_quality_check.evidence` must include at least one `passed` item with a non-empty `description` or `artifact`.
+- For `work_type: app_product`, every required app-quality check must be `passed` with non-empty evidence tied to that key.
+- Accepted app/product work requires evidence for desktop visual inspection, mobile visual inspection, primary workflow behavior, accessibility basics, and state coverage. Use the schema-compatible evidence type names `screenshot`, `responsive_check`, `manual_behavior_check`, `automated_test`, and `accessibility_check`; distinguish desktop/mobile/state coverage in `description` or `artifact`.
+- Reject generic evidence such as "looks good", "manual check passed", "responsive", "polished", or "accessibility considered" unless it includes what was checked, where, and the observed result.
 - Any failed required verification should appear in `blocking_gates`.
 - Any failed scenario flow score must add `scenario_flow_failed` to `blocking_gates`; a failed scenario flow requires `passed_threshold: false`, a non-accepted `status` and `recommendation`, and concrete `rework_items` unless the status is `blocked` or `rejected`.
 - Any failed app-quality check must add `app_quality_failed` to `blocking_gates`; `app_quality_failed` requires at least one failed or not-run app-quality item with evidence explaining the gap.
