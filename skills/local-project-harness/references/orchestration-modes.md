@@ -26,7 +26,7 @@ For each delegated or simulated role, record:
 When a runtime exposes only default, explorer, and worker agent categories, keep the harness role ID in records and map to the available runtime category:
 
 - `goal_refiner`, `goal_review_worker`, `app_designer`, `game_designer`, `polish_reviewer`, `review_worker`, `summary_worker`, `security_agent`, `technical_agent`, and `management_agent`: default no-edit agent
-- `frontend_worker`, `game_engine_worker`, `asset_worker`, and `subtask_worker`: worker agent with explicit `allowed_files` and disjoint write scope
+- `frontend_worker`, `game_engine_worker`, `asset_worker`, `game_asset_worker`, and `subtask_worker`: worker agent with explicit `allowed_files` and disjoint write scope
 - `explorer_agent`: explorer agent for read-only codebase questions
 - `playtest_worker` and `verification_worker`: explorer or default no-edit agent unless the assignment explicitly owns local verification artifacts, in which case use a worker agent with a narrow output scope
 

@@ -39,6 +39,7 @@
         "game_designer",
         "game_engine_worker",
         "asset_worker",
+        "game_asset_worker",
         "playtest_worker",
         "polish_reviewer",
         "subtask_worker",

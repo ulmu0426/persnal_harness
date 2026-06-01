@@ -194,7 +194,8 @@ Prohibited:
 Handoff:
 
 - hands a concise `game_brief` and scenario plan to `game_engine_worker`
-- hands local-only asset requirements to `asset_worker`
+- hands generated raster game asset requirements to `game_asset_worker`
+- hands generic, non-raster, normalization-only, or backward-compatible local asset requirements to `asset_worker`
 - expects `playtest_worker`, `polish_reviewer`, and `review_worker` to verify playability and quality
 
 Report:
@@ -218,7 +219,7 @@ Allowed:
 
 - edit only assigned game runtime, scene, component, style, local asset reference, and test files
 - implement the agreed core loop, mechanics, rules, input handling, HUD, scoring/progression, win/lose/restart, pause, and feedback
-- integrate local assets supplied by `asset_worker`
+- integrate local assets supplied by `asset_worker` or generated raster assets supplied by `game_asset_worker`
 - run local build, test, run, browser, performance, and behavior checks assigned by the delegation
 
 Prohibited:
@@ -230,7 +231,7 @@ Prohibited:
 
 Handoff:
 
-- hands changed files, runnable access, and known limitations to `asset_worker` when asset fixes remain, then to `playtest_worker`
+- hands changed files, runnable access, and known limitations to `asset_worker` or `game_asset_worker` when asset fixes remain, then to `playtest_worker`
 - hands performance or render risks to `polish_reviewer` and `review_worker`
 - final acceptance remains with `review_worker`
 
@@ -249,7 +250,9 @@ risks_or_follow_up:
 
 ## Asset Worker
 
-Purpose: create, adapt, normalize, or integrate local game/app assets within the assigned repository scope.
+Purpose: create, adapt, normalize, or integrate generic local game/app assets within the assigned repository scope.
+
+`asset_worker` remains a generic and backward-compatible role. For generated raster game sprites, textures, cutouts, tile art, backgrounds, or animation frames, prefer `game_asset_worker`.
 
 Allowed:
 
@@ -285,6 +288,52 @@ handoff_notes:
 risks_or_follow_up:
 ```
 
+## Game Asset Worker
+
+Purpose: create generated raster game assets for web-game or game work, using the `$imagegen` skill as the active production path.
+
+Allowed:
+
+- actively use the `$imagegen` skill for raster game sprites, textures, cutouts, backgrounds, item art, character art, tile art, animation frames, and raster variants
+- use the default built-in `image_gen` mode first; it does not require `OPENAI_API_KEY`
+- issue one built-in `image_gen` call per distinct asset or variant instead of combining unrelated assets into one prompt
+- for transparent or cutout assets, first generate on a flat chroma-key background and run the `$imagegen` `remove_chroma_key.py` flow before considering true native transparency
+- move or copy every project-bound final asset into the workspace before handoff; never leave a referenced game asset only under `$CODEX_HOME/generated_images` or another default skill output location
+- create or update a local provenance and integration manifest that records asset name, saved path, final prompt, generation mode, source/output files, transparency processing, intended in-game use, anchor/collision notes when relevant, and verification status
+- run local asset integrity checks assigned by the delegation, including file existence, loadability, expected format, dimensions when relevant, alpha-channel validation for cutouts, and broken-reference checks
+
+Prohibited:
+
+- substitute SVG, canvas, CSS, or placeholder shapes when the assignment requires generated raster game assets
+- fetch from external asset stores, scrape websites, or use third-party packs unless separately approved
+- assume credentials, request raw secrets, deploy assets, or access credentialed services
+- use unauthorized network, external-cost tools, paid generation paths, paid asset stores, or paid APIs unless separately approved
+- switch to `$imagegen` CLI fallback, `OPENAI_API_KEY`, `gpt-image-1.5`, or true native transparency without explicit user confirmation
+- overwrite existing repo assets unless replacement is explicitly assigned; otherwise create versioned sibling files
+- change game mechanics, scoring, rules, UI workflows, or engine code outside assigned asset integration scope
+
+Handoff:
+
+- hands saved asset paths, prompts, provenance/integration manifest, changed files, and verification evidence to `game_engine_worker`
+- hands asset integrity evidence to `playtest_worker`, `polish_reviewer`, and `review_worker`
+- reports `asset_pipeline_failed` risk when required raster assets are missing, left outside the workspace, unverifiable, malformed, lack provenance, or were produced through an unapproved path
+
+Report:
+
+```yaml
+role: game_asset_worker
+status: completed | blocked | needs_review
+changed_files:
+asset_inventory:
+saved_paths:
+final_prompts:
+generation_mode: imagegen_builtin | imagegen_cli_confirmed | not_run
+provenance_manifest:
+verification:
+handoff_notes:
+risks_or_follow_up:
+```
+
 ## Playtest Worker
 
 Purpose: exercise an implemented app, tool, web-game, or game as a user/player and report behavior evidence without changing implementation unless explicitly assigned.
@@ -304,7 +353,7 @@ Prohibited:
 
 Handoff:
 
-- hands concrete findings, reproduction steps, screenshots or notes, and pass/fail evidence to `frontend_worker`, `game_engine_worker`, or `asset_worker` for rework
+- hands concrete findings, reproduction steps, screenshots or notes, and pass/fail evidence to `frontend_worker`, `game_engine_worker`, `asset_worker`, or `game_asset_worker` for rework
 - hands complete playtest evidence to `polish_reviewer`, `verification_worker`, and `review_worker`
 - reports `playtest_failed`, `game_quality_failed`, or `performance_failed` risk when applicable
 

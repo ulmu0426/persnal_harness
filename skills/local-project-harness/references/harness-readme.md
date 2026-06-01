@@ -37,13 +37,14 @@ For game and web-game work, `game_brief` should record target player, genre, cor
 
 ## Specialist Routing
 
-The seven app/game specialist names are first-class, schema-valid role IDs in the skill-local schemas:
+The app/game specialist names are first-class, schema-valid role IDs in the skill-local schemas:
 
 - `app_designer`
 - `frontend_worker`
 - `game_designer`
 - `game_engine_worker`
 - `asset_worker`
+- `game_asset_worker`
 - `playtest_worker`
 - `polish_reviewer`
 
@@ -51,9 +52,9 @@ Preserve the generic roles as fallbacks. `subtask_worker` remains the generic im
 
 For app, site, tool, and product work, route through `app_designer -> frontend_worker -> playtest_worker` or `verification_worker -> polish_reviewer -> review_worker` as appropriate. Use `verification_worker` for deterministic command and behavior checks, and `playtest_worker` when the useful evidence is hands-on workflow exercise.
 
-For web-game and game work, route through `game_designer -> game_engine_worker -> asset_worker -> playtest_worker -> polish_reviewer -> review_worker`. `asset_worker` may be skipped only when no asset changes or asset verification are needed. `polish_reviewer` is advisory and cannot override `review_worker` hard gates or final scoring.
+For web-game and game work, route through `game_designer -> game_engine_worker -> game_asset_worker -> playtest_worker -> polish_reviewer -> review_worker` when generated raster game assets are needed. Use `asset_worker` for generic app/game assets, repo-owned vectors, audio placeholders, manifest normalization, asset verification, or backward-compatible assignments that do not require generated raster game art. Asset roles may be skipped only when no asset changes or asset verification are needed. `polish_reviewer` is advisory and cannot override `review_worker` hard gates or final scoring.
 
-When the runtime offers only default, explorer, and worker agent categories, keep the specialist role ID in the harness record and map execution categories this way: `app_designer`, `game_designer`, `polish_reviewer`, `review_worker`, `goal_refiner`, `goal_review_worker`, and `summary_worker` use a default no-edit agent; `frontend_worker`, `game_engine_worker`, `asset_worker`, and `subtask_worker` use a worker agent with explicit file ownership; `playtest_worker`, `verification_worker`, and `explorer_agent` use explorer or default no-edit agents unless they explicitly own local verification artifacts. Same-context simulation rules still apply, including `independence: simulated_same_context` and disclosure of missing independent checks.
+When the runtime offers only default, explorer, and worker agent categories, keep the specialist role ID in the harness record and map execution categories this way: `app_designer`, `game_designer`, `polish_reviewer`, `review_worker`, `goal_refiner`, `goal_review_worker`, and `summary_worker` use a default no-edit agent; `frontend_worker`, `game_engine_worker`, `asset_worker`, `game_asset_worker`, and `subtask_worker` use a worker agent with explicit file ownership; `playtest_worker`, `verification_worker`, and `explorer_agent` use explorer or default no-edit agents unless they explicitly own local verification artifacts. Same-context simulation rules still apply, including `independence: simulated_same_context` and disclosure of missing independent checks.
 
 This harness is a minimal operating framework that prevents the main session from directly doing coding work by default. Instead, it forces goal refinement and bounded subtasks to be delegated to workers. Its purpose is to clearly separate user request concretization, Goal Contract completeness checks, work breakdown, delegation, progress tracking, review delegation, and review-report-based integration decisions so the main session does not drift into being the goal analyst, implementer, and reviewer at the same time.
 

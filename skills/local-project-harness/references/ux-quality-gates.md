@@ -48,7 +48,7 @@ For `experience_kind: web_game` or `game`, these gates apply in addition to app/
 - `feedback_game_feel`: movement, hits, collects, invalid actions, transitions, and scoring produce timely visual/audio-placeholder/HUD feedback
 - `hud_readability`: score, health, timer, level, prompts, and status remain readable without covering the playfield
 - `performance_render_stability`: canvas/WebGL/animation rendering is nonblank, stable, and responsive at expected desktop and mobile sizes
-- `asset_integrity`: required local sprites, textures, models, audio placeholders, and manifests load with known provenance and no broken references
+- `asset_integrity`: required local sprites, textures, models, audio placeholders, and manifests load with known provenance and no broken references; generated raster game assets have workspace-saved paths, final prompts, generation mode, transparency processing notes when applicable, and provenance/integration manifest entries
 - `browser_mobile_playability`: the game is playable in the target browser and on the applicable mobile viewport or documented device class
 - `full_playthrough_evidence`: a complete loop, level, win/loss, or restart path was actually played through
 
@@ -80,7 +80,7 @@ Reject or require rework when:
 - the final answer omits how to run or open the product
 - a game is only a static scene, mock board, menu, animation, or asset preview without a playable loop
 - rules, scoring, controls, win/lose, pause/restart, or invalid action behavior cannot be exercised
-- game assets are broken, externally fetched without approval, missing provenance, or not locally verifiable
+- game assets are broken, externally fetched without approval, missing provenance, left only in default generation output locations, produced through unapproved paid/CLI/network paths, or not locally verifiable
 - canvas/WebGL/animation output is blank, unstable, unplayable, or too slow for the target viewport
 - no full playthrough or complete-loop playtest evidence exists
 

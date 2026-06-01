@@ -45,7 +45,7 @@ For non-trivial project work:
 4. Use `goal_review_worker` to review Goal Contract substance before implementation; do not proceed when it reports `blocked`, `rejected`, or unresolved `needs_rework`.
 5. For abstract app/site/game/tool/product ideas, require `work_type: app_product`; reject generic product briefs. Add `experience_kind` when useful, infer a strong `product_brief` with target user, domain workflow, data model and states, responsive/accessibility/visual evidence plan, and non-goals, and add `game_brief` for `experience_kind: web_game` or `game`; ask the user only for true blockers.
 6. Route app/tool/product work through `app_designer -> frontend_worker -> playtest_worker` or `verification_worker -> polish_reviewer -> review_worker` as appropriate for the scope.
-7. Route web-game/game work through `game_designer -> game_engine_worker -> asset_worker -> playtest_worker -> polish_reviewer -> review_worker`.
+7. Route web-game/game work through `game_designer -> game_engine_worker -> game_asset_worker -> playtest_worker -> polish_reviewer -> review_worker` when generated raster game assets are needed; use `asset_worker` for generic, non-raster, normalization-only, or backward-compatible asset tasks.
 8. Break work into bounded sub-tasks.
 9. Delegate to actual sub-agents when available and authorized.
 10. For non-trivial app, product, or game work, require real-subagent review or verification as a hard gate when real sub-agent tools are available.
@@ -74,7 +74,8 @@ When the runtime offers only generic agent categories, map harness roles this wa
 - `frontend_worker`: worker agent with explicit file ownership and disjoint write scope for app/site/tool UI implementation.
 - `game_designer`: default agent, no file edits; game brief, rules, loop, states, difficulty, and playtest plan.
 - `game_engine_worker`: worker agent with explicit file ownership and disjoint write scope for playable runtime implementation.
-- `asset_worker`: worker agent with explicit local-only asset scope; no external asset fetch, paid AI generation, deployment, credentials, or non-local network unless separately approved.
+- `asset_worker`: worker agent with explicit local-only generic asset scope; no external asset fetch, paid AI generation, deployment, credentials, or non-local network unless separately approved.
+- `game_asset_worker`: worker agent with explicit local-only game raster asset scope; actively uses `$imagegen` built-in mode by default, persists project-bound assets in the workspace, and requires explicit user confirmation before CLI fallback, external cost, network, credentialed, or paid paths.
 - `playtest_worker`: explorer or default agent for no-edit playtesting; worker agent only when the assignment explicitly owns local verification artifacts.
 - `polish_reviewer`: default agent, no file edits; advisory UX/game polish review that cannot override `review_worker` hard gates or final scoring.
 - `subtask_worker`: generic worker-agent fallback with explicit file ownership and disjoint write scope.
@@ -95,6 +96,7 @@ If actual sub-agents cannot be used, keep the harness shape by running named int
 - `game_designer`
 - `game_engine_worker`
 - `asset_worker`
+- `game_asset_worker`
 - `playtest_worker`
 - `polish_reviewer`
 - `subtask_worker`

@@ -117,7 +117,7 @@
       "Collect, collision, score change, life loss, win, lose, pause, and restart each produce visible HUD or animation feedback."
     ],
     "assets": [
-      "Use local vector/canvas shapes or repo-owned sprites with documented provenance."
+      "Use generated local raster sprites for the ship, pod, and debris when raster art is needed; route those assets through game_asset_worker with documented prompts, saved paths, and provenance."
     ],
     "engine_constraints": [
       "Browser runtime only, local preview, no external network, stable desktop and mobile rendering."
@@ -220,12 +220,13 @@
     },
     {
       "task_id": "orbital-rescue-assets-001",
-      "objective": "Create or normalize local placeholder assets and document provenance and load checks.",
-      "owner": "asset_worker",
+      "objective": "Use $imagegen built-in mode to generate project-bound raster ship, pod, and debris assets, persist them in the workspace, document prompts, saved paths, transparency processing, provenance, integration notes, and load checks.",
+      "owner": "game_asset_worker",
       "allowed_files": [
         "public/assets",
         "src/assets",
-        "docs/asset-inventory.md"
+        "docs/asset-inventory.md",
+        "docs/game-asset-provenance.md"
       ]
     },
     {
