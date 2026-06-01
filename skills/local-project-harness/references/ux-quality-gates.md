@@ -17,6 +17,25 @@ An app/product output is not accepted unless all applicable gates pass with evid
 - `behavior_evidence`: primary interactions were manually checked or covered by tests
 - `runnable_access`: final response reports a runnable local URL, dev server URL, or static file path
 
+## Review Schema Mapping
+
+The conceptual gates above guide review, but the review-report schema accepts only these app-quality keys under `app_quality_check`: `ux_workflow_completeness`, `visual_polish`, `responsive_desktop_mobile`, `accessibility_basics`, `error_loading_empty_states`, `text_overlap_layout_stability`, `domain_fit`, and `evidence`. Do not add conceptual gate names as extra `app_quality_check` properties.
+
+Use this mapping when writing schema-valid review reports:
+
+| Conceptual gate | Schema-compatible location |
+| --- | --- |
+| `primary_workflow_first_screen` | `app_quality_check.ux_workflow_completeness` evidence and, when applicable, `app_quality_check.evidence[]` with screenshot or behavior evidence |
+| `workflow_completion` | `app_quality_check.ux_workflow_completeness`, `scenario_flow_scores[]`, and `verification_check.behavior_check` |
+| `domain_fit` | `app_quality_check.domain_fit` |
+| `visual_polish` | `app_quality_check.visual_polish` |
+| `responsive_desktop_mobile` | `app_quality_check.responsive_desktop_mobile` and desktop/mobile `app_quality_check.evidence[]` entries |
+| `text_overlap_layout_stability` | `app_quality_check.text_overlap_layout_stability` |
+| `accessibility_basics` | `app_quality_check.accessibility_basics` and `app_quality_check.evidence[]` with `type: accessibility_check` |
+| `state_coverage` | `app_quality_check.error_loading_empty_states` and `app_quality_check.evidence[]` describing checked empty, loading, error, success, disabled, or validation states |
+| `behavior_evidence` | `verification_check.behavior_check` and `app_quality_check.evidence[]` with `type: manual_behavior_check` or `type: automated_test` |
+| `runnable_access` | `verification_check.run` evidence and the final Summary Report/user response; it is not a direct `app_quality_check` key |
+
 ## Game-Specific Gates
 
 For `experience_kind: web_game` or `game`, these gates apply in addition to app/product UX gates. Build, lint, and test results alone cannot satisfy game acceptance.

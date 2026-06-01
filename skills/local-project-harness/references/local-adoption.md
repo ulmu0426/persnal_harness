@@ -15,10 +15,24 @@ Prefer project-local files when the harness should travel with the repository:
     review-template.md
 ```
 
-Use a global skill path when the user wants this harness available across many repositories:
+Use an installed global skill path when the user wants this harness available across many repositories.
 
-- `$CODEX_HOME/skills/local-project-harness/` when `CODEX_HOME` is set
-- `~/.codex/skills/local-project-harness/` when `CODEX_HOME` is unset
+```powershell
+# Windows PowerShell
+$env:CODEX_HOME\skills\local-project-harness
+$HOME\.codex\skills\local-project-harness
+```
+
+```cmd
+REM Windows CMD
+%CODEX_HOME%\skills\local-project-harness
+%USERPROFILE%\.codex\skills\local-project-harness
+```
+
+```sh
+# POSIX
+${CODEX_HOME:-$HOME/.codex}/skills/local-project-harness
+```
 
 Use project-local policy files when the repository needs its own commands, protected paths, or reporting rules. Keep those files under the repo's `.codex/` directory and do not duplicate the whole global skill unless the project intentionally vendors a custom copy.
 
@@ -79,9 +93,11 @@ Add a runner only when manual discipline is not enough. Implement in this order:
 
 ## Built-In Audit Helper
 
-Before a full runner exists, use `scripts/harness_checks.mjs` for narrow local checks when matching records are available:
+Before a full runner exists, use `scripts/harness_checks.mjs` for narrow local checks when matching records are available.
 
-```text
+Repo-root vendored skill mode, run from the repository root:
+
+```powershell
 node skills/local-project-harness/scripts/harness_checks.mjs audit-scope --assignment <delegation.json> --report <worker-report.json> [--workspace <path>]
 node skills/local-project-harness/scripts/harness_checks.mjs secret-scan <file> [<file> ...]
 node skills/local-project-harness/scripts/harness_checks.mjs audit-close --lifecycle-log <events.jsonl>
@@ -91,20 +107,39 @@ node skills/local-project-harness/scripts/harness_checks.mjs app-evidence --revi
 node skills/local-project-harness/scripts/harness_checks.mjs summary-logic --summary <summary.json> --review <review.json>
 ```
 
-Those command strings are repo-root form for ordinary helper audits. In an installed global skill, run from the skill directory or use the installed skill path and map the helper command to `node scripts/harness_checks.mjs ...`. The skill-local runner policy uses that installed form and intentionally lists only installed-safe helper audits.
+Add `--allow-delete` to `audit-scope` only when the assignment explicitly approves a delete or revert. Without that approval, deleted files remain a scope-audit failure.
+
+Installed global skill mode, Windows PowerShell:
+
+```powershell
+Set-Location $env:CODEX_HOME\skills\local-project-harness
+node scripts/harness_checks.mjs review-logic --report <review-report.json> --contract <goal.json>
+node scripts/harness_checks.mjs app-evidence --review <review.json>
+```
+
+Installed global skill mode, Windows CMD:
+
+```cmd
+cd /d %CODEX_HOME%\skills\local-project-harness
+node scripts\harness_checks.mjs review-logic --report <review-report.json> --contract <goal.json>
+node scripts\harness_checks.mjs app-evidence --review <review.json>
+```
+
+Installed global skill mode, POSIX:
+
+```sh
+cd "${CODEX_HOME:-$HOME/.codex}/skills/local-project-harness"
+node scripts/harness_checks.mjs review-logic --report <review-report.json> --contract <goal.json>
+node scripts/harness_checks.mjs app-evidence --review <review.json>
+```
+
+The skill-local runner policy uses installed form paths such as `scripts/harness_checks.mjs` and intentionally lists only installed-safe helper audits.
 
 The repo-root runner policy additionally lists maintenance sync checks that require root files and are intentionally omitted from the installed skill-local helper list:
 
-```text
+```powershell
 node skills/local-project-harness/scripts/harness_checks.mjs runner-policy-sync
 node skills/local-project-harness/scripts/harness_checks.mjs sync-check --source README.md --copy skills/local-project-harness/references/harness-readme.md
-```
-
-For installed global skill use, run the same script from the installed skill path, for example:
-
-```text
-node %CODEX_HOME%/skills/local-project-harness/scripts/harness_checks.mjs review-logic --report <review-report.json> --contract <goal.json>
-node ~/.codex/skills/local-project-harness/scripts/harness_checks.mjs app-evidence --review <review.json>
 ```
 
 Installed skill copies include `references/schemas/` for all core schemas, including `run_state.schema.json` and `runner_policy.schema.json`, plus `references/policies/runner_policy.yaml` as the skill-local runner policy copy. Use those bundled paths when the repository root `schemas/` or `harness/runner_policy.yaml` files are unavailable.

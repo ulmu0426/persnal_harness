@@ -2,6 +2,8 @@
 
 Use these role contracts when spawning real sub-agents or simulating role passes.
 
+Unless explicitly labeled as schema-valid, the short `Report` snippets below are role-handoff summaries for orchestration notes. They are not complete JSON instances for the harness schemas. Schema-valid worker, review, delegation, Goal Contract, and Summary Report records must include every required field from the matching schema and must not add extra properties.
+
 ## Goal Refiner
 
 Purpose: convert the raw request into an implementable Goal Contract.
@@ -459,10 +461,23 @@ Prohibited:
 - hide failed or unrun verification
 - invent evidence not present in prior reports
 
-Report:
+Role handoff summary, not a schema-valid `summary_report.schema.json` instance:
 
 ```yaml
 role: summary_worker
+status: completed | blocked
+명령:
+수행 사전 작업:
+수행 내용:
+수행 결과:
+risks_or_follow_up:
+```
+
+Schema-valid Summary Reports omit `role` and include the required schema fields:
+
+```yaml
+schema_version: 1.0.0
+task_id:
 status: completed | blocked
 명령:
 수행 사전 작업:

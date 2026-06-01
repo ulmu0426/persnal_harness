@@ -1,5 +1,11 @@
 # Agentic Coding Harness
 
+## Path Context
+
+When this harness is installed as a Codex skill, the operational runtime root is the installed `skills/local-project-harness/` skill directory. In that mode, the bundled skill-local paths are the source of truth for runtime references: `SKILL.md`, `agents/`, `references/`, and `scripts/`.
+
+Repo-root paths such as `README.md`, `docs/`, `examples/`, `harness/`, `prompts/`, and root `schemas/` are development or vendored-source paths for this repository when those files are present. They are not required in an installed global skill. Do not assume root `README.md` and `references/harness-readme.md` are synchronized unless a development sync check has just passed.
+
 ## App/Product Quality Gates
 
 For vague app or product requests, the harness should not pester the user for broad product clarification. `goal_refiner` infers a practical product brief and records safe assumptions. It asks only for true blockers with no safe default, such as external cost, regulated or destructive data handling, production deployment, or an irreversible product decision.
@@ -71,57 +77,73 @@ This harness is a minimal operating framework that prevents the main session fro
 
 ## Directory Layout
 
+Installed skill-local bundle:
+
+```text
+skills/local-project-harness/
+|-- SKILL.md
+|-- agents/
+|   `-- openai.yaml
+|-- references/
+|   |-- *.md
+|   |-- examples/
+|   |   `-- *.json
+|   |-- policies/
+|   |   `-- runner_policy.yaml
+|   `-- schemas/
+|       `-- *.schema.json
+`-- scripts/
+    `-- harness_checks.mjs
+```
+
+Repo-root or vendored development checkout paths may also exist for maintenance, source editing, or sync checks. Treat these as development paths, not installed-skill runtime paths:
+
 ```text
 .
 |-- README.md
 |-- docs/
-|   |-- consensus-protocol.md
-|   |-- lifecycle-log.md
-|   |-- orchestration-rule.md
-|   |-- runner-cli.md
-|   |-- schema-validation.md
-|   `-- security-gates.md
 |-- examples/
-|   |-- goal_contract.valid.json
-|   |-- delegation_contract.valid.json
-|   |-- lifecycle_log.jsonl
-|   |-- review_report.valid.json
-|   |-- worker_report.valid.json
-|   |-- summary_report.valid.json
-|   `-- task_breakdown.md
 |-- harness/
 |   |-- orchestration_policy.yaml
 |   `-- runner_policy.yaml
 |-- prompts/
-|   |-- main_orchestrator.md
-|   `-- subtask_worker.md
-`-- schemas/
-    |-- delegation_contract.schema.json
-    |-- goal_contract.schema.json
-    |-- lifecycle_event.schema.json
-    |-- review_report.schema.json
-    |-- run_state.schema.json
-    |-- runner_policy.schema.json
-    |-- summary_report.schema.json
-    `-- worker_report.schema.json
+|-- schemas/
+`-- skills/local-project-harness/
+    |-- SKILL.md
+    |-- agents/
+    |-- references/
+    `-- scripts/
 ```
 
 ## Quick Usage
 
-1. Load `harness/orchestration_policy.yaml` as policy input in the runtime or agent configuration.
-2. Apply `prompts/main_orchestrator.md` to the main session as a system or developer prompt.
-3. Use `prompts/subtask_worker.md` as the worker prompt when starting a subtask.
-4. When a real work request arrives, the main session passes the raw request to `goal_refiner` and delegates Goal Contract creation.
-5. The main session checks only that the Goal Contract has all required fields and that `verification_matrix` includes `build`, `lint`, `test`, `run`, and `behavior_check`.
-6. A separate `goal_review_worker` reviews the Goal Contract's content quality. If it reports `needs_rework`, `blocked`, or `rejected`, resolve the revision or user input before breaking down the work.
-7. The main session routes app, site, tool, product, web-game, and game work through the specialist chain when applicable, with generic roles as fallback when a runtime has only default, explorer, and worker agent categories.
-8. The main session breaks the Goal Contract into independent subtasks and assigns scope and expected outputs to each worker.
-9. After receiving worker results, the main session delegates review to a separate `review_worker` or `verification_worker` when real sub-agent tools are available.
-10. `review_worker` writes a review report that includes completion score, scenario-flow scores, threshold status, and rework items.
-11. If the completion score is below 85 or a required gate fails, the main session re-delegates work based on `rework_items`. If the score is at least 85 and required gates pass, it makes the integration decision.
-12. When a sub-agent report has been consumed as input to the next stage, the main session closes that sub-agent.
-13. After all work is complete, the main session delegates final summarization to `summary_worker` and closes `summary_worker` after consuming the Summary Report.
-14. Until a real runner is implemented, commands in `docs/runner-cli.md` are treated only as dry-run, record, and audit contracts.
+### Installed/global skill mode
+
+1. Load or trigger the installed `local-project-harness` skill and follow `SKILL.md`.
+2. Use skill-local runtime files: `references/*.md`, `references/schemas/*.schema.json`, `references/policies/runner_policy.yaml`, and `scripts/harness_checks.mjs`.
+3. Run helper audits from the installed skill directory as `node scripts/harness_checks.mjs ...`, or call the same script by its installed absolute path.
+4. Do not require repo-root `docs/`, `harness/`, `prompts/`, root `schemas/`, or root `examples/` for installed-skill operation.
+
+### Repo-root/vendor development mode
+
+1. Use this mode only when maintaining this repository or a project that intentionally vendors the harness source tree.
+2. Repo-root `harness/orchestration_policy.yaml`, `prompts/main_orchestrator.md`, and `prompts/subtask_worker.md` are source-maintenance inputs when present; the installed skill runtime is still the skill-local bundle.
+3. Use root `schemas/` and `harness/runner_policy.yaml` for repo-maintenance validation and sync checks against `skills/local-project-harness/references/schemas/` and `skills/local-project-harness/references/policies/runner_policy.yaml`.
+4. Use sync checks to detect drift between root sources and bundled references. Do not claim root `README.md` and `references/harness-readme.md` are synchronized without checking.
+
+### Shared orchestration flow
+
+1. When a real work request arrives, the main session passes the raw request to `goal_refiner` and delegates Goal Contract creation.
+2. The main session checks only that the Goal Contract has all required fields and that `verification_matrix` includes `build`, `lint`, `test`, `run`, and `behavior_check`.
+3. A separate `goal_review_worker` reviews the Goal Contract's content quality. If it reports `needs_rework`, `blocked`, or `rejected`, resolve the revision or user input before breaking down the work.
+4. The main session routes app, site, tool, product, web-game, and game work through the specialist chain when applicable, with generic roles as fallback when a runtime has only default, explorer, and worker agent categories.
+5. The main session breaks the Goal Contract into independent subtasks and assigns scope and expected outputs to each worker.
+6. After receiving worker results, the main session delegates review to a separate `review_worker` or `verification_worker` when real sub-agent tools are available.
+7. `review_worker` writes a review report that includes completion score, scenario-flow scores, threshold status, and rework items.
+8. If the completion score is below 85 or a required gate fails, the main session re-delegates work based on `rework_items`. If the score is at least 85 and required gates pass, it makes the integration decision.
+9. When a sub-agent report has been consumed as input to the next stage, the main session closes that sub-agent.
+10. After all work is complete, the main session delegates final summarization to `summary_worker` and closes `summary_worker` after consuming the Summary Report.
+11. Until a real runner is implemented, helper commands are treated only as dry-run, record, and audit contracts.
 
 ## Required Goal Contract Fields
 
@@ -212,7 +234,9 @@ The main session checks only Summary Report format completeness and does not ask
 
 ## Schema Validation And Runner Policy
 
-The v1 harness does not implement a real execution runner. Instead, `schemas/` and `harness/runner_policy.yaml` define fixed structures for the Goal Contract, delegation contract, worker report, review report, Summary Report, lifecycle event, and run state.
+The v1 harness does not implement a real execution runner. In an installed skill, `references/schemas/*.schema.json` and `references/policies/runner_policy.yaml` define fixed structures for the Goal Contract, delegation contract, worker report, review report, Summary Report, lifecycle event, run state, and runner policy. The installed helper path is `scripts/harness_checks.mjs`.
+
+In this repository or a vendored source checkout, root `schemas/`, root `harness/runner_policy.yaml`, and `skills/local-project-harness/scripts/harness_checks.mjs` are maintenance paths used to develop, compare, or sync the installed skill-local bundle.
 
 The runner contract is limited to the following scope.
 
@@ -225,7 +249,7 @@ The runner contract is limited to the following scope.
 
 The v1 runner does not modify files, directly run build/lint/test/run commands, spawn worker processes, or perform network/external-cost work. If Ajv-based validation is implemented later, dependencies must be pinned in `package.json` and the lockfile. Running unpinned `npx` is not accepted as standard harness validation.
 
-The skill distribution may include the optional local audit script `skills/local-project-harness/scripts/harness_checks.mjs`. This script does not run the harness. It checks `allowed_files` versus report change scope, secret candidates, lifecycle close state, review report logical consistency, goal contract logical consistency, app acceptance evidence, and summary/review consistency. The repo-root runner policy also lists repo-maintenance sync checks for runner policy synchronization and synchronization between root `README.md` and bundled `references/harness-readme.md`; the installed skill-local runner policy omits those root-only maintenance commands and lists only helper audits that are meaningful from the installed skill directory.
+The skill distribution includes the optional local audit script `scripts/harness_checks.mjs`; its repo-root source path is `skills/local-project-harness/scripts/harness_checks.mjs`. This script does not run the harness. It checks `allowed_files` versus report change scope, secret candidates, lifecycle close state, review report logical consistency, goal contract logical consistency, app acceptance evidence, and summary/review consistency. The repo-root runner policy also lists repo-maintenance sync checks for runner policy synchronization and drift checks between root `README.md` and bundled `references/harness-readme.md`; the installed skill-local runner policy omits those root-only maintenance commands and lists only helper audits that are meaningful from the installed skill directory.
 
 `runner-policy-sync` compares `harness/runner_policy.yaml` with `skills/local-project-harness/references/policies/runner_policy.yaml` while treating root `schemas/<name>.schema.json` paths as equivalent to skill-local `references/schemas/<name>.schema.json` paths and root helper path `skills/local-project-harness/scripts/harness_checks.mjs` as equivalent to installed-skill helper path `scripts/harness_checks.mjs`. It allows only the repo-root maintenance helper commands for root-vs-skill runner policy sync and root README/reference sync to be omitted from the skill-local helper list; other command, budget, gate, and policy drift fails. `audit-scope --workspace <path>` defaults to the current working directory, realpath-checks existing allowed or changed paths, rejects workspace escapes and symlink targets outside the workspace, and keeps non-existing newly added files on normalized relative-path comparison. `review-logic --report <review-report.json> --contract <goal.json>` is required for accepted/final review auditing; accepted reports fail when the Goal Contract is omitted. It rejects contract-linked review reports whose `work_type` differs from the Goal Contract; rejects accepted reports unless hard gates (`scope_check`, `goal_contract_check`, `security_check`, `secret_scan_result`, `scope_diff_result`) are passed; rejects accepted `app_product` reports unless app-quality, typed app evidence, `run`, and `behavior_check` are passed; enforces `app_quality_failed`; checks default rubric score sums when practical; and requires `simulated_same_context` limitations to be recorded. `goal-logic` checks goal contracts, including product-surface improvement requests such as UX work, redesign, polish, revamp, modernization, and app UI upgrades that must be `app_product` unless they are clearly implementation-only maintenance. `app-evidence` checks review report app evidence, and `summary-logic` checks summary reports against review reports and requires accepted `app_product` summaries to disclose concrete runnable access.
 

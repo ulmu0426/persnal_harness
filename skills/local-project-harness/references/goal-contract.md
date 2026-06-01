@@ -11,7 +11,6 @@ concrete_goal:
 success_criteria:
 scope_in:
 scope_out:
-allowed_files:
 assumptions:
 implementation_constraints:
 verification_matrix:
@@ -22,6 +21,8 @@ verification_matrix:
   behavior_check:
 open_questions:
 ```
+
+File ownership is not a top-level Goal Contract field. Put concrete file scope in delegation records, or use `delegation_plan_seed[].allowed_files` when seeding worker assignments.
 
 ## Full Contract
 
