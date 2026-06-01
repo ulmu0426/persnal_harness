@@ -38,6 +38,12 @@
 - 향후 실행 러너에서 명령 실행을 허용할 경우 `command_audit`가 필요하다.
 - command audit에는 명령, 작업 디렉터리, 목적, 예상 산출물, 종료 코드, 마스킹된 출력 요약을 남긴다.
 
+### Local Audit Helper
+
+- `skills/local-project-harness/scripts/harness_checks.mjs audit-scope`는 위임 계약의 `allowed_files`와 워커 보고서의 `changed_files`를 비교한다. Optional `--workspace <path>` defaults to the current working directory and resolves existing allowed or changed paths with realpath so workspace escapes and symlink targets outside the workspace fail.
+- `skills/local-project-harness/scripts/harness_checks.mjs secret-scan`은 보고서나 산출물 파일의 비밀값 후보를 찾는다.
+- 이 보조 스크립트는 정적 감사만 수행하며, 전체 secret scanning 제품이나 전체 runner를 대체하지 않는다.
+
 ## 하드 실패 상태
 
 - `security_failed`: 보안 veto, 비밀값 노출, workspace escape, unauthorized network/cost

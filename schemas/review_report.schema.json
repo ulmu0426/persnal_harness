@@ -7,6 +7,7 @@
   "additionalProperties": false,
   "required": [
     "task_id",
+    "work_type",
     "status",
     "reviewed_outputs",
     "scope_check",
@@ -18,11 +19,13 @@
     "passed_threshold",
     "blocking_gates",
     "verification_check",
+    "app_quality_check",
     "security_check",
     "secret_scan_result",
     "scope_diff_result",
     "command_audit",
     "budget_used",
+    "independence",
     "rework_items",
     "next_iteration_recommendation",
     "risks_or_follow_up",
@@ -36,6 +39,16 @@
     "task_id": {
       "type": "string",
       "minLength": 1
+    },
+    "work_type": {
+      "enum": [
+        "code_change",
+        "docs",
+        "schema_policy",
+        "app_product",
+        "research",
+        "other"
+      ]
     },
     "status": {
       "enum": [
@@ -103,12 +116,16 @@
           "test_failed",
           "run_failed",
           "behavior_check_failed",
-          "scenario_flow_failed"
+          "scenario_flow_failed",
+          "app_quality_failed"
         ]
       }
     },
     "verification_check": {
       "$ref": "#/$defs/verification_check"
+    },
+    "app_quality_check": {
+      "$ref": "#/$defs/app_quality_check"
     },
     "security_check": {
       "$ref": "#/$defs/check_result"
@@ -128,6 +145,12 @@
     "budget_used": {
       "$ref": "#/$defs/budget_used"
     },
+    "independence": {
+      "enum": [
+        "real_subagent",
+        "simulated_same_context"
+      ]
+    },
     "rework_items": {
       "$ref": "#/$defs/string_list"
     },
@@ -146,6 +169,91 @@
       ]
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "accepted"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "passed_threshold": {
+            "const": true
+          },
+          "blocking_gates": {
+            "maxItems": 0
+          },
+          "recommendation": {
+            "const": "accepted"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "blocking_gates": {
+            "minItems": 1
+          }
+        },
+        "required": [
+          "blocking_gates"
+        ]
+      },
+      "then": {
+        "properties": {
+          "passed_threshold": {
+            "const": false
+          },
+          "status": {
+            "not": {
+              "const": "accepted"
+            }
+          },
+          "recommendation": {
+            "not": {
+              "const": "accepted"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "passed_threshold": {
+            "const": false
+          },
+          "status": {
+            "enum": [
+              "needs_rework",
+              "validation_failed",
+              "security_failed",
+              "budget_exceeded",
+              "consensus_failed"
+            ]
+          }
+        },
+        "required": [
+          "passed_threshold",
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "rework_items": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
     "string_list": {
       "type": "array",
@@ -292,6 +400,87 @@
         },
         "behavior_check": {
           "$ref": "#/$defs/check_result"
+        }
+      }
+    },
+    "app_quality_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ux_workflow_completeness",
+        "visual_polish",
+        "responsive_desktop_mobile",
+        "accessibility_basics",
+        "error_loading_empty_states",
+        "text_overlap_layout_stability",
+        "domain_fit",
+        "evidence"
+      ],
+      "properties": {
+        "ux_workflow_completeness": {
+          "$ref": "#/$defs/check_result"
+        },
+        "visual_polish": {
+          "$ref": "#/$defs/check_result"
+        },
+        "responsive_desktop_mobile": {
+          "$ref": "#/$defs/check_result"
+        },
+        "accessibility_basics": {
+          "$ref": "#/$defs/check_result"
+        },
+        "error_loading_empty_states": {
+          "$ref": "#/$defs/check_result"
+        },
+        "text_overlap_layout_stability": {
+          "$ref": "#/$defs/check_result"
+        },
+        "domain_fit": {
+          "$ref": "#/$defs/check_result"
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/app_quality_evidence"
+          }
+        }
+      }
+    },
+    "app_quality_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "status",
+        "description"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "screenshot",
+            "manual_behavior_check",
+            "automated_test",
+            "accessibility_check",
+            "responsive_check",
+            "not_applicable"
+          ]
+        },
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "not_run",
+            "not_applicable"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifact": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },

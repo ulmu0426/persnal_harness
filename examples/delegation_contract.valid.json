@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "docs-worker-001",
+  "role": "subtask_worker",
+  "objective": "Update the runner CLI documentation with the local audit helper commands.",
+  "assigned_scope": "Documentation-only change for the runner CLI contract.",
+  "inputs": [
+    "Goal Contract goal-harness-v1",
+    "Existing docs/runner-cli.md"
+  ],
+  "allowed_files": [
+    "docs/runner-cli.md"
+  ],
+  "path_normalization_policy": {
+    "required": true,
+    "workspace_relative_only": true,
+    "reject_parent_directory_segments": true,
+    "reject_absolute_paths": true,
+    "reject_workspace_escape": true,
+    "reject_globs": true
+  },
+  "symlink_policy": {
+    "resolve_before_access": true,
+    "reject_targets_outside_workspace": true
+  },
+  "secret_handling_policy": {
+    "secret_scan_required": true,
+    "mask_secret_candidates": true,
+    "reject_raw_secret_output": true
+  },
+  "network_cost_policy": {
+    "network_default": "denied",
+    "external_cost_default": "denied",
+    "explicit_approval_required": true
+  },
+  "prohibited_actions": [
+    "Do not edit files outside allowed_files.",
+    "Do not delete or revert existing files.",
+    "Do not expose raw secrets."
+  ],
+  "expected_outputs": [
+    "Updated docs/runner-cli.md",
+    "Worker report with changed_files and verification"
+  ],
+  "verification": {
+    "build": "Not applicable for documentation-only change.",
+    "lint": "Markdown structure remains readable.",
+    "test": "JSON examples still parse.",
+    "run": "Not applicable for documentation-only change.",
+    "behavior_check": "Audit helper commands are documented without claiming full runner behavior."
+  },
+  "reporting_format": "Worker Report"
+}

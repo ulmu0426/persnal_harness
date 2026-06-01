@@ -2,6 +2,8 @@
 
 `harness-runner`는 하네스 정책을 사람이 일관되게 운용할 수 있도록 돕는 명령 계약이다. v1은 dry-run, report recording, audit만 정의한다. 실제 파일 수정, 워커 프로세스 생성, 빌드/린트/테스트/실행 명령 수행은 v1 범위가 아니다.
 
+스킬 배포본에는 전체 `harness-runner` 대신 좁은 보조 감사 스크립트가 포함된다. `skills/local-project-harness/scripts/harness_checks.mjs`는 기존 계약과 보고서를 읽어 scope, secret 후보, close 상태, review 논리, README/reference 동기화만 확인한다.
+
 ## v1 명령
 
 ```text
@@ -31,6 +33,22 @@ v1 러너는 다음을 하지 않는다.
 - 네트워크 호출
 - 결제 또는 외부 비용이 발생하는 작업
 - 환경 변수 원문, 비밀값, 인증 토큰 출력
+
+## 보조 감사 스크립트
+
+```text
+node skills/local-project-harness/scripts/harness_checks.mjs audit-scope --assignment <delegation.json> --report <worker-report.json> [--workspace <path>]
+node skills/local-project-harness/scripts/harness_checks.mjs secret-scan <file> [<file> ...]
+node skills/local-project-harness/scripts/harness_checks.mjs audit-close --lifecycle-log <events.jsonl>
+node skills/local-project-harness/scripts/harness_checks.mjs review-logic --report <review-report.json>
+node skills/local-project-harness/scripts/harness_checks.mjs sync-check --source README.md --copy skills/local-project-harness/references/harness-readme.md
+```
+
+`audit-scope` defaults `--workspace` to the current working directory. Existing allowed or changed paths are resolved with realpath so workspace escapes and symlink targets outside the workspace fail. Newly added changed files that do not exist yet are still string-checked and compared as normalized relative paths.
+
+`review-logic` fails reports missing the full `app_quality_check` key set or the required `evidence` array. For `work_type: app_product`, every required app-quality check must be `passed` with non-empty evidence, and the evidence array must include at least one passed item with a non-empty description or artifact. For non-app work, every required app-quality check must be `not_applicable` with evidence, and the evidence array must exist. The command still fails accepted reports that contain failed verification, app-quality, security, scope, secret, or scenario-flow checks, enforces `app_quality_failed` and `scenario_flow_failed` consistency, checks default rubric score sums when practical, and requires disclosure of `simulated_same_context` review limitations.
+
+이 스크립트는 기존 기록을 감사하는 도구이며, 워커 생성이나 빌드/린트/테스트/실행을 하지 않는다.
 
 ## `dry-run`
 
@@ -72,7 +90,7 @@ v1 러너는 다음을 하지 않는다.
 
 ## `audit-scope`
 
-`audit-scope`는 위임 계약의 `allowed_files`와 보고서의 `changed_files`를 비교한다.
+`audit-scope`는 위임 계약의 `allowed_files`와 보고서의 `changed_files`를 비교한다. `--workspace <path>`를 지정하지 않으면 현재 작업 디렉터리를 기준으로 realpath와 symlink target을 검사한다.
 
 하드 실패:
 

@@ -4,6 +4,7 @@ policy:
   language: ko
   mode: dry_run_record_audit
   summary: "v1 runner policy for schema validation, dry-run assignment checks, report recording, lifecycle close audit, and finalization audit."
+  audit_helper: "skills/local-project-harness/scripts/harness_checks.mjs"
 
 schema_validation:
   dialect: "https://json-schema.org/draft/2020-12/schema"
@@ -41,6 +42,12 @@ commands:
     - "harness-runner audit-close --state <file>"
     - "harness-runner audit-scope --assignment <file> --report <file>"
     - "harness-runner finalize --state <file>"
+  helper_audit:
+    - "node skills/local-project-harness/scripts/harness_checks.mjs audit-scope --assignment <delegation.json> --report <worker-report.json> [--workspace <path>]"
+    - "node skills/local-project-harness/scripts/harness_checks.mjs secret-scan <file> [<file> ...]"
+    - "node skills/local-project-harness/scripts/harness_checks.mjs audit-close --lifecycle-log <events.jsonl>"
+    - "node skills/local-project-harness/scripts/harness_checks.mjs review-logic --report <review-report.json>"
+    - "node skills/local-project-harness/scripts/harness_checks.mjs sync-check --source README.md --copy skills/local-project-harness/references/harness-readme.md"
 
 non_execution_scope_v1:
   - no_file_creation_or_modification
@@ -86,6 +93,7 @@ security_gates:
     compare_changed_files_to_allowed_files: true
     reject_unapproved_deletes: true
     reject_unapproved_reverts: true
+    helper_workspace_flag: "--workspace <path> defaults to cwd and realpath-checks existing allowed/changed paths."
   secret_policy:
     require_secret_scan_result: true
     mask_secret_candidates: true

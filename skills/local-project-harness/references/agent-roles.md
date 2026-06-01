@@ -25,6 +25,7 @@ Report:
 role: goal_refiner
 status: completed | blocked
 goal_contract:
+  work_type:
 risks_or_follow_up:
 ```
 
@@ -55,9 +56,48 @@ relevant_files:
 risks_or_follow_up:
 ```
 
-## Worker Agent
+## Goal Review Worker
+
+Purpose: review the Goal Contract before implementation so poor requirements do not pass only because required fields exist.
+
+Checks:
+
+- concrete goal is implementable and testable
+- success criteria are observable
+- scope in/out is clear enough for delegation
+- assumptions are safe or called out
+- `verification_matrix` uses real project checks where possible
+- `scenario_flows` cover primary behavior and meaningful failure cases
+- `open_questions` contains only real blockers
+- for `work_type: app_product`, `product_brief` identifies target users, core problem, primary workflows, domain assumptions, content/data model assumptions, and non-goals
+- for `work_type: app_product`, `app_quality_gates` cover UX workflow completeness, visual polish, responsive desktop/mobile, accessibility basics, loading/error/empty states, text overlap/layout stability, domain fit, and required screenshot or manual behavior evidence
+
+Prohibited:
+
+- edit files
+- implement features
+- replace the goal_refiner's authorship
+- invent user decisions
+
+Report:
+
+```yaml
+role: goal_review_worker
+status: accepted | needs_rework | blocked | rejected
+independence: real_subagent | simulated_same_context
+findings:
+rework_items:
+blocking_questions:
+recommendation:
+```
+
+## Subtask Worker
 
 Purpose: implement a bounded slice.
+
+`subtask_worker` is the canonical implementation role id for prompts, schemas, lifecycle records, and reports.
+
+For app/product tasks, implement the assigned workflow as a usable product surface, not a placeholder or marketing shell. Respect the `product_brief`, include expected empty/loading/error states in scope when assigned, keep desktop and mobile layouts stable, avoid text overlap, and gather the assigned screenshot or manual behavior evidence when verification asks for it.
 
 Delegation must include:
 
@@ -69,7 +109,7 @@ Delegation must include:
 Report:
 
 ```yaml
-role: worker_agent
+role: subtask_worker
 status: completed | blocked | needs_review
 changed_files:
 summary:
@@ -80,7 +120,7 @@ risks_or_follow_up:
 
 ## Verification Worker
 
-Purpose: independently run checks and inspect behavior without changing implementation.
+Purpose: run checks and inspect behavior without changing implementation. When assigned to a real sub-agent, this is an independent verification pass; when simulated in the main context, report `independence: simulated_same_context` and do not call it independent.
 
 Report:
 
@@ -104,19 +144,33 @@ Purpose: judge whether the integrated result satisfies the Goal Contract.
 Report:
 
 ```yaml
-role: review_worker
-status: accepted | needs_rework | blocked | rejected
+task_id:
+work_type: code_change | docs | schema_policy | app_product | research | other
+status: accepted | rejected | needs_rework | blocked | validation_failed | security_failed | budget_exceeded | consensus_failed
+reviewed_outputs:
+scope_check:
+goal_contract_check:
 overall_completion_score:
+rubric_scores:
+scenario_flow_scores:
 score_threshold: 85
 passed_threshold:
 blocking_gates:
-scope_check:
-goal_contract_check:
 verification_check:
+app_quality_check:
+security_check:
+secret_scan_result:
+scope_diff_result:
+command_audit:
+budget_used:
+independence: real_subagent | simulated_same_context
 rework_items:
-recommendation:
+next_iteration_recommendation:
 risks_or_follow_up:
+recommendation:
 ```
+
+For non-app work, `app_quality_check` is required with `not_applicable` statuses. For app/product work, each check must cite passed evidence or create concrete `rework_items`; do not accept a product UI on generic build/lint/test success alone, and do not accept `not_run` app-quality evidence. If any `scenario_flow_scores[].passed === false`, add `scenario_flow_failed` to `blocking_gates`, set `passed_threshold: false`, use a non-accepted `status` and `recommendation`, and provide concrete `rework_items` unless the report is `blocked` or `rejected`.
 
 ## Summary Worker
 

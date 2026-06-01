@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "docs-worker-001",
+  "status": "completed",
+  "changed_files": [
+    {
+      "path": "docs/runner-cli.md",
+      "action": "modified"
+    }
+  ],
+  "summary": "Documented the local audit helper commands for the runner CLI contract.",
+  "verification": {
+    "build": {
+      "status": "not_applicable",
+      "evidence": "Documentation-only change.",
+      "findings": []
+    },
+    "lint": {
+      "status": "passed",
+      "evidence": "Markdown section and command fence were reviewed.",
+      "findings": []
+    },
+    "test": {
+      "status": "passed",
+      "evidence": "JSON examples parse successfully.",
+      "findings": []
+    },
+    "run": {
+      "status": "not_applicable",
+      "evidence": "No app run is required.",
+      "findings": []
+    },
+    "behavior_check": {
+      "status": "passed",
+      "evidence": "The helper commands are described as audits, not as a full runner.",
+      "findings": []
+    }
+  },
+  "security_check": {
+    "status": "passed",
+    "evidence": "No unsafe path, network, or destructive behavior is included.",
+    "findings": []
+  },
+  "secret_scan_result": {
+    "status": "passed",
+    "evidence": "No secret candidates found in the edited documentation.",
+    "findings": []
+  },
+  "scope_diff_result": {
+    "status": "passed",
+    "evidence": "Changed files are within allowed_files.",
+    "findings": []
+  },
+  "command_audit": [],
+  "budget_used": {
+    "iterations": 1,
+    "rework_iterations": 0,
+    "consensus_rounds": 0,
+    "subagents_started": 1,
+    "open_subagents": 0
+  },
+  "risks_or_follow_up": []
+}

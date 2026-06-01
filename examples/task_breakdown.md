@@ -1,5 +1,14 @@
 # Task Breakdown Example
 
+## App/Product Request Note
+
+When the raw request is an abstract app idea, the `goal_refiner` should set `work_type: app_product` and infer:
+
+- `product_brief`: target users, core problem, primary workflows, domain assumptions, content/data model assumptions, and non-goals.
+- `app_quality_gates`: UX workflow completeness, visual polish, responsive desktop/mobile, accessibility basics, error/loading/empty states, text overlap/layout stability, domain fit, and evidence requirements.
+
+The review task must report `app_quality_check`. For non-app examples like the login-message task below, app-quality checks can be `not_applicable` unless the assigned UI surface materially changes.
+
 ## 사용자 요청
 
 "로그인 실패 시 에러 메시지를 개선하고 관련 테스트를 추가해 주세요."
@@ -131,14 +140,31 @@
 - `quality_score_threshold`, `scenario_flows`, `completion_rubric`, `acceptance_evidence_plan`, `iteration_policy`가 모두 있는가?
 - `open_questions`가 비어 있어 작업 위임을 진행할 수 있는가?
 
+## Goal Review Worker 검토 예시
+
+```markdown
+## Goal Review Worker Report
+
+- task_id: auth-goal-review-001
+- status: accepted
+- independence: real_subagent
+- findings:
+  - concrete_goal은 구현 가능하고 테스트 가능하다.
+  - scope_in과 scope_out이 인증 실패 메시지 범위로 제한되어 있다.
+  - verification_matrix가 기존 테스트 명령과 수동 동작 확인을 포함한다.
+- rework_items: []
+- blocking_questions: []
+- recommendation: 작업 분해 진행 가능
+```
+
 ## 하위 작업 목록
 
 메인 세션은 Goal Contract의 `delegation_plan_seed`를 기반으로 하위 작업을 만든다.
 
 | task_id | owner | status | scope | notes |
 | --- | --- | --- | --- | --- |
-| auth-ui-message-001 | worker | pending | 로그인 실패 메시지 구현 | UI 문구와 상태 처리만 |
-| auth-test-001 | worker | pending | 로그인 실패 테스트 추가 | 테스트 파일 범위만 |
+| auth-ui-message-001 | subtask_worker | pending | 로그인 실패 메시지 구현 | UI 문구와 상태 처리만 |
+| auth-test-001 | subtask_worker | pending | 로그인 실패 테스트 추가 | 테스트 파일 범위만 |
 | auth-review-001 | review_worker | pending | 산출물 검수 보고서 작성 | 직접 수정 금지 |
 
 ## 서브에이전트 라이프사이클 추적 예시
@@ -148,6 +174,7 @@
 | agent_id | role | task_id | status | close_condition | close_deferred_reason |
 | --- | --- | --- | --- | --- | --- |
 | agent-goal-001 | goal_refiner | auth-goal-refine-001 | closed | Goal Contract가 완비성 확인에 사용됨 |  |
+| agent-goal-review-001 | goal_review_worker | auth-goal-review-001 | closed | Goal Review Report가 작업 분해 입력으로 소비됨 |  |
 | agent-worker-001 | subtask_worker | auth-ui-message-001 | running | Worker Report가 리뷰 위임 입력으로 소비된 뒤 close |  |
 | agent-worker-002 | subtask_worker | auth-test-001 | running | Worker Report가 리뷰 위임 입력으로 소비된 뒤 close |  |
 | agent-review-001 | review_worker | auth-review-001 | assigned | Review Report가 재위임 또는 통합 결정에 소비된 뒤 close |  |
@@ -309,6 +336,7 @@
   consensus_rounds: 0
   subagents_started: 3
   open_subagents: 1
+- independence: real_subagent
 - rework_items:
   - 빈 입력 검증 메시지와 인증 실패 메시지가 동시에 표시되지 않는지 테스트를 추가한다.
   - run 검증을 실제 실행 결과 또는 명확한 실행 불가 사유로 보강한다.
@@ -406,6 +434,7 @@
   consensus_rounds: 0
   subagents_started: 4
   open_subagents: 0
+- independence: real_subagent
 - rework_items: []
 - next_iteration_recommendation: 없음
 - risks_or_follow_up: 없음
@@ -436,6 +465,7 @@
 - overall_completion_score: 91
 - score_threshold: 85
 - passed_threshold: true
+- independence: real_subagent
 - verification: review_worker 보고서상 npm test -- LoginForm 통과
 - integration_decision: 통합 가능
 - residual_risk: 인증 API 자체 동작은 이번 범위에서 변경하지 않았습니다.

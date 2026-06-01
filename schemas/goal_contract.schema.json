@@ -6,6 +6,7 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
+    "work_type",
     "raw_user_request",
     "concrete_goal",
     "success_criteria",
@@ -31,6 +32,16 @@
       "type": "string",
       "minLength": 1
     },
+    "work_type": {
+      "enum": [
+        "code_change",
+        "docs",
+        "schema_policy",
+        "app_product",
+        "research",
+        "other"
+      ]
+    },
     "raw_user_request": {
       "type": "string",
       "minLength": 1
@@ -53,6 +64,12 @@
     },
     "implementation_constraints": {
       "$ref": "#/$defs/string_list_nonempty"
+    },
+    "product_brief": {
+      "$ref": "#/$defs/product_brief"
+    },
+    "app_quality_gates": {
+      "$ref": "#/$defs/app_quality_gates"
     },
     "quality_score_threshold": {
       "type": "integer",
@@ -111,6 +128,26 @@
       }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "work_type": {
+            "const": "app_product"
+          }
+        },
+        "required": [
+          "work_type"
+        ]
+      },
+      "then": {
+        "required": [
+          "product_brief",
+          "app_quality_gates"
+        ]
+      }
+    }
+  ],
   "$defs": {
     "string_list": {
       "type": "array",
@@ -236,6 +273,79 @@
         },
         "behavior_check": {
           "$ref": "#/$defs/verification_item"
+        }
+      }
+    },
+    "product_brief": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target_users",
+        "core_problem",
+        "primary_workflows",
+        "domain_assumptions",
+        "content_data_model_assumptions",
+        "non_goals"
+      ],
+      "properties": {
+        "target_users": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "core_problem": {
+          "type": "string",
+          "minLength": 1
+        },
+        "primary_workflows": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "domain_assumptions": {
+          "$ref": "#/$defs/string_list"
+        },
+        "content_data_model_assumptions": {
+          "$ref": "#/$defs/string_list"
+        },
+        "non_goals": {
+          "$ref": "#/$defs/string_list"
+        }
+      }
+    },
+    "app_quality_gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ux_workflow_completeness",
+        "visual_polish",
+        "responsive_desktop_mobile",
+        "accessibility_basics",
+        "error_loading_empty_states",
+        "text_overlap_layout_stability",
+        "domain_fit",
+        "evidence_requirements"
+      ],
+      "properties": {
+        "ux_workflow_completeness": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "visual_polish": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "responsive_desktop_mobile": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "accessibility_basics": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "error_loading_empty_states": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "text_overlap_layout_stability": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "domain_fit": {
+          "$ref": "#/$defs/string_list_nonempty"
+        },
+        "evidence_requirements": {
+          "$ref": "#/$defs/string_list_nonempty"
         }
       }
     },
@@ -414,6 +524,7 @@
         "owner": {
           "enum": [
             "goal_refiner",
+            "goal_review_worker",
             "subtask_worker",
             "review_worker",
             "verification_worker",

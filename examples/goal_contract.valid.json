@@ -1,6 +1,7 @@
 {
   "schema_version": "1.0.0",
   "goal_id": "goal-harness-v1",
+  "work_type": "schema_policy",
   "raw_user_request": "Add the v1 harness contracts for schemas, dry-run runner policy, lifecycle close audit, security gates, and consensus flow.",
   "concrete_goal": "Define schema-backed contracts and examples for an orchestrated coding harness without implementing an executable runner.",
   "success_criteria": [

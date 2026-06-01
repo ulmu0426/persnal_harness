@@ -1,6 +1,7 @@
 {
   "schema_version": "1.0.0",
   "task_id": "review-001",
+  "work_type": "schema_policy",
   "status": "accepted",
   "reviewed_outputs": [
     "schemas/goal_contract.schema.json",
@@ -101,6 +102,50 @@
       "findings": []
     }
   },
+  "app_quality_check": {
+    "ux_workflow_completeness": {
+      "status": "not_applicable",
+      "evidence": "This review covers schema and policy artifacts, not an app/product UI.",
+      "findings": []
+    },
+    "visual_polish": {
+      "status": "not_applicable",
+      "evidence": "This review covers schema and policy artifacts, not an app/product UI.",
+      "findings": []
+    },
+    "responsive_desktop_mobile": {
+      "status": "not_applicable",
+      "evidence": "This review covers schema and policy artifacts, not an app/product UI.",
+      "findings": []
+    },
+    "accessibility_basics": {
+      "status": "not_applicable",
+      "evidence": "This review covers schema and policy artifacts, not an app/product UI.",
+      "findings": []
+    },
+    "error_loading_empty_states": {
+      "status": "not_applicable",
+      "evidence": "This review covers schema and policy artifacts, not an app/product UI.",
+      "findings": []
+    },
+    "text_overlap_layout_stability": {
+      "status": "not_applicable",
+      "evidence": "This review covers schema and policy artifacts, not an app/product UI.",
+      "findings": []
+    },
+    "domain_fit": {
+      "status": "not_applicable",
+      "evidence": "This review covers schema and policy artifacts, not an app/product UI.",
+      "findings": []
+    },
+    "evidence": [
+      {
+        "type": "not_applicable",
+        "status": "not_applicable",
+        "description": "App-quality evidence is not required for this non-app schema/policy review."
+      }
+    ]
+  },
   "security_check": {
     "status": "passed",
     "evidence": "No raw secrets, workspace escape, or unauthorized network/cost behavior is present.",
@@ -119,7 +164,7 @@
   "command_audit": [
     {
       "command": "node -e <parse json/jsonl and markdown fence checks>; js-yaml@4.1.0 <policy yaml>",
-      "cwd": "C:/Users/kcor2/Desktop/make_fun/make_harness",
+      "cwd": "C:/Users/kcor2/Desktop/make_fun/persnal_harness",
       "purpose": "Validate artifact syntax without claiming executable runner validation.",
       "exit_code": 0,
       "output_summary": "All syntax checks passed."
@@ -132,6 +177,7 @@
     "subagents_started": 4,
     "open_subagents": 0
   },
+  "independence": "real_subagent",
   "rework_items": [],
   "next_iteration_recommendation": "No rework required.",
   "risks_or_follow_up": [

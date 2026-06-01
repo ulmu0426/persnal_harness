@@ -87,6 +87,9 @@
         },
         "audit": {
           "$ref": "#/$defs/string_list_nonempty"
+        },
+        "helper_audit": {
+          "$ref": "#/$defs/string_list_nonempty"
         }
       }
     },

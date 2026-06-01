@@ -34,6 +34,7 @@ Terminal failure states:
 Close or mark complete when:
 
 - goal contract has been consumed by planning
+- goal review report has been consumed by breakdown, rework, or user-input decision
 - worker report has been consumed by integration or review
 - verification report has been consumed by review or final decision
 - review report has been consumed by rework or completion decision

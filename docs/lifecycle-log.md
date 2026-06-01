@@ -62,6 +62,7 @@ close는 구현이나 검수가 아니라 오케스트레이션 메모리 관리
 즉시 close 대상:
 
 - Goal Contract가 완비성 확인에 사용된 `goal_refiner`
+- Goal Review Report가 작업 분해, 재작업, 또는 사용자 입력 결정에 사용된 `goal_review_worker`
 - Worker Report가 리뷰 입력으로 소비된 `subtask_worker`
 - Review Report가 통합 또는 재작업 결정에 소비된 `review_worker`
 - Verification Report가 리뷰 또는 통합 결정에 소비된 `verification_worker`
@@ -78,3 +79,9 @@ close 지연은 같은 에이전트에 즉시 후속 입력을 보내야 하고,
 - `close_deferred_reason`이 있는 에이전트가 최종화 전에 해소됐는가?
 - `blocked` 상태가 명확한 차단 사유를 포함하는가?
 - `budget_exceeded`, `validation_failed`, `security_failed`, `consensus_failed`가 최종 완료로 잘못 처리되지 않았는가?
+
+전체 러너가 없을 때는 보조 감사로 다음 명령을 사용할 수 있다.
+
+```text
+node skills/local-project-harness/scripts/harness_checks.mjs audit-close --lifecycle-log <events.jsonl>
+```

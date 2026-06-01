@@ -12,6 +12,8 @@ roles:
       - capture_user_request
       - delegate_goal_refinement
       - check_goal_contract_completeness
+      - delegate_goal_contract_review
+      - check_goal_review_report_completeness
       - decompose_work
       - delegate_subtasks
       - track_progress
@@ -60,6 +62,8 @@ roles:
       - infer_concrete_goal
       - define_success_criteria
       - define_scope
+      - infer_product_brief_for_app_product_work
+      - define_app_quality_gates
       - define_scenario_flows
       - define_completion_rubric
       - define_verification_matrix
@@ -71,6 +75,27 @@ roles:
       - implement_features
       - modify_files
       - evaluate_outputs_directly
+      - make_irreversible_product_decisions_without_input
+      - expose_sensitive_data
+
+  goal_review_worker:
+    description: "구현 전에 Goal Contract의 구현 가능성, 테스트 가능성, 범위, 가정, 검증 계획, 시나리오 품질을 검토하는 세션"
+    allowed_actions:
+      - inspect_goal_contract
+      - check_goal_testability
+      - check_success_criteria_observability
+      - check_scope_clarity
+      - check_assumption_safety
+      - check_verification_matrix_quality
+      - check_scenario_flow_quality
+      - check_product_brief_for_app_product_work
+      - check_app_quality_gates_for_app_product_work
+      - identify_goal_rework_items
+      - report_goal_review_result
+    prohibited_actions:
+      - implement_features
+      - modify_files
+      - evaluate_task_outputs
       - make_irreversible_product_decisions_without_input
       - expose_sensitive_data
 
@@ -96,6 +121,7 @@ roles:
       - inspect_worker_reports
       - run_assigned_verification
       - compare_outputs_to_goal_contract
+      - check_app_quality
       - score_completion_rubric
       - score_scenario_flows
       - identify_rework_items
@@ -147,6 +173,7 @@ roles:
 
 goal_contract:
   required_fields:
+    - work_type
     - raw_user_request
     - concrete_goal
     - success_criteria
@@ -162,6 +189,29 @@ goal_contract:
     - iteration_policy
     - open_questions
     - delegation_plan_seed
+  optional_fields:
+    - product_brief
+    - app_quality_gates
+  app_product_required_fields:
+    - work_type
+    - product_brief
+    - app_quality_gates
+  product_brief_required_fields:
+    - target_users
+    - core_problem
+    - primary_workflows
+    - domain_assumptions
+    - content_data_model_assumptions
+    - non_goals
+  app_quality_gate_required_fields:
+    - ux_workflow_completeness
+    - visual_polish
+    - responsive_desktop_mobile
+    - accessibility_basics
+    - error_loading_empty_states
+    - text_overlap_layout_stability
+    - domain_fit
+    - evidence_requirements
   default_quality_score_threshold: 85
   scenario_flow_required_fields:
     - id
@@ -208,6 +258,8 @@ goal_contract:
       - "review_worker 또는 subtask_worker가 blocked를 보고해 사용자 입력이나 외부 상태 변경 없이는 개선할 수 없다."
   question_policy:
     default: "추상 요청은 기본적으로 사용자에게 되묻지 않고 합리적 가정을 세워 구현 가능한 수준으로 구체화한다."
+    app_product_default: "Vague app/product requests should be refined into a product brief without broad clarification. Infer target users, core problem, primary workflows, domain assumptions, content/data model assumptions, and non-goals from the request and repository context."
+    app_product_classification: "Requests for apps, sites, games, tools, or product experiences must use work_type: app_product unless clearly only non-product implementation work."
     blocking_questions_only_when:
       - security_risk_without_safe_default
       - potential_data_loss
@@ -219,12 +271,14 @@ goal_contract:
     - "verification_matrix에 build, lint, test, run, behavior_check 항목이 모두 있는가?"
     - "quality_score_threshold, scenario_flows, completion_rubric, acceptance_evidence_plan, iteration_policy가 모두 있는가?"
     - "open_questions에 차단 질문이 있으면 작업 위임을 보류하거나 사용자 입력을 요청하는가?"
+    - "work_type이 app_product이면 product_brief와 app_quality_gates가 있는가?"
   main_orchestrator_must_not_check:
     - "concrete_goal이 제품적으로 타당한지 직접 판단하지 않는다."
     - "success_criteria나 scope의 내용 품질을 직접 평가하지 않는다."
     - "scenario_flows나 completion_rubric의 내용 품질을 직접 평가하지 않는다."
     - "overall_completion_score를 직접 산정하거나 조정하지 않는다."
     - "verification_matrix의 실질 충분성을 직접 검수하지 않는다."
+    - "app_product의 제품 적합성, UX, 시각 품질을 직접 판정하지 않고 goal_review_worker/review_worker에게 맡긴다."
 
 subagent_lifecycle:
   purpose: "서브에이전트를 필요한 동안만 유지하고, 보고서가 오케스트레이션 입력으로 소비되면 즉시 close해 메모리와 컨텍스트 오염을 줄인다."
@@ -252,6 +306,7 @@ subagent_lifecycle:
   default_close_policy: "보고서가 다음 오케스트레이션 단계의 입력으로 소비되면 즉시 close한다."
   close_required_when:
     - "goal_refiner의 Goal Contract가 main_orchestrator의 완비성 확인에 사용됐다."
+    - "goal_review_worker의 Goal Review Report가 작업 분해, 재작업, 또는 사용자 입력 결정에 소비됐다."
     - "subtask_worker의 Worker Report가 review_worker 또는 verification_worker 위임 입력으로 소비됐다."
     - "review_worker의 Review Worker Report가 통합, 재위임, 또는 완료 결정에 소비됐다."
     - "verification_worker의 Verification Report가 review 또는 통합 결정에 소비됐다."
@@ -331,6 +386,9 @@ workflow:
     - id: goal_contract_completeness_check
       owner: main_orchestrator
       output: "Goal Contract 필수 필드와 verification_matrix 필수 항목 존재 확인 메타 결과"
+    - id: goal_contract_quality_review
+      owner: goal_review_worker
+      output: "Goal Contract 구현 가능성, 테스트 가능성, 범위, 가정, 검증 계획, 시나리오 품질 검토 보고서"
     - id: schema_validation
       owner: verification_worker
       output: "Goal Contract, 위임 계약, 보고서, lifecycle event의 schema validation report"
@@ -381,6 +439,17 @@ delegation_contract:
     - network_cost_policy
 
 review_gate:
+  independent_review_policy:
+    applies_to: "non-trivial app or product work"
+    hard_gate_when_real_subagents_available: true
+    real_review_roles:
+      - review_worker
+      - verification_worker
+    same_context_policy:
+      independence_value: simulated_same_context
+      must_not_call_independent: true
+      final_report_must_downgrade_confidence: true
+      final_report_must_list_missing_independent_checks: true
   review_worker_must_check:
     - "워커가 할당 범위만 변경했는가?"
     - "산출물이 Goal Contract의 성공 기준과 범위를 만족하는가?"
@@ -389,10 +458,14 @@ review_gate:
     - "overall_completion_score가 quality_score_threshold 이상인가?"
     - "검증 방법과 결과가 보고됐는가?"
     - "verification_matrix의 build, lint, test, run, behavior_check 기준이 구현 후 에러 없이 완료됐는가?"
+    - "work_type이 app_product이면 app_quality_check가 UX workflow completeness, visual polish, responsive desktop/mobile, accessibility basics, error/loading/empty states, text overlap/layout stability, domain fit, evidence를 모두 보고하는가?"
+    - "non-app work이면 app_quality_check가 not_applicable로 보고됐는가?"
     - "기존 파일 삭제, 되돌림, 범위 밖 변경이 없는가?"
     - "보안 또는 민감 정보 노출 위험이 없는가?"
   review_report_required_fields:
     - task_id
+    - work_type
+    - status
     - reviewed_outputs
     - scope_check
     - goal_contract_check
@@ -403,11 +476,13 @@ review_gate:
     - passed_threshold
     - blocking_gates
     - verification_check
+    - app_quality_check
     - security_check
     - secret_scan_result
     - scope_diff_result
     - command_audit
     - budget_used
+    - independence
     - rework_items
     - next_iteration_recommendation
     - risks_or_follow_up
@@ -416,6 +491,12 @@ review_gate:
     - "검수 보고서가 필수 항목을 모두 포함하는가?"
     - "검수 보고서가 모든 관련 워커 산출물을 다루는가?"
     - "overall_completion_score, score_threshold, passed_threshold가 보고됐는가?"
+    - "app_quality_check가 보고됐고, app_product 작업이면 failed, not_run, not_applicable 앱 품질 항목 또는 미통과 evidence가 app_quality_failed blocking_gate와 rework_items에 반영됐는가?"
+    - "accepted 상태이면 passed_threshold가 true이고 blocking_gates가 비어 있으며 overall_completion_score가 score_threshold 이상인가?"
+    - "blocking_gates가 있으면 passed_threshold가 false이고 accepted가 아닌가?"
+    - "같은 컨텍스트 내부 pass이면 independence가 simulated_same_context로 보고됐는가?"
+    - "non-trivial 앱/제품 작업에서 실제 서브에이전트 도구가 있었으면 review_worker 또는 verification_worker의 real_subagent 검수가 있는가?"
+    - "실제 서브에이전트 도구가 없어 같은 컨텍스트 pass만 가능했다면 최종 보고에 낮은 confidence와 누락된 독립 확인이 반영됐는가?"
     - "passed_threshold가 false이면 rework_items와 next_iteration_recommendation이 있는가?"
     - "검수 보고서의 권고가 threshold 기반 통합 또는 재위임 결정을 내릴 수 있는 상태인가?"
     - "미검증 항목, 위험, 후속 작업이 사용자 보고에 반영됐는가?"
@@ -492,6 +573,12 @@ runner_policy:
       - "harness-runner audit-close --state <file>"
       - "harness-runner audit-scope --assignment <file> --report <file>"
       - "harness-runner finalize --state <file>"
+    helper_audit:
+      - "node skills/local-project-harness/scripts/harness_checks.mjs audit-scope --assignment <delegation.json> --report <worker-report.json>"
+      - "node skills/local-project-harness/scripts/harness_checks.mjs secret-scan <file> [<file> ...]"
+      - "node skills/local-project-harness/scripts/harness_checks.mjs audit-close --lifecycle-log <events.jsonl>"
+      - "node skills/local-project-harness/scripts/harness_checks.mjs review-logic --report <review-report.json>"
+      - "node skills/local-project-harness/scripts/harness_checks.mjs sync-check --source README.md --copy skills/local-project-harness/references/harness-readme.md"
   non_execution_scope_v1:
     - no_file_creation_or_modification
     - no_file_deletion

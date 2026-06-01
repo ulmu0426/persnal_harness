@@ -32,6 +32,7 @@
     "role": {
       "enum": [
         "goal_refiner",
+        "goal_review_worker",
         "subtask_worker",
         "review_worker",
         "verification_worker",
