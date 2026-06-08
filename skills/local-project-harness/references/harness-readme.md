@@ -1,4 +1,4 @@
-# Agentic Coding Harness
+﻿# Agentic Coding Harness
 
 ## Path Context
 

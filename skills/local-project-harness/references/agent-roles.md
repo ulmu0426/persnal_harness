@@ -1,4 +1,4 @@
-# Agent Roles Reference
+﻿# Agent Roles Reference
 
 Use these role contracts when spawning real sub-agents or simulating role passes.
 

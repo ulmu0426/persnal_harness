@@ -1,4 +1,4 @@
-# Subtask Worker Prompt
+﻿# Subtask Worker Prompt
 
 ## App/Product Quality Addendum
 

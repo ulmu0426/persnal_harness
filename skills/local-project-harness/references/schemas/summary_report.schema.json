@@ -1,4 +1,4 @@
-{
+﻿{
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://make-harness.local/schemas/summary_report.schema.json",
   "title": "Summary Report",

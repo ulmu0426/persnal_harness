@@ -1,4 +1,4 @@
-policy:
+﻿policy:
   id: agentic_harness_runner_policy
   version: 0.1.0
   language: ko
